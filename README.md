@@ -1,6 +1,6 @@
 # Story Builder
 
-A client-server application, written in Golang, specifically used to play the story builder chat room game.
+A Golang client-server application specifically used to play the story builder chat room game.
 
 ### Disclaimer
 
