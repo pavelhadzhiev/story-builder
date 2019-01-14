@@ -5,10 +5,6 @@ import (
 	"net/http"
 )
 
-func defaultHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(404)
-}
-
 // StartStoryBuilderServer starts a story builder server at localhost:<port>
 func StartStoryBuilderServer(port int) *http.Server {
 	srv := &http.Server{Addr: fmt.Sprintf(":%d", port)}
@@ -23,4 +19,8 @@ func StartStoryBuilderServer(port int) *http.Server {
 	}()
 
 	return srv
+}
+
+func defaultHandler(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(404)
 }

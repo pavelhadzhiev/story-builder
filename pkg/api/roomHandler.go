@@ -1,10 +1,10 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 )
 
+// RoomHandler is an http handler for the story builder's rooms API
 func RoomHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
@@ -17,6 +17,5 @@ func RoomHandler(w http.ResponseWriter, r *http.Request) {
 		// Give an error message.
 	}
 
-	fmt.Println("I received a request: ", r)
-	w.Write([]byte("Hello from your new room! Here is URL: " + r.URL.Path))
+	w.Write([]byte("Called the rooms API!"))
 }
