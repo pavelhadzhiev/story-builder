@@ -15,9 +15,12 @@
 package server
 
 import (
+	"bufio"
 	"fmt"
+	"os"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/api"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +36,18 @@ func (hc *HostCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (hc *HostCmd) Run() error {
-	fmt.Println("host called")
+	srv := api.StartStoryBuilderServer(8080)
+
+	defer func() {
+		if err := srv.Shutdown(nil); err != nil {
+			panic(err) // failed or timed out while shutting down the server
+		}
+	}()
+
+	fmt.Print("Press ENTER to shut down...")
+	reader := bufio.NewReader(os.Stdin)
+	reader.ReadString('\n')
+
 	return nil
 }
 
