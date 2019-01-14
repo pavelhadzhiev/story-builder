@@ -26,6 +26,8 @@ func StartStoryBuilderServer(port int) *http.Server {
 	http.HandleFunc("/", defaultHandler)
 	http.HandleFunc("/rooms/", RoomHandler)
 	http.HandleFunc("/register/", RegistrationHandler)
+	http.HandleFunc("/healthcheck", healthcheck)
+
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
 			panic(err)
@@ -37,4 +39,8 @@ func StartStoryBuilderServer(port int) *http.Server {
 
 func defaultHandler(w http.ResponseWriter, r *http.Request) {
 	w.WriteHeader(404)
+}
+
+func healthcheck(w http.ResponseWriter, r *http.Request) {
+	w.WriteHeader(200)
 }
