@@ -26,7 +26,7 @@ func StartStoryBuilderServer(port int) *http.Server {
 	http.HandleFunc("/", defaultHandler)
 	http.HandleFunc("/rooms/", RoomHandler)
 	http.HandleFunc("/register/", RegistrationHandler)
-	http.HandleFunc("/healthcheck", healthcheck)
+	http.HandleFunc("/healthcheck/", healthcheck)
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil {
