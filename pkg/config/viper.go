@@ -29,8 +29,8 @@ type ViperConfigurator struct {
 	viper *viper.Viper
 }
 
-// NewViperConfiguration creates a new ViperConfiguration, provided a configuration file path.
-func NewViperConfiguration(cfgFile string) (SBConfigurator, error) {
+// NewViperConfigurator creates a new ViperConfigurator, provided a configuration file path.
+func NewViperConfigurator(cfgFile string) (SBConfigurator, error) {
 	viper := viper.New()
 
 	absCfgFilePath, err := getConfigFileAbsPath(cfgFile)
@@ -38,6 +38,13 @@ func NewViperConfiguration(cfgFile string) (SBConfigurator, error) {
 		return nil, err
 	}
 	viper.SetConfigFile(absCfgFilePath)
+
+	viper.Set("url", "")
+	viper.Set("authorization", "")
+	viper.Set("room", "")
+	if err := viper.WriteConfig(); err != nil {
+		return nil, err
+	}
 
 	return &ViperConfigurator{viper: viper}, nil
 }

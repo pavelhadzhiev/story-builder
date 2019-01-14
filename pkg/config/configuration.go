@@ -40,7 +40,7 @@ func (sbConfig SBConfiguration) ValidateConnection() error {
 	if err := validateURL(url); err != nil {
 		return err
 	}
-	if err := healthCheckServer(url); err != nil {
+	if err := healthCheckServer(url + "/healthcheck/"); err != nil {
 		return err
 	}
 	return nil
