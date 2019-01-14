@@ -44,6 +44,7 @@ func (hc *HostCmd) Run() error {
 		}
 	}()
 
+	fmt.Print("Server was started at http://localhost:8080")
 	fmt.Print("Press ENTER to shut down...")
 	reader := bufio.NewReader(os.Stdin)
 	reader.ReadString('\n')
