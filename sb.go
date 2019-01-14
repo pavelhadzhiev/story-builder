@@ -23,14 +23,15 @@ import (
 )
 
 func main() {
-	rootCmd := cmd.BuildRootCommand()
+	ctx := &cmd.Context{}
+	rootCmd := cmd.BuildRootCommand(ctx)
 
 	commands := []cmd.CommandWrapper{
 		&server.HostCmd{},
 		&server.ConnectCmd{},
 		&client.LoginCmd{},
 		&client.LogoutCmd{},
-		&client.RegisterCmd{},
+		&client.RegisterCmd{Context: ctx},
 		&room.CreateRoomCmd{},
 		&room.DeleteRoomCmd{},
 		&room.JoinRoomCmd{},

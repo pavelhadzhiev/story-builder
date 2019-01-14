@@ -15,14 +15,22 @@
 package client
 
 import (
+	"encoding/base64"
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/client"
 	"github.com/spf13/cobra"
 )
 
 // RegisterCmd is a wrapper for the story-builder register command
-type RegisterCmd struct{}
+type RegisterCmd struct {
+	*cmd.Context
+
+	username string
+	password string
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (rc *RegisterCmd) Command() *cobra.Command {
@@ -33,6 +41,32 @@ func (rc *RegisterCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (rc *RegisterCmd) Run() error {
+	cfg, err := rc.Configurator.Load()
+	cfg.URL = "http://localhost:8080"
+	if err != nil {
+		return err
+	}
+	if err = cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	// if cfg.Authorization != "" {
+	// 	return errors.New("users is already logged in")
+	// }
+	if rc.username == "" {
+		return errors.New("username is empty")
+	}
+	if rc.password == "" {
+		return errors.New("password is empty")
+	}
+	cfg.Authorization = "Basic " + base64.StdEncoding.EncodeToString([]byte(rc.username+":"+rc.password))
+	rc.Configurator.Save(cfg)
+
+	rc.Client = client.NewStoryBuilderClient(cfg)
+
+	if err = rc.Client.Register(); err != nil {
+		return err
+	}
+
 	fmt.Println("register called")
 	return nil
 }
@@ -44,5 +78,9 @@ func (rc *RegisterCmd) buildCommand() *cobra.Command {
 		Long:  ``,
 		RunE:  cmd.RunE(rc),
 	}
+
+	registerCmd.PersistentFlags().StringVarP(&rc.username, "username", "u", "", "Username")
+	registerCmd.PersistentFlags().StringVarP(&rc.password, "password", "p", "", "Password")
+
 	return registerCmd
 }

@@ -15,6 +15,7 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
 )
 
@@ -26,6 +27,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodPost:
+		fmt.Print("Register endpoint was called: ", r, "\n")
 		w.Write([]byte("Let's say you've registered.\n"))
 	default:
 		w.WriteHeader(405)

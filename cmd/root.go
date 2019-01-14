@@ -18,36 +18,38 @@ import (
 	"fmt"
 	"os"
 
-	homedir "github.com/mitchellh/go-homedir"
+	"github.com/pavelhadzhiev/story-builder/pkg/client"
+	"github.com/pavelhadzhiev/story-builder/pkg/config"
 	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
 )
 
 // BuildRootCommand builds the root command for story-builder
-func BuildRootCommand() *cobra.Command {
+func BuildRootCommand(ctx *Context) *cobra.Command {
 	var cfgFile string
 
 	var rootCmd = &cobra.Command{
 		Use:   "story-builder",
-		Short: "A brief description of your application",
-		Long: `A longer description that spans multiple lines and likely contains
-	examples and usage of using your application. For example:
-	
-	Cobra is a CLI library for Go that empowers applications.
-	This application is a tool to generate the needed files
-	to quickly create a Cobra application.`,
+		Short: "",
+		Long:  ``,
+
+		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
+			if ctx.Configurator == nil {
+				configurator, err := config.NewViperConfigurator(cfgFile)
+				if err != nil {
+					return err
+				}
+				ctx.Configurator = configurator
+			}
+			config, err := ctx.Configurator.Load()
+			if err != nil {
+				return err
+			}
+			ctx.Client = client.NewStoryBuilderClient(config)
+			return nil
+		},
 	}
 
-	cobra.OnInitialize(initConfig(cfgFile))
-
-	// Here you will define your flags and configuration settings.
-	// Cobra supports persistent flags, which, if defined here,
-	// will be global for your application.
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.story-builder.yaml)")
-
-	// Cobra also supports local flags, which will only run
-	// when this action is called directly.
-	rootCmd.Flags().BoolP("toggle", "t", false, "Help message for toggle")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.story-builder.json)")
 
 	return rootCmd
 }
@@ -58,33 +60,5 @@ func Execute(cmd *cobra.Command) {
 	if err := cmd.Execute(); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
-	}
-}
-
-// initConfig reads in config file and ENV variables if set.
-func initConfig(cfgFile string) func() {
-	return func() {
-		if cfgFile != "" {
-			// Use config file from the flag.
-			viper.SetConfigFile(cfgFile)
-		} else {
-			// Find home directory.
-			home, err := homedir.Dir()
-			if err != nil {
-				fmt.Println(err)
-				os.Exit(1)
-			}
-
-			// Search config in home directory with name ".story-builder" (without extension).
-			viper.AddConfigPath(home)
-			viper.SetConfigName(".story-builder")
-		}
-
-		viper.AutomaticEnv() // read in environment variables that match
-
-		// If a config file is found, read it in.
-		if err := viper.ReadInConfig(); err == nil {
-			fmt.Println("Using config file:", viper.ConfigFileUsed())
-		}
 	}
 }
