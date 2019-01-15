@@ -51,6 +51,13 @@ func (client *StoryBuilderClient) Register() error {
 	return nil
 }
 
+func (client *StoryBuilderClient) Login() error {
+	if _, err := client.call(http.MethodPost, "/login/", nil); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (client *StoryBuilderClient) call(method string, path string, body io.Reader) (*http.Response, error) {
 	URL := httputil.NormalizeURL(client.config.URL)
 	fullURL := URL + path

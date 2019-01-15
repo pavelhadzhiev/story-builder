@@ -15,14 +15,22 @@
 package client
 
 import (
+	"encoding/base64"
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/client"
 	"github.com/spf13/cobra"
 )
 
 // LoginCmd is a wrapper for the story-builder login command
-type LoginCmd struct{}
+type LoginCmd struct {
+	*cmd.Context
+
+	username string
+	password string
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (lc *LoginCmd) Command() *cobra.Command {
@@ -33,6 +41,32 @@ func (lc *LoginCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (lc *LoginCmd) Run() error {
+	cfg, err := lc.Configurator.Load()
+	cfg.URL = "http://localhost:8080"
+	if err != nil {
+		return err
+	}
+	if err = cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	// if cfg.Authorization != "" {
+	// 	return errors.New("users is already logged in")
+	// }
+	if lc.username == "" {
+		return errors.New("username is empty")
+	}
+	if lc.password == "" {
+		return errors.New("password is empty")
+	}
+	cfg.Authorization = "Basic " + base64.StdEncoding.EncodeToString([]byte(lc.username+":"+lc.password))
+	lc.Configurator.Save(cfg)
+
+	lc.Client = client.NewStoryBuilderClient(cfg)
+
+	if err = lc.Client.Login(); err != nil {
+		return err
+	}
+
 	fmt.Println("login called")
 	return nil
 }
@@ -44,5 +78,9 @@ func (lc *LoginCmd) buildCommand() *cobra.Command {
 		Long:  ``,
 		RunE:  cmd.RunE(lc),
 	}
+
+	loginCmd.PersistentFlags().StringVarP(&lc.username, "username", "u", "", "Username")
+	loginCmd.PersistentFlags().StringVarP(&lc.password, "password", "p", "", "Password")
+
 	return loginCmd
 }

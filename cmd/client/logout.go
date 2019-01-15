@@ -22,7 +22,9 @@ import (
 )
 
 // LogoutCmd is a wrapper for the story-builder logout command
-type LogoutCmd struct{}
+type LogoutCmd struct {
+	*cmd.Context
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (lc *LogoutCmd) Command() *cobra.Command {

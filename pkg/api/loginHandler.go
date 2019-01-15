@@ -19,17 +19,17 @@ import (
 	"net/http"
 )
 
-// RegistrationHandler is an http handler for the story builder's registration endpoint
-func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/register/" {
+// LoginHandler is an http handler for the story builder's login endpoint
+func LoginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/login/" {
 		w.WriteHeader(404)
 		return
 	}
 	switch r.Method {
 	case http.MethodPost:
-		// Registers users (writes him in DB)
-		fmt.Print("Register endpoint was called: ", r, "\n")
-		w.Write([]byte("Let's say you've registered.\n"))
+		// Checks if user exists in DB
+		fmt.Print("Login endpoint was called: ", r, "\n")
+		w.Write([]byte("Let's say you've logged in.\n"))
 	default:
 		w.WriteHeader(405)
 	}
