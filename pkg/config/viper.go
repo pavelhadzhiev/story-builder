@@ -39,14 +39,12 @@ func NewViperConfigurator(cfgFile string) (SBConfigurator, error) {
 	}
 	viper.SetConfigFile(absCfgFilePath)
 
-	viper.Set("url", "")
-	viper.Set("authorization", "")
-	viper.Set("room", "")
-	if err := viper.WriteConfig(); err != nil {
-		return nil, err
+	configurator := &ViperConfigurator{viper: viper}
+	if err := viper.ReadInConfig(); err != nil {
+		configurator.Save(&SBConfiguration{})
 	}
 
-	return &ViperConfigurator{viper: viper}, nil
+	return configurator, nil
 }
 
 // Save is filling the configuration file with the properties from the passed configuration object
