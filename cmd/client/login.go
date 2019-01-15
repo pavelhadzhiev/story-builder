@@ -42,10 +42,10 @@ func (lc *LoginCmd) Command() *cobra.Command {
 // Run is used to build the RunE function for the cobra command
 func (lc *LoginCmd) Run() error {
 	cfg, err := lc.Configurator.Load()
-	cfg.URL = "http://localhost:8080"
 	if err != nil {
 		return err
 	}
+	cfg.URL = "http://localhost:8080"
 	if err = cfg.ValidateConnection(); err != nil {
 		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}

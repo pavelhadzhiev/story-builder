@@ -29,7 +29,7 @@ func main() {
 	commands := []cmd.CommandWrapper{
 		&server.HostCmd{},
 		&server.ConnectCmd{},
-		&client.LoginCmd{},
+		&client.LoginCmd{Context: ctx},
 		&client.LogoutCmd{},
 		&client.RegisterCmd{Context: ctx},
 		&room.CreateRoomCmd{},
