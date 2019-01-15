@@ -49,9 +49,9 @@ func (lc *LoginCmd) Run() error {
 	if err = cfg.ValidateConnection(); err != nil {
 		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
-	// if cfg.Authorization != "" {
-	// 	return errors.New("users is already logged in")
-	// }
+	if cfg.Authorization != "" {
+		return errors.New("user is already logged in")
+	}
 	if lc.username == "" {
 		return errors.New("username is empty")
 	}

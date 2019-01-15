@@ -30,7 +30,7 @@ func main() {
 		&server.HostCmd{},
 		&server.ConnectCmd{},
 		&client.LoginCmd{Context: ctx},
-		&client.LogoutCmd{},
+		&client.LogoutCmd{Context: ctx},
 		&client.RegisterCmd{Context: ctx},
 		&room.CreateRoomCmd{},
 		&room.DeleteRoomCmd{},

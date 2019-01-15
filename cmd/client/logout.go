@@ -15,6 +15,7 @@
 package client
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -35,6 +36,19 @@ func (lc *LogoutCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (lc *LogoutCmd) Run() error {
+	cfg, err := lc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	// if err = cfg.ValidateConnection(); err != nil {
+	// 	return fmt.Errorf("there is no valid connection with a server: %v", err)
+	// }
+	if cfg.Authorization == "" {
+		return errors.New("there is no logged in user")
+	}
+	cfg.Authorization = ""
+	lc.Configurator.Save(cfg)
+
 	fmt.Println("logout called")
 	return nil
 }
