@@ -21,30 +21,40 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// ConnectCmd is a wrapper for the story-builder connect command
-type ConnectCmd struct {
+// DisconnectCmd is a wrapper for the story-builder connect command
+type DisconnectCmd struct {
 	*cmd.Context
 }
 
 // Command builds and returns a cobra command that will be added to the root command
-func (cc *ConnectCmd) Command() *cobra.Command {
+func (cc *DisconnectCmd) Command() *cobra.Command {
 	result := cc.buildCommand()
 
 	return result
 }
 
 // Run is used to build the RunE function for the cobra command
-func (cc *ConnectCmd) Run() error {
-	fmt.Println("connect called")
+func (cc *DisconnectCmd) Run() error {
+	cfg, err := cc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err = cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	cfg.URL = ""
+	cc.Configurator.Save(cfg)
+
+	fmt.Println("disconnect called")
 	return nil
 }
 
-func (cc *ConnectCmd) buildCommand() *cobra.Command {
-	var connectCmd = &cobra.Command{
-		Use:   "connect",
+func (cc *DisconnectCmd) buildCommand() *cobra.Command {
+	var disconnectCmd = &cobra.Command{
+		Use:   "disconnect",
 		Short: "",
 		Long:  ``,
 		RunE:  cmd.RunE(cc),
 	}
-	return connectCmd
+	return disconnectCmd
 }

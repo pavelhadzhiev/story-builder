@@ -40,9 +40,9 @@ func (lc *LogoutCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	// if err = cfg.ValidateConnection(); err != nil {
-	// 	return fmt.Errorf("there is no valid connection with a server: %v", err)
-	// }
+	if err = cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
 	if cfg.Authorization == "" {
 		return errors.New("there is no logged in user")
 	}

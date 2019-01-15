@@ -28,7 +28,8 @@ func main() {
 
 	commands := []cmd.CommandWrapper{
 		&server.HostCmd{},
-		&server.ConnectCmd{},
+		&server.ConnectCmd{Context: ctx},
+		&server.DisconnectCmd{Context: ctx},
 		&client.LoginCmd{Context: ctx},
 		&client.LogoutCmd{Context: ctx},
 		&client.RegisterCmd{Context: ctx},

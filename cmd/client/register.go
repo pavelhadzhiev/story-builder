@@ -45,7 +45,6 @@ func (rc *RegisterCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	cfg.URL = "http://localhost:8080"
 	if err = cfg.ValidateConnection(); err != nil {
 		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
