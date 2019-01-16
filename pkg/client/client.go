@@ -17,8 +17,6 @@ package client
 import (
 	"io"
 	"net/http"
-	"smctl/pkg/errors"
-	"smctl/pkg/httputil"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/config"
 )
@@ -60,8 +58,7 @@ func (client *StoryBuilderClient) Login() error {
 }
 
 func (client *StoryBuilderClient) call(method string, path string, body io.Reader) (*http.Response, error) {
-	URL := httputil.NormalizeURL(client.config.URL)
-	fullURL := URL + path
+	fullURL := client.config.URL + path
 
 	req, err := http.NewRequest(method, fullURL, body)
 	if err != nil {
@@ -75,7 +72,7 @@ func (client *StoryBuilderClient) call(method string, path string, body io.Reade
 	}
 
 	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		respErr := errors.ResponseError{
+		respErr := ResponseError{
 			URL:        fullURL,
 			StatusCode: resp.StatusCode,
 		}
