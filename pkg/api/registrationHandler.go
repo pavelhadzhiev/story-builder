@@ -27,7 +27,7 @@ func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodPost:
-		// Registers users (writes him in DB)
+		// Registers user (writes them in DB)
 		fmt.Print("Register endpoint was called: ", r, "\n")
 		w.Write([]byte("Let's say you've registered.\n"))
 	default:

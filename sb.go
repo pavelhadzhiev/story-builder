@@ -38,6 +38,8 @@ func main() {
 		&room.JoinRoomCmd{},
 		&room.LeaveRoomCmd{},
 		&room.ListRoomsCmd{},
+		&game.StartGameCmd{},
+		&game.EndGameCmd{},
 		&game.AddCmd{},
 		&game.StoryCmd{},
 		&game.UsersCmd{},
