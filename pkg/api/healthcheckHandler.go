@@ -19,25 +19,18 @@ import (
 	"net/http"
 )
 
-// StartStoryBuilderServer starts a story builder server at localhost:<port>
-func StartStoryBuilderServer(port int) *http.Server {
-	srv := &http.Server{Addr: fmt.Sprintf(":%d", port)}
-
-	http.HandleFunc("/", defaultHandler)
-	http.HandleFunc("/rooms/", RoomHandler)
-	http.HandleFunc("/register/", RegistrationHandler)
-	http.HandleFunc("/login/", LoginHandler)
-	http.HandleFunc("/healthcheck/", HealthcheckHandler)
-
-	go func() {
-		if err := srv.ListenAndServe(); err != nil {
-			panic(err)
-		}
-	}()
-
-	return srv
-}
-
-func defaultHandler(w http.ResponseWriter, r *http.Request) {
-	w.WriteHeader(404)
+// HealthcheckHandler is an http handler for the story builder's healthcheck endpoint
+func HealthcheckHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/healthcheck/" {
+		w.WriteHeader(404)
+		return
+	}
+	switch r.Method {
+	case http.MethodGet:
+		// Returns status code 200 to show server is online and healthy
+		fmt.Print("Healthcheck endpoint was called: ", r, "\n")
+		w.WriteHeader(200)
+	default:
+		w.WriteHeader(405)
+	}
 }

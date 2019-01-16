@@ -24,6 +24,8 @@ import (
 // ConnectCmd is a wrapper for the story-builder connect command
 type ConnectCmd struct {
 	*cmd.Context
+
+	host string
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -35,6 +37,16 @@ func (cc *ConnectCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (cc *ConnectCmd) Run() error {
+	cfg, err := cc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	cfg.URL = cc.host
+	if err = cfg.ValidateConnection(); err != nil {
+		return err
+	}
+	cc.Configurator.Save(cfg)
+
 	fmt.Println("connect called")
 	return nil
 }
@@ -46,5 +58,8 @@ func (cc *ConnectCmd) buildCommand() *cobra.Command {
 		Long:  ``,
 		RunE:  cmd.RunE(cc),
 	}
+
+	connectCmd.Flags().StringVarP(&cc.host, "host", "", "", "Host")
+
 	return connectCmd
 }

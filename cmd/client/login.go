@@ -78,8 +78,8 @@ func (lc *LoginCmd) buildCommand() *cobra.Command {
 		RunE:  cmd.RunE(lc),
 	}
 
-	loginCmd.PersistentFlags().StringVarP(&lc.username, "username", "u", "", "Username")
-	loginCmd.PersistentFlags().StringVarP(&lc.password, "password", "p", "", "Password")
+	loginCmd.Flags().StringVarP(&lc.username, "username", "u", "", "Username")
+	loginCmd.Flags().StringVarP(&lc.password, "password", "p", "", "Password")
 
 	return loginCmd
 }

@@ -51,6 +51,7 @@ func (client *StoryBuilderClient) Register() error {
 	return nil
 }
 
+// Login makes a request to the story builder server to check whether the user in the configuration is registered in the server DB.
 func (client *StoryBuilderClient) Login() error {
 	if _, err := client.call(http.MethodPost, "/login/", nil); err != nil {
 		return err
