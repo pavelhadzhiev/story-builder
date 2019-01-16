@@ -29,8 +29,8 @@ func BuildRootCommand(ctx *Context) *cobra.Command {
 
 	var rootCmd = &cobra.Command{
 		Use:   "story-builder",
-		Short: "",
-		Long:  ``,
+		Short: "Story Builder is a chat room game. All participants take turns in adding a sentence to a story and see the results that they get.",
+		Long:  `Story Builder is a chat room game. All participants take turns in adding a sentence to a story and see the results that they get. To use it you have to connect to a server and register or log in with an existing user. Then join a room and start playing. Check out the help page for available commands and what they are used for.`,
 
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if ctx.Configurator == nil {

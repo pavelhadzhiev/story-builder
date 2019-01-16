@@ -52,8 +52,8 @@ func (cc *DisconnectCmd) Run() error {
 func (cc *DisconnectCmd) buildCommand() *cobra.Command {
 	var disconnectCmd = &cobra.Command{
 		Use:   "disconnect",
-		Short: "",
-		Long:  ``,
+		Short: "Disconnects from the connected server.",
+		Long:  `Disconnects from the connected server. If there is none, a sufficient error message is returned.`,
 		RunE:  cmd.RunE(cc),
 	}
 	return disconnectCmd

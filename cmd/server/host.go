@@ -55,8 +55,8 @@ func (hc *HostCmd) Run() error {
 func (hc *HostCmd) buildCommand() *cobra.Command {
 	var serverCmd = &cobra.Command{
 		Use:   "host",
-		Short: "",
-		Long:  ``,
+		Short: "Hosts a server at the specified port.",
+		Long:  `Hosts a server at the specified port. If the port is invalid or the server cannot be started, a sufficient errog message is returned.`,
 		RunE:  cmd.RunE(hc),
 	}
 	return serverCmd

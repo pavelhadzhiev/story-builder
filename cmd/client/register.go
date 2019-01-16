@@ -73,13 +73,13 @@ func (rc *RegisterCmd) Run() error {
 func (rc *RegisterCmd) buildCommand() *cobra.Command {
 	var registerCmd = &cobra.Command{
 		Use:   "register",
-		Short: "",
-		Long:  ``,
+		Short: "Registers a non-existing user with the provided username and password.",
+		Long:  `Registers a non-existing user with the provided username and password. If the user does exists, the request is rejected. Requires a valid connection to a server, a username and a password. If any of these are missing a sufficient error message is provided. To connect to a server check the connect command.`,
 		RunE:  cmd.RunE(rc),
 	}
 
-	registerCmd.Flags().StringVarP(&rc.username, "username", "u", "", "Username")
-	registerCmd.Flags().StringVarP(&rc.password, "password", "p", "", "Password")
+	registerCmd.Flags().StringVarP(&rc.username, "username", "u", "", "username to register")
+	registerCmd.Flags().StringVarP(&rc.password, "password", "p", "", "password to register with")
 
 	return registerCmd
 }

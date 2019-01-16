@@ -73,13 +73,13 @@ func (lc *LoginCmd) Run() error {
 func (lc *LoginCmd) buildCommand() *cobra.Command {
 	var loginCmd = &cobra.Command{
 		Use:   "login",
-		Short: "",
-		Long:  ``,
+		Short: "Logs in an existing user with the provided username and password.",
+		Long:  `Logs in an existing user with the provided username and password. If the user does not exists, the request is rejected. Requires a valid connection to a server, a username and a password. If any of these are missing a sufficient error message is provided. To connect to a server check the connect command.`,
 		RunE:  cmd.RunE(lc),
 	}
 
-	loginCmd.Flags().StringVarP(&lc.username, "username", "u", "", "Username")
-	loginCmd.Flags().StringVarP(&lc.password, "password", "p", "", "Password")
+	loginCmd.Flags().StringVarP(&lc.username, "username", "u", "", "username to log in")
+	loginCmd.Flags().StringVarP(&lc.password, "password", "p", "", "password to log with")
 
 	return loginCmd
 }

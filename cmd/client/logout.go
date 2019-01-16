@@ -56,8 +56,8 @@ func (lc *LogoutCmd) Run() error {
 func (lc *LogoutCmd) buildCommand() *cobra.Command {
 	var logoutCmd = &cobra.Command{
 		Use:   "logout",
-		Short: "",
-		Long:  ``,
+		Short: "Logs the user out.",
+		Long:  `Logs the user out. If a user is not logged in, rejects the request. Requires a valid connection to a server. If it is missing, a sufficient error message is provided. To connect to a server check the connect command.`,
 		RunE:  cmd.RunE(lc),
 	}
 	return logoutCmd

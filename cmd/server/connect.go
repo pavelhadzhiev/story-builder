@@ -54,8 +54,8 @@ func (cc *ConnectCmd) Run() error {
 func (cc *ConnectCmd) buildCommand() *cobra.Command {
 	var connectCmd = &cobra.Command{
 		Use:   "connect",
-		Short: "",
-		Long:  ``,
+		Short: "Connects to a healthy server with the provided host.",
+		Long:  `Connects to a healthy server with the provided host. If the URL is invalid, or the specified server doesn't have a responing healthcheck, the request is rejected.`,
 		RunE:  cmd.RunE(cc),
 	}
 
