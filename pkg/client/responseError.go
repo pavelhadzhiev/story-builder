@@ -2,6 +2,7 @@ package client
 
 import "fmt"
 
+// ResponseError represents an error that will be returned by the client, holding context of an error response from the server.
 type ResponseError struct {
 	URL        string
 	StatusCode int
