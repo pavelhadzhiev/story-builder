@@ -47,7 +47,7 @@ func (cc *ConnectCmd) Run() error {
 	}
 	cc.Configurator.Save(cfg)
 
-	fmt.Println("connect called")
+	fmt.Println("You've successfully connected to the server!")
 	return nil
 }
 

@@ -32,15 +32,15 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 		authorizationHeader := r.Header.Get("Authorization")
 		authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
 		if authorizationHeader == authorizationHeaderValue {
-			w.Write([]byte("Unsupported authorization header."))
 			w.WriteHeader(400)
+			w.Write([]byte("Unsupported authorization header."))
 			return
 		}
 
 		credentials, err := base64.StdEncoding.DecodeString(authorizationHeaderValue)
 		if err != nil {
-			w.Write([]byte("Invalid authorization header."))
 			w.WriteHeader(400)
+			w.Write([]byte("Invalid authorization header."))
 			return
 		}
 
@@ -48,13 +48,13 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 		username, password := splitted[0], splitted[1]
 		usernameTaken, err := server.Database.UserExists(username)
 		if err != nil {
-			w.Write([]byte("Database lookup failed."))
 			w.WriteHeader(500)
+			w.Write([]byte("Database lookup failed."))
 			return
 		}
 		if usernameTaken {
-			w.Write([]byte("Username is already taken."))
 			w.WriteHeader(409)
+			w.Write([]byte("Username is already taken."))
 			return
 		}
 

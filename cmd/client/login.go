@@ -45,7 +45,7 @@ func (lc *LoginCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	if err = cfg.ValidateConnection(); err != nil {
+	if err := cfg.ValidateConnection(); err != nil {
 		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
 	if cfg.Authorization != "" {
@@ -62,11 +62,27 @@ func (lc *LoginCmd) Run() error {
 
 	lc.Client = client.NewSBClient(cfg)
 
-	if err = lc.Client.Login(); err != nil {
+	resp, err := lc.Client.Login()
+	if err != nil {
 		return err
 	}
 
-	fmt.Println("login called")
+	switch resp.StatusCode {
+	case 200:
+		fmt.Println("You've logged in successfully!")
+		err = nil
+	case 400:
+		err = errors.New("credentials have illegal characters")
+	case 401:
+		err = errors.New("user doesn't exist or password is wrong")
+	default:
+		err = errors.New("something went really wrong :(")
+	}
+	if err != nil {
+		cfg.Authorization = ""
+		lc.Configurator.Save(cfg)
+		return err
+	}
 	return nil
 }
 

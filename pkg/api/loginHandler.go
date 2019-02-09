@@ -32,28 +32,28 @@ func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		authorizationHeader := r.Header.Get("Authorization")
 		authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
 		if authorizationHeader == authorizationHeaderValue {
-			w.Write([]byte("Unsupported authorization header."))
 			w.WriteHeader(400)
+			w.Write([]byte("Unsupported authorization header."))
 			return
 		}
 
 		credentials, err := base64.StdEncoding.DecodeString(authorizationHeaderValue)
 		if err != nil {
-			w.Write([]byte("Invalid authorization header."))
 			w.WriteHeader(400)
+			w.Write([]byte("Invalid authorization header."))
 			return
 		}
 
 		splitted := strings.Split(string(credentials), ":")
 		username, password := splitted[0], splitted[1]
 		if err := server.Database.LoginUser(username, password); err != nil {
-			w.Write([]byte("Could not authenticate user."))
 			w.WriteHeader(401)
+			w.Write([]byte("Could not authenticate user."))
 			return
 		}
 
 		fmt.Printf("Logged in user with name \"%s\".\n", username)
-		w.Write([]byte("Let's say you've logged in.\n"))
+		w.Write([]byte("Successfully logged in! Welcome back, " + username + "."))
 	default:
 		w.WriteHeader(405)
 	}

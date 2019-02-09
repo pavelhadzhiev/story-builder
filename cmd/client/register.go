@@ -45,7 +45,7 @@ func (rc *RegisterCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	if err = cfg.ValidateConnection(); err != nil {
+	if err := cfg.ValidateConnection(); err != nil {
 		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
 	if cfg.Authorization != "" {
@@ -62,11 +62,27 @@ func (rc *RegisterCmd) Run() error {
 
 	rc.Client = client.NewSBClient(cfg)
 
-	if err = rc.Client.Register(); err != nil {
+	resp, err := rc.Client.Register()
+	if err != nil {
 		return err
 	}
 
-	fmt.Println("register called")
+	switch resp.StatusCode {
+	case 200:
+		fmt.Println("You've registered successfully!")
+		err = nil
+	case 400:
+		err = errors.New("credentials have illegal characters")
+	case 409:
+		err = errors.New("username already exists")
+	default:
+		err = errors.New("something went really wrong :(")
+	}
+	if err != nil {
+		cfg.Authorization = ""
+		rc.Configurator.Save(cfg)
+		return err
+	}
 	return nil
 }
 
