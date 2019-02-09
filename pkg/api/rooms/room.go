@@ -16,22 +16,22 @@ package rooms
 
 // Room represents a story builder room, in which a select group of players can play the game
 type Room struct {
-	Name    string
-	Creator string
-	Rules   RoomRules
+	Name    string    `json:"name"`
+	Creator string    `json:"creator,omitempty"`
+	Rules   RoomRules `json:"rules,omitempty"`
 
-	Turn    string
-	Players []string
-	Story   []Entry
+	Turn    string   `json:"turn,omitempty"`
+	Players []string `json:"players,omitempty"`
+	Story   []Entry  `json:"story,omitempty"`
 }
 
 // Entry represents a single player's turn in the story builder game
 type Entry struct {
-	Text   string
-	Player string
+	Text   string `json:"text"`
+	Player string `json:"player"`
 }
 
 // RoomRules keeps some configurations for the gameplay in the story builder room.
 type RoomRules struct {
-	Timeout int
+	Timeout int `json:"timeout,omitempty"`
 }
