@@ -18,8 +18,8 @@ import (
 	"net/http"
 )
 
-// RoomHandler is an http handler for the story builder's rooms API
-func RoomHandler(w http.ResponseWriter, r *http.Request) {
+// RoomHandler is an http handler for the story builder's room API
+func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 	switch r.Method {
 	case http.MethodGet:
 		// Serve the resource.

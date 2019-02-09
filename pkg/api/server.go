@@ -17,25 +17,46 @@ package api
 import (
 	"fmt"
 	"net/http"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/db"
 )
 
-// StartStoryBuilderServer starts a story builder server at localhost:<port>
-func StartStoryBuilderServer(port int) *http.Server {
-	srv := &http.Server{Addr: fmt.Sprintf(":%d", port)}
+// SBServer implements the story builder server API. It contains a database and some configurations. Use the Start and Shutdown methods to manage.
+type SBServer struct {
+	Database *db.SBDatabase
+	srv      *http.Server
+}
+
+// NewSBServer returns a story builder server configured for localhost:<port> that will use the provided database
+func NewSBServer(sbdb *db.SBDatabase, port string) *SBServer {
+	sbServer := &SBServer{
+		Database: sbdb,
+		srv:      &http.Server{Addr: fmt.Sprintf(":%s", port)},
+	}
 
 	http.HandleFunc("/", defaultHandler)
-	http.HandleFunc("/rooms/", RoomHandler)
-	http.HandleFunc("/register/", RegistrationHandler)
-	http.HandleFunc("/login/", LoginHandler)
-	http.HandleFunc("/healthcheck/", HealthcheckHandler)
+	http.HandleFunc("/rooms/", sbServer.RoomHandler)
+	http.HandleFunc("/register/", sbServer.RegistrationHandler)
+	http.HandleFunc("/login/", sbServer.LoginHandler)
+	http.HandleFunc("/healthcheck/", sbServer.HealthcheckHandler)
 
+	return sbServer
+}
+
+// Start starts an HTTP server, using the available configuration
+func (sbServer *SBServer) Start() {
 	go func() {
-		if err := srv.ListenAndServe(); err != nil {
+		if err := sbServer.srv.ListenAndServe(); err != nil {
 			panic(err)
 		}
 	}()
+}
 
-	return srv
+// Shutdown stops the HTTP server gracefully. It's supposed to be used in a defer statement in the process that starts the server, in case of errors.
+func (sbServer *SBServer) Shutdown() {
+	if err := sbServer.srv.Shutdown(nil); err != nil {
+		panic(err) // failed or timed out while shutting down the server
+	}
 }
 
 func defaultHandler(w http.ResponseWriter, r *http.Request) {

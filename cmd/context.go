@@ -17,7 +17,6 @@ package cmd
 import (
 	"github.com/pavelhadzhiev/story-builder/pkg/client"
 	"github.com/pavelhadzhiev/story-builder/pkg/config"
-	"github.com/pavelhadzhiev/story-builder/pkg/db"
 )
 
 // Context holds objects, commonly used between various story builder commands.
@@ -25,6 +24,4 @@ type Context struct {
 	Client *client.SBClient
 
 	Configurator config.SBConfigurator
-
-	Database *db.SBDatabase
 }

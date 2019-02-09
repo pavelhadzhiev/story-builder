@@ -20,7 +20,7 @@ import (
 )
 
 // RegistrationHandler is an http handler for the story builder's registration endpoint
-func RegistrationHandler(w http.ResponseWriter, r *http.Request) {
+func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/register/" {
 		w.WriteHeader(404)
 		return

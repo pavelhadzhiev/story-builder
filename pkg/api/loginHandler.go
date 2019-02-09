@@ -20,7 +20,7 @@ import (
 )
 
 // LoginHandler is an http handler for the story builder's login endpoint
-func LoginHandler(w http.ResponseWriter, r *http.Request) {
+func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/login/" {
 		w.WriteHeader(404)
 		return

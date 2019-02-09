@@ -20,7 +20,7 @@ import (
 )
 
 // HealthcheckHandler is an http handler for the story builder's healthcheck endpoint
-func HealthcheckHandler(w http.ResponseWriter, r *http.Request) {
+func (server *SBServer) HealthcheckHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path != "/healthcheck/" {
 		w.WriteHeader(404)
 		return

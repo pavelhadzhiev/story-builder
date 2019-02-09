@@ -21,26 +21,23 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
-// var user = "admin" // default username
-// var passwd = "Abcd1234" // default password
-
+// SBDatabase represents the database layer for the story builder server
 type SBDatabase struct {
 	database *sql.DB // a database variable to close on program exit
 	username string
 	password string
 }
 
-func NewSBDatabase() *SBDatabase {
+// NewSBDatabase returns a pointer to a new instance of SBDatabase, using the provided credentials.
+func NewSBDatabase(username string, password string) *SBDatabase {
 	return &SBDatabase{
-		username: "admin",
-		password: "Abcd1234",
+		username: username,
+		password: password,
 	}
 }
 
+// InitializeDB connects to a local MySQL server using the configured user, creates a database named "storybuilder" and creates all necessary for the story builder API tables inside. Recourses are created only if they do not exist.
 func (sbdb *SBDatabase) InitializeDB() error {
-	sbdb.username = "admin"    // default username
-	sbdb.password = "Abcd1234" // default password
-
 	var config = mysql.Config{
 		User:   sbdb.username,
 		Passwd: sbdb.password,
@@ -48,7 +45,7 @@ func (sbdb *SBDatabase) InitializeDB() error {
 	var err error
 	sbdb.database, err = sql.Open("mysql", config.FormatDSN())
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	_, err = sbdb.database.Exec("create database if not exists storybuilder")
@@ -70,14 +67,7 @@ func (sbdb *SBDatabase) InitializeDB() error {
 	return nil
 }
 
-func (sbdb *SBDatabase) SetUsername(username string) {
-	sbdb.username = username
-}
-
-func (sbdb *SBDatabase) SetPassword(password string) {
-	sbdb.password = password
-}
-
+// CloseDB shuts down the connection to the database.
 func (sbdb *SBDatabase) CloseDB() {
 	sbdb.database.Close()
 }
