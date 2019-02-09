@@ -15,8 +15,10 @@
 package api
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // RegistrationHandler is an http handler for the story builder's registration endpoint
@@ -25,11 +27,40 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(404)
 		return
 	}
+	authorizationHeader := r.Header.Get("Authorization")
+	authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
+	if authorizationHeader == authorizationHeaderValue {
+		w.Write([]byte("Unsupported authorization header."))
+		w.WriteHeader(400)
+		return
+	}
 	switch r.Method {
 	case http.MethodPost:
-		// Registers user (writes them in DB)
-		fmt.Print("Register endpoint was called: ", r, "\n")
-		w.Write([]byte("Let's say you've registered.\n"))
+		credentials, err := base64.StdEncoding.DecodeString(authorizationHeaderValue)
+		if err != nil {
+			w.Write([]byte("Invalid authorization header."))
+			w.WriteHeader(400)
+			return
+		}
+
+		splitted := strings.Split(string(credentials), ":")
+		username, password := splitted[0], splitted[1]
+		usernameTaken, err := server.Database.UserExists(username)
+		if err != nil {
+			w.Write([]byte("Database lookup failed."))
+			w.WriteHeader(500)
+			return
+		}
+		if usernameTaken {
+			w.Write([]byte("Username is already taken."))
+			w.WriteHeader(409)
+			return
+		}
+
+		server.Database.RegisterUser(username, password)
+
+		fmt.Println("Registered user with name \"", username, "\".")
+		w.Write([]byte("Successfully registered! Welcome, " + username + "."))
 	default:
 		w.WriteHeader(405)
 	}
