@@ -15,8 +15,10 @@
 package api
 
 import (
+	"encoding/base64"
 	"fmt"
 	"net/http"
+	"strings"
 )
 
 // LoginHandler is an http handler for the story builder's login endpoint
@@ -27,8 +29,30 @@ func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodPost:
-		// Checks if user exists in DB
-		fmt.Print("Login endpoint was called: ", r, "\n")
+		authorizationHeader := r.Header.Get("Authorization")
+		authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
+		if authorizationHeader == authorizationHeaderValue {
+			w.Write([]byte("Unsupported authorization header."))
+			w.WriteHeader(400)
+			return
+		}
+
+		credentials, err := base64.StdEncoding.DecodeString(authorizationHeaderValue)
+		if err != nil {
+			w.Write([]byte("Invalid authorization header."))
+			w.WriteHeader(400)
+			return
+		}
+
+		splitted := strings.Split(string(credentials), ":")
+		username, password := splitted[0], splitted[1]
+		if err := server.Database.LoginUser(username, password); err != nil {
+			w.Write([]byte("Could not authenticate user."))
+			w.WriteHeader(401)
+			return
+		}
+
+		fmt.Printf("Logged in user with name \"%s\".\n", username)
 		w.Write([]byte("Let's say you've logged in.\n"))
 	default:
 		w.WriteHeader(405)

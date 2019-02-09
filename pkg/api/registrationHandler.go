@@ -27,15 +27,16 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 		w.WriteHeader(404)
 		return
 	}
-	authorizationHeader := r.Header.Get("Authorization")
-	authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
-	if authorizationHeader == authorizationHeaderValue {
-		w.Write([]byte("Unsupported authorization header."))
-		w.WriteHeader(400)
-		return
-	}
 	switch r.Method {
 	case http.MethodPost:
+		authorizationHeader := r.Header.Get("Authorization")
+		authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
+		if authorizationHeader == authorizationHeaderValue {
+			w.Write([]byte("Unsupported authorization header."))
+			w.WriteHeader(400)
+			return
+		}
+
 		credentials, err := base64.StdEncoding.DecodeString(authorizationHeaderValue)
 		if err != nil {
 			w.Write([]byte("Invalid authorization header."))
@@ -58,8 +59,7 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 		}
 
 		server.Database.RegisterUser(username, password)
-
-		fmt.Println("Registered user with name \"", username, "\".")
+		fmt.Printf("Registered user with name \"%s\".\n", username)
 		w.Write([]byte("Successfully registered! Welcome, " + username + "."))
 	default:
 		w.WriteHeader(405)

@@ -14,9 +14,11 @@
 
 package db
 
+import "errors"
+
 var getUserByUsername = "select * from users where username = ?"
 
-// UserExists returns true if the provided username is already taken according to the database
+// UserExists returns true if the provided username is already taken according to the server database
 func (sbdb *SBDatabase) UserExists(username string) (bool, error) {
 	stmt, err := sbdb.database.Prepare(getUserByUsername)
 	if err != nil {
@@ -35,6 +37,32 @@ func (sbdb *SBDatabase) UserExists(username string) (bool, error) {
 		return true, nil
 	}
 	return false, nil
+}
+
+// LoginUser returns true if the provided user exists and the password matches the one that is saved for that username in the server database
+func (sbdb *SBDatabase) LoginUser(username, password string) error {
+	stmt, err := sbdb.database.Prepare(getUserByUsername)
+	if err != nil {
+		return err
+	}
+	defer stmt.Close()
+	rows, err := stmt.Query(username)
+	if err != nil {
+		return err
+	}
+	defer rows.Close()
+	var user, pass string
+	if rows.Next() {
+		err := rows.Scan(&user, &pass)
+		if err != nil {
+			return err
+		}
+		if pass != password {
+			return errors.New("password incorrect")
+		}
+		return nil
+	}
+	return errors.New("user not found")
 }
 
 // RegisterUser registers a new user to the server with the provided username and password
