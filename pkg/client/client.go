@@ -21,17 +21,17 @@ import (
 	"github.com/pavelhadzhiev/story-builder/pkg/config"
 )
 
-// StoryBuilderClient is an HTTP client wrapper that executes story builder API requests.
-type StoryBuilderClient struct {
+// SBClient is an HTTP client wrapper that executes story builder API requests.
+type SBClient struct {
 	config     *config.SBConfiguration
 	httpClient *http.Client
 	headers    *http.Header
 }
 
-// NewStoryBuilderClient creates a new StoryBuilderClient with a given SBConfiguration.
+// NewSBClient creates a new StoryBuilderClient with a given SBConfiguration.
 // It attaches an application/json content-type header and authorization, if set in the configuration.
-func NewStoryBuilderClient(config *config.SBConfiguration) *StoryBuilderClient {
-	client := &StoryBuilderClient{config: config, httpClient: &http.Client{}}
+func NewSBClient(config *config.SBConfiguration) *SBClient {
+	client := &SBClient{config: config, httpClient: &http.Client{}}
 	client.headers = &http.Header{}
 	client.headers.Add("Content-Type", "application/json")
 	if len(client.config.Authorization) > 0 {
@@ -42,7 +42,7 @@ func NewStoryBuilderClient(config *config.SBConfiguration) *StoryBuilderClient {
 }
 
 // Register makes a request to the story builder server to register the user in the configuration
-func (client *StoryBuilderClient) Register() error {
+func (client *SBClient) Register() error {
 	if _, err := client.call(http.MethodPost, "/register/", nil); err != nil {
 		return err
 	}
@@ -50,14 +50,14 @@ func (client *StoryBuilderClient) Register() error {
 }
 
 // Login makes a request to the story builder server to check whether the user in the configuration is registered in the server DB.
-func (client *StoryBuilderClient) Login() error {
+func (client *SBClient) Login() error {
 	if _, err := client.call(http.MethodPost, "/login/", nil); err != nil {
 		return err
 	}
 	return nil
 }
 
-func (client *StoryBuilderClient) call(method string, path string, body io.Reader) (*http.Response, error) {
+func (client *SBClient) call(method string, path string, body io.Reader) (*http.Response, error) {
 	fullURL := client.config.URL + path
 
 	req, err := http.NewRequest(method, fullURL, body)

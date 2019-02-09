@@ -44,7 +44,7 @@ func BuildRootCommand(ctx *Context) *cobra.Command {
 			if err != nil {
 				return err
 			}
-			ctx.Client = client.NewStoryBuilderClient(config)
+			ctx.Client = client.NewSBClient(config)
 			return nil
 		},
 	}

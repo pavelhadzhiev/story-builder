@@ -60,7 +60,7 @@ func (rc *RegisterCmd) Run() error {
 	cfg.Authorization = "Basic " + base64.StdEncoding.EncodeToString([]byte(rc.username+":"+rc.password))
 	rc.Configurator.Save(cfg)
 
-	rc.Client = client.NewStoryBuilderClient(cfg)
+	rc.Client = client.NewSBClient(cfg)
 
 	if err = rc.Client.Register(); err != nil {
 		return err

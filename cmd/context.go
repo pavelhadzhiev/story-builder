@@ -22,7 +22,7 @@ import (
 
 // Context holds objects, commonly used between various story builder commands.
 type Context struct {
-	Client *client.StoryBuilderClient
+	Client *client.SBClient
 
 	Configurator config.SBConfigurator
 
