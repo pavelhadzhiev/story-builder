@@ -24,7 +24,10 @@ import (
 // Returns error in case of a database error.
 func (sbdb *SBDatabase) GetAllRooms() ([]rooms.Room, error) {
 	fmt.Println("GET ALL ROOMS")
-	return nil, nil
+	var roomArray = make([]rooms.Room, 2)
+	roomArray[0] = rooms.Room{Name: "some room"}
+	roomArray[1] = rooms.Room{Name: "some other room"}
+	return roomArray, nil
 }
 
 // CreateNewRoom creates a new room in the server's database by the provided model.
@@ -38,14 +41,14 @@ func (sbdb *SBDatabase) CreateNewRoom(room *rooms.Room) error {
 // Returns error if room is not found or in case of a database error.
 func (sbdb *SBDatabase) GetRoom(roomName string) (*rooms.Room, error) {
 	fmt.Println("GET A ROOM")
-	return nil, nil
+	return &rooms.Room{Name: roomName}, nil
 }
 
 // UpdateRoom updates the room with the provided name from the server's database with the provided room model.
 // Returns error if room is not found or in case of a database error.
 func (sbdb *SBDatabase) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Room, error) {
 	fmt.Println("UPDATE A ROOM")
-	return nil, nil
+	return &rooms.Room{Name: roomName}, nil
 }
 
 // DeleteRoom deletes the room with the provided name from the server's database.

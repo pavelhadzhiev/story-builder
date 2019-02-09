@@ -15,6 +15,7 @@
 package room
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -22,7 +23,9 @@ import (
 )
 
 // LeaveRoomCmd is a wrapper for the story-builder leave-room command
-type LeaveRoomCmd struct{}
+type LeaveRoomCmd struct {
+	*cmd.Context
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (lrc *LeaveRoomCmd) Command() *cobra.Command {
@@ -33,7 +36,27 @@ func (lrc *LeaveRoomCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (lrc *LeaveRoomCmd) Run() error {
-	fmt.Println("leave-room called")
+	cfg, err := lrc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err := cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	if cfg.Authorization == "" {
+		return errors.New("users is not logged in")
+	}
+	if cfg.Room == "" {
+		return errors.New("user is not in a room")
+	}
+	var roomName = cfg.Room
+
+	cfg.Room = ""
+	if err := lrc.Configurator.Save(cfg); err != nil {
+		return err
+	}
+
+	fmt.Printf("You've successfully left room \"%s\".\n", roomName)
 	return nil
 }
 

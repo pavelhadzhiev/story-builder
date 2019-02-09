@@ -15,6 +15,7 @@
 package room
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -22,7 +23,9 @@ import (
 )
 
 // ListRoomsCmd is a wrapper for the story-builder list-rooms command
-type ListRoomsCmd struct{}
+type ListRoomsCmd struct {
+	*cmd.Context
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (lrc *ListRoomsCmd) Command() *cobra.Command {
@@ -33,7 +36,23 @@ func (lrc *ListRoomsCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (lrc *ListRoomsCmd) Run() error {
-	fmt.Println("list-rooms called")
+	cfg, err := lrc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err := cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	if cfg.Authorization == "" {
+		return errors.New("users is not logged in")
+	}
+
+	rooms, err := lrc.Client.GetAllRooms()
+	if err != nil {
+		return err
+	}
+
+	fmt.Println("All rooms in the current server are:", rooms[0].Name, ",", rooms[1].Name)
 	return nil
 }
 

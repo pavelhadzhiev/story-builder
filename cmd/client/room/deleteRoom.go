@@ -15,6 +15,7 @@
 package room
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -22,7 +23,11 @@ import (
 )
 
 // DeleteRoomCmd is a wrapper for the story-builder delete-room command
-type DeleteRoomCmd struct{}
+type DeleteRoomCmd struct {
+	*cmd.Context
+
+	roomName string
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (drc *DeleteRoomCmd) Command() *cobra.Command {
@@ -33,7 +38,26 @@ func (drc *DeleteRoomCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (drc *DeleteRoomCmd) Run() error {
-	fmt.Println("delete-room called")
+	cfg, err := drc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err := cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	if cfg.Authorization == "" {
+		return errors.New("users is not logged in")
+	}
+	if drc.roomName == "" {
+		return errors.New("room name is empty")
+	}
+
+	// TODO: Add creator check. For the purpose, add util to extract username from authorization header.
+	if err := drc.Client.DeleteRoom(drc.roomName); err != nil {
+		return err
+	}
+
+	fmt.Printf("You've successfully deleted room \"%s\".\n", drc.roomName)
 	return nil
 }
 
@@ -44,5 +68,8 @@ func (drc *DeleteRoomCmd) buildCommand() *cobra.Command {
 		Long:  ``,
 		RunE:  cmd.RunE(drc),
 	}
+
+	deleteRoomCmd.Flags().StringVarP(&drc.roomName, "name", "n", "", "name of the room to delete")
+
 	return deleteRoomCmd
 }

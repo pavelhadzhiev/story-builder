@@ -35,10 +35,10 @@ func (client *SBClient) GetAllRooms() ([]rooms.Room, error) {
 	switch response.StatusCode {
 	// handle status codes
 	}
-
 	defer response.Body.Close()
-	var rooms []rooms.Room
-	if err := json.NewDecoder(response.Body).Decode(rooms); err != nil {
+	var rooms = make([]rooms.Room, 1)
+
+	if err := json.NewDecoder(response.Body).Decode(&rooms); err != nil {
 		return nil, err
 	}
 	fmt.Println("GET ALL ROOMS")
@@ -78,7 +78,7 @@ func (client *SBClient) GetRoom(roomName string) (*rooms.Room, error) {
 	}
 
 	defer response.Body.Close()
-	var room *rooms.Room
+	var room = &rooms.Room{}
 	if err := json.NewDecoder(response.Body).Decode(room); err != nil {
 		return nil, err
 	}

@@ -15,14 +15,21 @@
 package room
 
 import (
+	"errors"
 	"fmt"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
 	"github.com/spf13/cobra"
 )
 
 // CreateRoomCmd is a wrapper for the story-builder create-room command
-type CreateRoomCmd struct{}
+type CreateRoomCmd struct {
+	*cmd.Context
+
+	roomName string
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (crc *CreateRoomCmd) Command() *cobra.Command {
@@ -33,7 +40,26 @@ func (crc *CreateRoomCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (crc *CreateRoomCmd) Run() error {
-	fmt.Println("create-room called")
+	cfg, err := crc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err := cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	if cfg.Authorization == "" {
+		return errors.New("users is not logged in")
+	}
+	if crc.roomName == "" {
+		return errors.New("room name is empty")
+	}
+
+	// TODO: Add creator. For the purpose, add util to extract username from authorization header.
+	if err := crc.Client.CreateNewRoom(&rooms.Room{Name: crc.roomName}); err != nil {
+		return err
+	}
+
+	fmt.Printf("You've successfully created room \"%s\".\n", crc.roomName)
 	return nil
 }
 
@@ -44,5 +70,8 @@ func (crc *CreateRoomCmd) buildCommand() *cobra.Command {
 		Long:  ``,
 		RunE:  cmd.RunE(crc),
 	}
+
+	createRoomCmd.Flags().StringVarP(&crc.roomName, "name", "n", "", "name of the room to create")
+
 	return createRoomCmd
 }
