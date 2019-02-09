@@ -16,7 +16,7 @@ package db
 
 import "errors"
 
-var getUserByUsername = "select * from users where username = ?"
+const getUserByUsername = "select * from users where username = ?"
 
 // UserExists returns true if the provided username is already taken according to the server database
 func (sbdb *SBDatabase) UserExists(username string) (bool, error) {

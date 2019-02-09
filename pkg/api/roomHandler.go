@@ -18,6 +18,8 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
 )
 
 // RoomHandler is an http handler for the story builder's room API
@@ -30,11 +32,11 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/rooms/" {
 		switch r.Method {
 		case http.MethodGet:
-			//GetAllRooms()
-			fmt.Println("GET ALL ROOMS")
+			server.Database.GetAllRooms()
+			return
 		case http.MethodPost:
-			//CreateNewRoom(room)
-			fmt.Println("CREATE NEW ROOM")
+			server.Database.CreateNewRoom(&rooms.Room{})
+			return
 		default:
 			w.WriteHeader(405)
 			return
@@ -44,7 +46,6 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 	var urlSuffix = strings.TrimPrefix(r.URL.Path, "/rooms/")
 	var urlSuffixSplit = strings.Split(urlSuffix, "/")
 	if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
-		fmt.Println("INVALID ROOM NAME")
 		w.WriteHeader(400)
 		w.Write([]byte("Room name is illegal."))
 		return
@@ -53,18 +54,16 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("ROOM NAME:", roomName)
 	switch r.Method {
 	case http.MethodGet:
-		//GetRoom(roomName)
-		fmt.Println("GET A ROOM")
+		server.Database.GetRoom(roomName)
+		return
 	case http.MethodPut:
-		//UpdateRoom(roomName, room)
-		fmt.Println("UPDATE A ROOM")
+		server.Database.UpdateRoom(roomName, &rooms.Room{})
+		return
 	case http.MethodDelete:
-		//DeleteRoom(roomName)
-		fmt.Println("DELETE A ROOM")
+		server.Database.DeleteRoom(roomName)
+		return
 	default:
 		w.WriteHeader(405)
 		return
 	}
-
-	w.Write([]byte("Called the rooms API!"))
 }
