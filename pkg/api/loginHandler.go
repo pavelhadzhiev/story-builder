@@ -44,8 +44,8 @@ func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		splitted := strings.Split(string(credentials), ":")
-		username, password := splitted[0], splitted[1]
+		split := strings.Split(string(credentials), ":")
+		username, password := split[0], split[1]
 		if err := server.Database.LoginUser(username, password); err != nil {
 			w.WriteHeader(401)
 			w.Write([]byte("Could not authenticate user."))

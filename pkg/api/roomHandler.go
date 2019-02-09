@@ -15,20 +15,55 @@
 package api
 
 import (
+	"fmt"
 	"net/http"
+	"strings"
 )
 
 // RoomHandler is an http handler for the story builder's room API
 func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
+	if !strings.HasPrefix(r.URL.Path, "/rooms/") {
+		w.WriteHeader(404)
+		return
+	}
+
+	if r.URL.Path == "/rooms/" {
+		switch r.Method {
+		case http.MethodGet:
+			//GetAllRooms()
+			fmt.Println("GET ALL ROOMS")
+		case http.MethodPost:
+			//CreateNewRoom(room)
+			fmt.Println("CREATE NEW ROOM")
+		default:
+			w.WriteHeader(405)
+			return
+		}
+	}
+
+	var urlSuffix = strings.TrimPrefix(r.URL.Path, "/rooms/")
+	var urlSuffixSplit = strings.Split(urlSuffix, "/")
+	if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
+		fmt.Println("INVALID ROOM NAME")
+		w.WriteHeader(400)
+		w.Write([]byte("Room name is illegal."))
+		return
+	}
+	var roomName = urlSuffixSplit[0]
+	fmt.Println("ROOM NAME:", roomName)
 	switch r.Method {
 	case http.MethodGet:
-		// Serve the resource.
-	case http.MethodPost:
-		// Create a new record.
+		//GetRoom(roomName)
+		fmt.Println("GET A ROOM")
+	case http.MethodPut:
+		//UpdateRoom(roomName, room)
+		fmt.Println("UPDATE A ROOM")
 	case http.MethodDelete:
-		// Remove the record.
+		//DeleteRoom(roomName)
+		fmt.Println("DELETE A ROOM")
 	default:
-		// Give an error message.
+		w.WriteHeader(405)
+		return
 	}
 
 	w.Write([]byte("Called the rooms API!"))

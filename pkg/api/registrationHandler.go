@@ -44,8 +44,8 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		splitted := strings.Split(string(credentials), ":")
-		username, password := splitted[0], splitted[1]
+		split := strings.Split(string(credentials), ":")
+		username, password := split[0], split[1]
 		usernameTaken, err := server.Database.UserExists(username)
 		if err != nil {
 			w.WriteHeader(500)
