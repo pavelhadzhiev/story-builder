@@ -9,6 +9,12 @@
 			"revisionTime": "2018-08-30T22:02:26Z"
 		},
 		{
+			"checksumSHA1": "kfQRh4U4iBSTd0fWpilCK8HU2Hw=",
+			"path": "github.com/go-sql-driver/mysql",
+			"revision": "1b9eda25029c206f36637dde8e2acad26df99dab",
+			"revisionTime": "2019-01-27T01:11:11Z"
+		},
+		{
 			"checksumSHA1": "bWGI7DqWg6IdhfamV96OD+Esa+8=",
 			"path": "github.com/hashicorp/hcl",
 			"revision": "65a6292f0157eff210d03ed1bf6c59b190b8b906",

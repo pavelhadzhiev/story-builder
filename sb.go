@@ -20,10 +20,18 @@ import (
 	"github.com/pavelhadzhiev/story-builder/cmd/client/game"
 	"github.com/pavelhadzhiev/story-builder/cmd/client/room"
 	"github.com/pavelhadzhiev/story-builder/cmd/server"
+	"github.com/pavelhadzhiev/story-builder/pkg/db"
 )
 
 func main() {
-	ctx := &cmd.Context{}
+	var db = db.NewSBDatabase()
+	defer db.CloseDB()
+	err := db.InitializeDB()
+	if err != nil {
+		panic(err)
+	}
+
+	ctx := &cmd.Context{Database: db}
 	rootCmd := cmd.BuildRootCommand(ctx)
 
 	commands := []cmd.CommandWrapper{
