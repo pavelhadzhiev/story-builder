@@ -45,7 +45,7 @@ func (cc *DisconnectCmd) Run() error {
 	cfg.URL = ""
 	cc.Configurator.Save(cfg)
 
-	fmt.Println("disconnect called")
+	fmt.Println("You've disconnected from the server.")
 	return nil
 }
 

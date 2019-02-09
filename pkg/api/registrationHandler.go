@@ -58,8 +58,10 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		server.Database.RegisterUser(username, password)
-		fmt.Printf("Registered user with name \"%s\".\n", username)
+		if err := server.Database.RegisterUser(username, password); err != nil {
+
+		}
+		fmt.Printf("Registered a user with name \"%s\".\n", username)
 		w.Write([]byte("Successfully registered! Welcome, " + username + "."))
 	default:
 		w.WriteHeader(405)

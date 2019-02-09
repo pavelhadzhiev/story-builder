@@ -69,7 +69,7 @@ func (rc *RegisterCmd) Run() error {
 
 	switch resp.StatusCode {
 	case 200:
-		fmt.Println("You've registered successfully!")
+		fmt.Printf("You've registered successfully! Welcome, %s.\n", rc.username)
 		err = nil
 	case 400:
 		err = errors.New("credentials have illegal characters")

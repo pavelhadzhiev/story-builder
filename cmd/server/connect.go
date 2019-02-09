@@ -47,7 +47,7 @@ func (cc *ConnectCmd) Run() error {
 	}
 	cc.Configurator.Save(cfg)
 
-	fmt.Println("You've successfully connected to the server!")
+	fmt.Println("You've successfully connected to the server! You can now log in as an existing user or register as a new one.")
 	return nil
 }
 

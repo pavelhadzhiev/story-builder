@@ -69,7 +69,7 @@ func (lc *LoginCmd) Run() error {
 
 	switch resp.StatusCode {
 	case 200:
-		fmt.Println("You've logged in successfully!")
+		fmt.Printf("You've logged in successfully! Welcome back, %s.\n", lc.username)
 		err = nil
 	case 400:
 		err = errors.New("credentials have illegal characters")

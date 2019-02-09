@@ -49,7 +49,7 @@ func (lc *LogoutCmd) Run() error {
 	cfg.Authorization = ""
 	lc.Configurator.Save(cfg)
 
-	fmt.Println("logout called")
+	fmt.Println("You've logged out successfully. See you soon!")
 	return nil
 }
 

@@ -73,14 +73,5 @@ func (client *SBClient) call(method string, path string, body io.Reader) (*http.
 		return nil, err
 	}
 
-	if resp.StatusCode < 200 || resp.StatusCode > 299 {
-		respErr := ResponseError{
-			URL:        fullURL,
-			StatusCode: resp.StatusCode,
-		}
-
-		return nil, respErr
-	}
-
 	return resp, nil
 }

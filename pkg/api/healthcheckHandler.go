@@ -28,7 +28,7 @@ func (server *SBServer) HealthcheckHandler(w http.ResponseWriter, r *http.Reques
 	switch r.Method {
 	case http.MethodGet:
 		// Returns status code 200 to show server is online and healthy
-		fmt.Print("Healthcheck endpoint was called: ", r, "\n")
+		fmt.Println("Healthcheck endpoint was called.")
 		w.WriteHeader(200)
 	default:
 		w.WriteHeader(405)
