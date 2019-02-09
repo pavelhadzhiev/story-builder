@@ -62,27 +62,13 @@ func (lc *LoginCmd) Run() error {
 
 	lc.Client = client.NewSBClient(cfg)
 
-	response, err := lc.Client.Login()
-	if err != nil {
-		return err
-	}
-
-	switch response.StatusCode {
-	case 200:
-		fmt.Printf("You've logged in successfully! Welcome back, %s.\n", lc.username)
-		err = nil
-	case 400:
-		err = errors.New("credentials have illegal characters")
-	case 401:
-		err = errors.New("user doesn't exist or password is wrong")
-	default:
-		err = errors.New("something went really wrong :(")
-	}
-	if err != nil {
+	if _, err := lc.Client.Login(); err != nil {
 		cfg.Authorization = ""
 		lc.Configurator.Save(cfg)
 		return err
 	}
+
+	fmt.Printf("You've logged in successfully! Welcome back, %s.\n", lc.username)
 	return nil
 }
 

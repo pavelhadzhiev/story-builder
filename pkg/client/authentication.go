@@ -14,22 +14,45 @@
 
 package client
 
-import "net/http"
+import (
+	"errors"
+	"net/http"
+)
 
 // Register makes a request to the story builder server to register the user in the configuration
 func (client *SBClient) Register() (*http.Response, error) {
-	resp, err := client.call(http.MethodPost, "/register/", nil)
+	response, err := client.call(http.MethodPost, "/register/", nil)
 	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+
+	switch response.StatusCode {
+	case 200:
+		return response, nil
+	case 400:
+		return response, errors.New("credentials have illegal characters")
+	case 409:
+		return response, errors.New("username already exists")
+	default:
+		return response, errors.New("something went really wrong :(")
+	}
 }
 
 // Login makes a request to the story builder server to check whether the user in the configuration is registered in the server DB.
 func (client *SBClient) Login() (*http.Response, error) {
-	resp, err := client.call(http.MethodPost, "/login/", nil)
+	response, err := client.call(http.MethodPost, "/login/", nil)
 	if err != nil {
 		return nil, err
 	}
-	return resp, nil
+
+	switch response.StatusCode {
+	case 200:
+		return response, nil
+	case 400:
+		return response, errors.New("credentials have illegal characters")
+	case 401:
+		return response, errors.New("user doesn't exist or password is wrong")
+	default:
+		return response, errors.New("something went really wrong :(")
+	}
 }

@@ -61,28 +61,13 @@ func (rc *RegisterCmd) Run() error {
 	rc.Configurator.Save(cfg)
 
 	rc.Client = client.NewSBClient(cfg)
-
-	response, err := rc.Client.Register()
-	if err != nil {
-		return err
-	}
-
-	switch response.StatusCode {
-	case 200:
-		fmt.Printf("You've registered successfully! Welcome, %s.\n", rc.username)
-		err = nil
-	case 400:
-		err = errors.New("credentials have illegal characters")
-	case 409:
-		err = errors.New("username already exists")
-	default:
-		err = errors.New("something went really wrong :(")
-	}
-	if err != nil {
+	if _, err = rc.Client.Register(); err != nil {
 		cfg.Authorization = ""
 		rc.Configurator.Save(cfg)
 		return err
 	}
+
+	fmt.Printf("You've registered successfully! Welcome, %s.\n", rc.username)
 	return nil
 }
 
