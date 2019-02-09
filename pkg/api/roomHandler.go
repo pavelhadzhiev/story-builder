@@ -21,6 +21,7 @@ import (
 	"strings"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
 // RoomHandler is an http handler for the story builder's room API
@@ -117,7 +118,13 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 		return
 	case http.MethodDelete:
-		server.Database.DeleteRoom(roomName)
+		issuer, err := util.DecodeBasicAuthorization(r.Header.Get("Authorization"))
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Error during decoding of authorization header."))
+			return
+		}
+		server.Database.DeleteRoom(roomName, issuer)
 		return
 	default:
 		w.WriteHeader(405)

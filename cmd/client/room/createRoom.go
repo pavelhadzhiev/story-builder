@@ -18,6 +18,8 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
+
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -54,12 +56,15 @@ func (crc *CreateRoomCmd) Run() error {
 		return errors.New("room name is empty")
 	}
 
-	// TODO: Add creator. For the purpose, add util to extract username from authorization header.
-	if err := crc.Client.CreateNewRoom(&rooms.Room{Name: crc.roomName}); err != nil {
+	user, err := util.DecodeBasicAuthorization(cfg.Authorization)
+	if err != nil {
+		return err
+	}
+	if err := crc.Client.CreateNewRoom(&rooms.Room{Name: crc.roomName, Creator: user}); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've successfully created room \"%s\".\n", crc.roomName)
+	fmt.Printf("You've successfully created room \"%s\", created by \"%s\".\n", crc.roomName, user)
 	return nil
 }
 

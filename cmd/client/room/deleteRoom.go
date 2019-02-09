@@ -52,7 +52,6 @@ func (drc *DeleteRoomCmd) Run() error {
 		return errors.New("room name is empty")
 	}
 
-	// TODO: Add creator check. For the purpose, add util to extract username from authorization header.
 	if err := drc.Client.DeleteRoom(drc.roomName); err != nil {
 		return err
 	}

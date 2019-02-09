@@ -15,6 +15,7 @@
 package db
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
@@ -53,7 +54,14 @@ func (sbdb *SBDatabase) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Ro
 
 // DeleteRoom deletes the room with the provided name from the server's database.
 // Returns error if room is not found or in case of a database error.
-func (sbdb *SBDatabase) DeleteRoom(roomName string) error {
+func (sbdb *SBDatabase) DeleteRoom(roomName, issuer string) error {
+	room, err := sbdb.GetRoom(roomName)
+	if err != nil {
+		return err
+	}
+	if room.Creator != issuer {
+		return errors.New("user doesn't have permission to delete this room")
+	}
 	fmt.Println("DELETE A ROOM")
 	return nil
 }
