@@ -62,12 +62,12 @@ func (rc *RegisterCmd) Run() error {
 
 	rc.Client = client.NewSBClient(cfg)
 
-	resp, err := rc.Client.Register()
+	response, err := rc.Client.Register()
 	if err != nil {
 		return err
 	}
 
-	switch resp.StatusCode {
+	switch response.StatusCode {
 	case 200:
 		fmt.Printf("You've registered successfully! Welcome, %s.\n", rc.username)
 		err = nil

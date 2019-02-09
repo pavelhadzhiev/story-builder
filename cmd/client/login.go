@@ -62,12 +62,12 @@ func (lc *LoginCmd) Run() error {
 
 	lc.Client = client.NewSBClient(cfg)
 
-	resp, err := lc.Client.Login()
+	response, err := lc.Client.Login()
 	if err != nil {
 		return err
 	}
 
-	switch resp.StatusCode {
+	switch response.StatusCode {
 	case 200:
 		fmt.Printf("You've logged in successfully! Welcome back, %s.\n", lc.username)
 		err = nil

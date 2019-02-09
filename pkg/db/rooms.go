@@ -20,31 +20,36 @@ import (
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
 )
 
-// GetAllRooms retrieves all rooms from the server's database and returns them. Returns error in case of a database error.
+// GetAllRooms retrieves all rooms from the server's database and returns them.
+// Returns error in case of a database error.
 func (sbdb *SBDatabase) GetAllRooms() ([]rooms.Room, error) {
 	fmt.Println("GET ALL ROOMS")
 	return nil, nil
 }
 
-// CreateNewRoom creates a new room in the server's database by the provided model. Returns error in case of a database error.
+// CreateNewRoom creates a new room in the server's database by the provided model.
+// Returns error in case of a database error.
 func (sbdb *SBDatabase) CreateNewRoom(room *rooms.Room) error {
 	fmt.Println("CREATE NEW ROOM")
 	return nil
 }
 
-// GetRoom retrieves the room with the provided name from the server's database. Returns error if room is not found or in case of a database error.
+// GetRoom retrieves the room with the provided name from the server's database.
+// Returns error if room is not found or in case of a database error.
 func (sbdb *SBDatabase) GetRoom(roomName string) (*rooms.Room, error) {
 	fmt.Println("GET A ROOM")
 	return nil, nil
 }
 
-// UpdateRoom updates the room with the provided name from the server's database with the provided room model. Returns error if room is not found or in case of a database error.
+// UpdateRoom updates the room with the provided name from the server's database with the provided room model.
+// Returns error if room is not found or in case of a database error.
 func (sbdb *SBDatabase) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Room, error) {
 	fmt.Println("UPDATE A ROOM")
 	return nil, nil
 }
 
-// DeleteRoom deletes the room with the provided name from the server's database. Returns error if room is not found or in case of a database error.
+// DeleteRoom deletes the room with the provided name from the server's database.
+// Returns error if room is not found or in case of a database error.
 func (sbdb *SBDatabase) DeleteRoom(roomName string) error {
 	fmt.Println("DELETE A ROOM")
 	return nil
