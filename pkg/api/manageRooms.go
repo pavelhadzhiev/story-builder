@@ -34,7 +34,6 @@ func (sbServer *SBServer) CreateNewRoom(room *rooms.Room) error {
 		return errors.New("a room with this name already exists")
 	}
 	sbServer.Rooms = append(sbServer.Rooms, *room)
-	sbServer.roomCount++
 	fmt.Println("CREATE NEW ROOM")
 	return nil
 }

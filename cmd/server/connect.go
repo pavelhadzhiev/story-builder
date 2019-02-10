@@ -41,6 +41,9 @@ func (cc *ConnectCmd) Run() error {
 	if err != nil {
 		return err
 	}
+	if cfg.URL != "" {
+		return fmt.Errorf("You are already connected to \"" + cfg.URL + "\". You have to disconnect first.")
+	}
 	cfg.URL = cc.host
 	if err = cfg.ValidateConnection(); err != nil {
 		return err

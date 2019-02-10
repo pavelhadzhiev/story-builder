@@ -18,7 +18,7 @@ import "errors"
 
 const getUserByUsername = "select * from users where username = ?"
 
-// UserExists returns true if the provided username is already taken according to the server database
+// UserExists returns true if the provided username is already taken according to the server database.
 func (sbdb *SBDatabase) UserExists(username string) (bool, error) {
 	stmt, err := sbdb.database.Prepare(getUserByUsername)
 	if err != nil {
@@ -39,7 +39,7 @@ func (sbdb *SBDatabase) UserExists(username string) (bool, error) {
 	return false, nil
 }
 
-// LoginUser returns true if the provided user exists and the password matches the one that is saved for that username in the server database
+// LoginUser returns true if the provided user exists and the password matches the one that is saved for that username in the server database.
 func (sbdb *SBDatabase) LoginUser(username, password string) error {
 	stmt, err := sbdb.database.Prepare(getUserByUsername)
 	if err != nil {
@@ -65,7 +65,7 @@ func (sbdb *SBDatabase) LoginUser(username, password string) error {
 	return errors.New("user not found")
 }
 
-// RegisterUser registers a new user to the server with the provided username and password
+// RegisterUser registers a new user to the server with the provided username and password.
 func (sbdb *SBDatabase) RegisterUser(username, password string) error {
 	_, err := sbdb.database.Exec("insert into users(username, password) values(?, ?)", username, password)
 	if err != nil {

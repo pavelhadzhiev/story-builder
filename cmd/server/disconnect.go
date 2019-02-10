@@ -18,6 +18,7 @@ import (
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/config"
 	"github.com/spf13/cobra"
 )
 
@@ -27,36 +28,43 @@ type DisconnectCmd struct {
 }
 
 // Command builds and returns a cobra command that will be added to the root command
-func (cc *DisconnectCmd) Command() *cobra.Command {
-	result := cc.buildCommand()
+func (dc *DisconnectCmd) Command() *cobra.Command {
+	result := dc.buildCommand()
 
 	return result
 }
 
 // Run is used to build the RunE function for the cobra command
-func (cc *DisconnectCmd) Run() error {
-	cfg, err := cc.Configurator.Load()
+func (dc *DisconnectCmd) Run() error {
+	cfg, err := dc.Configurator.Load()
 	if err != nil {
 		return err
 	}
 	if err = cfg.ValidateConnection(); err != nil {
-		return fmt.Errorf("there is no valid connection with a server: %v", err)
+		dc.Configurator.Save(&config.SBConfiguration{})
+		return fmt.Errorf("there is no valid connection with a server: %v. Existing configuration will be reset", err)
 	}
-	cfg.Room = ""
-	cfg.Authorization = ""
+	if cfg.Room != "" {
+		dc.Client.LeaveRoom(cfg.Room)
+		cfg.Room = ""
+	}
+	if cfg.Authorization != "" {
+		//dc.Client.Logout()
+		cfg.Authorization = ""
+	}
 	cfg.URL = ""
-	cc.Configurator.Save(cfg)
+	dc.Configurator.Save(cfg)
 
 	fmt.Println("You've disconnected from the server.")
 	return nil
 }
 
-func (cc *DisconnectCmd) buildCommand() *cobra.Command {
+func (dc *DisconnectCmd) buildCommand() *cobra.Command {
 	var disconnectCmd = &cobra.Command{
 		Use:   "disconnect",
 		Short: "Disconnects from the connected server.",
 		Long:  `Disconnects from the connected server. If there is none, a sufficient error message is returned.`,
-		RunE:  cmd.RunE(cc),
+		RunE:  cmd.RunE(dc),
 	}
 	return disconnectCmd
 }

@@ -44,7 +44,6 @@ func NewRoom(name, creator string) *Room {
 		Admins:  admins,
 		Banned:  make([]string, 0),
 
-		Turn:    creator,
 		Players: make([]string, 0),
 		Story:   make([]Entry, 0),
 	}
