@@ -26,7 +26,7 @@ import (
 type DeleteRoomCmd struct {
 	*cmd.Context
 
-	roomName string
+	name string
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -34,6 +34,16 @@ func (drc *DeleteRoomCmd) Command() *cobra.Command {
 	result := drc.buildCommand()
 
 	return result
+}
+
+// Validate makes sure all required arguments are legal and are provided
+func (drc *DeleteRoomCmd) Validate(args []string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("requires a single arg")
+	}
+
+	drc.name = args[0]
+	return nil
 }
 
 // Run is used to build the RunE function for the cobra command
@@ -48,28 +58,27 @@ func (drc *DeleteRoomCmd) Run() error {
 	if cfg.Authorization == "" {
 		return errors.New("users is not logged in")
 	}
-	if drc.roomName == "" {
+	if drc.name == "" {
 		return errors.New("room name is empty")
 	}
 
-	if err := drc.Client.DeleteRoom(drc.roomName); err != nil {
+	if err := drc.Client.DeleteRoom(drc.name); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've successfully deleted room \"%s\".\n", drc.roomName)
+	fmt.Printf("You've successfully deleted room \"%s\".\n", drc.name)
 	return nil
 }
 
 func (drc *DeleteRoomCmd) buildCommand() *cobra.Command {
 	var deleteRoomCmd = &cobra.Command{
-		Use:     "delete-room",
+		Use:     "delete-room [name]",
 		Aliases: []string{"dr"},
 		Short:   "Deletes the game room with the provided name. Requires the user to be the creator of the room.",
 		Long:    `Deletes the game room with the provided name. Requires the user to be the creator of the room. Returns an error if a room with this name doesn't exist or the issuer isn't the room creator.`,
+		PreRunE: cmd.PreRunE(drc, drc.Context),
 		RunE:    cmd.RunE(drc),
 	}
-
-	deleteRoomCmd.Flags().StringVarP(&drc.roomName, "name", "n", "", "name of the room to delete")
 
 	return deleteRoomCmd
 }

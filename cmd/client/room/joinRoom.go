@@ -26,7 +26,7 @@ import (
 type JoinRoomCmd struct {
 	*cmd.Context
 
-	roomName string
+	name string
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -34,6 +34,16 @@ func (jrc *JoinRoomCmd) Command() *cobra.Command {
 	result := jrc.buildCommand()
 
 	return result
+}
+
+// Validate makes sure all required arguments are legal and are provided
+func (jrc *JoinRoomCmd) Validate(args []string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("requires a single arg")
+	}
+
+	jrc.name = args[0]
+	return nil
 }
 
 // Run is used to build the RunE function for the cobra command
@@ -51,33 +61,32 @@ func (jrc *JoinRoomCmd) Run() error {
 	if cfg.Room != "" {
 		return errors.New("user is already in a room")
 	}
-	if jrc.roomName == "" {
+	if jrc.name == "" {
 		return errors.New("room name is empty")
 	}
 
-	if err := jrc.Client.JoinRoom(jrc.roomName); err != nil {
+	if err := jrc.Client.JoinRoom(jrc.name); err != nil {
 		return err
 	}
 
-	cfg.Room = jrc.roomName
+	cfg.Room = jrc.name
 	if err := jrc.Configurator.Save(cfg); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've successfully joined room \"%s\".\n", jrc.roomName)
+	fmt.Printf("You've successfully joined room \"%s\".\n", jrc.name)
 	return nil
 }
 
 func (jrc *JoinRoomCmd) buildCommand() *cobra.Command {
 	var joinRoomCmd = &cobra.Command{
-		Use:     "join-room",
+		Use:     "join-room [name]",
 		Aliases: []string{"jr"},
 		Short:   "Joins the room with the provided name.",
 		Long:    `Joins the room with the provided name. If the room doesn't exist or the player is banned from it, an error is returned.`,
+		PreRunE: cmd.PreRunE(jrc, jrc.Context),
 		RunE:    cmd.RunE(jrc),
 	}
-
-	joinRoomCmd.Flags().StringVarP(&jrc.roomName, "name", "n", "", "name of the room to join")
 
 	return joinRoomCmd
 }

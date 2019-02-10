@@ -32,6 +32,7 @@ type ValidatedCommand interface {
 }
 
 // PreRunE is used to execute some generic preparations for the command execution, depending on interfaces the command impements.
+// Set this function to the PreRunE property of a cobra command.
 func PreRunE(cmd Command, ctx *Context) func(*cobra.Command, []string) error {
 	return func(c *cobra.Command, args []string) error {
 		if valCmd, ok := cmd.(ValidatedCommand); ok {
@@ -43,7 +44,7 @@ func PreRunE(cmd Command, ctx *Context) func(*cobra.Command, []string) error {
 	}
 }
 
-// RunE is used to set the RunE property of a cobra command
+// RunE is used to set the RunE property of a cobra command.
 func RunE(cmd Command) func(*cobra.Command, []string) error {
 	return func(c *cobra.Command, args []string) error {
 		return cmd.Run()

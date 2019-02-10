@@ -35,6 +35,16 @@ func (cc *ConnectCmd) Command() *cobra.Command {
 	return result
 }
 
+// Validate makes sure all required arguments are legal and are provided
+func (cc *ConnectCmd) Validate(args []string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("requires a single arg")
+	}
+
+	cc.host = args[0]
+	return nil
+}
+
 // Run is used to build the RunE function for the cobra command
 func (cc *ConnectCmd) Run() error {
 	cfg, err := cc.Configurator.Load()
@@ -58,13 +68,12 @@ func (cc *ConnectCmd) Run() error {
 
 func (cc *ConnectCmd) buildCommand() *cobra.Command {
 	var connectCmd = &cobra.Command{
-		Use:   "connect",
-		Short: "Connects to a healthy server with the provided host.",
-		Long:  `Connects to a healthy server with the provided host. If the URL is invalid, or the specified server doesn't have a responing healthcheck, the request is rejected.`,
-		RunE:  cmd.RunE(cc),
+		Use:     "connect [host]",
+		Short:   "Connects to a healthy server with the provided host.",
+		Long:    `Connects to a healthy server with the provided host. If the URL is invalid, or the specified server doesn't have a responing healthcheck, the request is rejected.`,
+		PreRunE: cmd.PreRunE(cc, cc.Context),
+		RunE:    cmd.RunE(cc),
 	}
-
-	connectCmd.Flags().StringVarP(&cc.host, "host", "", "", "Host")
 
 	return connectCmd
 }
