@@ -49,7 +49,7 @@ func BuildRootCommand(ctx *Context) *cobra.Command {
 		},
 	}
 
-	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is $HOME/.story-builder.json)")
+	rootCmd.PersistentFlags().StringVar(&cfgFile, "config", "", "config file (default is <homedir>/.story-builder.json)")
 
 	return rootCmd
 }

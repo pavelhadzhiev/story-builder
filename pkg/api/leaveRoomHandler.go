@@ -15,7 +15,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -24,7 +23,6 @@ import (
 
 // LeaveRoomHandler is an http handler for the story builder's leave room API
 func (server *SBServer) LeaveRoomHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("LEAVE ROOM REQUEST:", r)
 	if !strings.HasPrefix(r.URL.Path, "/leave-room/") {
 		w.WriteHeader(404)
 		return

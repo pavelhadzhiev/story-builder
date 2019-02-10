@@ -51,10 +51,7 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		fmt.Printf("Registered a user with name \"%s\".\n", username)
 		server.Online = append(server.Online, username)
-		fmt.Println("ONLINE USERS:", server.Online)
-
 		w.Write([]byte("Successfully registered! Welcome, " + username + "."))
 	default:
 		w.WriteHeader(405)

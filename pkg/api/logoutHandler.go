@@ -42,14 +42,11 @@ func (server *SBServer) LogoutHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		fmt.Printf("Logged out user with name \"%s\".\n", username)
 		for index, user := range server.Online {
 			if user == username {
 				server.Online = append(server.Online[:index], server.Online[index+1:]...)
 			}
 		}
-		fmt.Println("ONLINE USERS:", server.Online)
-
 		w.Write([]byte("Successfully logged out. See you soon, " + username + "!"))
 	default:
 		w.WriteHeader(405)

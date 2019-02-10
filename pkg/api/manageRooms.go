@@ -16,14 +16,12 @@ package api
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
 )
 
 // GetAllRooms retrieves all rooms from the server and returns them.
 func (sbServer *SBServer) GetAllRooms() []rooms.Room {
-	fmt.Println("GET ALL ROOMS")
 	return sbServer.Rooms
 }
 
@@ -34,7 +32,6 @@ func (sbServer *SBServer) CreateNewRoom(room *rooms.Room) error {
 		return errors.New("a room with this name already exists")
 	}
 	sbServer.Rooms = append(sbServer.Rooms, *room)
-	fmt.Println("CREATE NEW ROOM")
 	return nil
 }
 
@@ -43,11 +40,9 @@ func (sbServer *SBServer) CreateNewRoom(room *rooms.Room) error {
 func (sbServer *SBServer) GetRoom(roomName string) (*rooms.Room, error) {
 	for _, room := range sbServer.Rooms {
 		if room.Name == roomName {
-			fmt.Println("GET A ROOM")
 			return &room, nil
 		}
 	}
-	fmt.Println("ROOM NOT FOUND")
 	return nil, errors.New("room with name \"" + roomName + "\" doesn't exist")
 }
 
@@ -60,7 +55,6 @@ func (sbServer *SBServer) DeleteRoom(roomName, issuer string) error {
 	for index, room = range sbServer.Rooms {
 		if room.Name == roomName {
 			roomExists = true
-			fmt.Println("FOUND ROOM")
 			break
 		}
 	}
@@ -72,6 +66,5 @@ func (sbServer *SBServer) DeleteRoom(roomName, issuer string) error {
 	}
 
 	sbServer.Rooms = append(sbServer.Rooms[:index], sbServer.Rooms[index+1:]...)
-	fmt.Println("DELETE A ROOM")
 	return nil
 }

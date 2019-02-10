@@ -49,10 +49,7 @@ func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		fmt.Printf("Logged in user with name \"%s\".\n", username)
 		server.Online = append(server.Online, username)
-		fmt.Println("ONLINE USERS:", server.Online)
-
 		w.Write([]byte("Successfully logged in! Welcome back, " + username + "."))
 	default:
 		w.WriteHeader(405)

@@ -15,7 +15,6 @@
 package api
 
 import (
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -24,7 +23,6 @@ import (
 
 // JoinRoomHandler is an http handler for the story builder's join room API
 func (server *SBServer) JoinRoomHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("JOIN ROOM REQUEST:", r)
 	if !strings.HasPrefix(r.URL.Path, "/join-room/") {
 		w.WriteHeader(404)
 		return

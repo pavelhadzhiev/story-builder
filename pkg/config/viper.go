@@ -67,7 +67,6 @@ func (viperConfig *ViperConfigurator) Load() (*SBConfiguration, error) {
 	}
 
 	sbConfig := &SBConfiguration{}
-
 	if err := viperConfig.viper.Unmarshal(sbConfig); err != nil {
 		return nil, err
 	}

@@ -16,7 +16,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"strings"
 
@@ -26,7 +25,6 @@ import (
 
 // RoomHandler is an http handler for the story builder's room API
 func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
-	fmt.Println("ROOM REQUEST:", r)
 	if !strings.HasPrefix(r.URL.Path, "/rooms/") {
 		w.WriteHeader(404)
 		return
@@ -42,7 +40,6 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("Error during serialization of retrieved rooms."))
 				return
 			}
-			fmt.Println("Rooms found and returned as body")
 			w.Write(responseBody)
 			return
 		case http.MethodPost:
@@ -73,7 +70,6 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	roomName := urlSuffixSplit[0]
-	fmt.Println("ROOM NAME:", roomName)
 	switch r.Method {
 	case http.MethodGet:
 		room, err := server.GetRoom(roomName)

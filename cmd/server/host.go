@@ -45,11 +45,11 @@ func (hc *HostCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (hc *HostCmd) Run() error {
-	if hc.username == "" && hc.password == "" { // set default user if not provided
+	if hc.username == "" && hc.password == "" { // set default database user if not provided
 		hc.username = "admin"
 		hc.password = "Abcd1234"
 	}
-	if hc.port == "" { // set default port if not provided
+	if hc.port == "" { // set default server port if not provided
 		hc.port = "8080"
 	}
 

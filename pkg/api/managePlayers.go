@@ -16,7 +16,6 @@ package api
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
 )
@@ -35,7 +34,6 @@ func (sbServer *SBServer) JoinRoom(roomName, player string) error {
 				}
 			}
 			roomExists = true
-			fmt.Println("JOINED A ROOM")
 			break
 		}
 	}
@@ -44,7 +42,6 @@ func (sbServer *SBServer) JoinRoom(roomName, player string) error {
 		return nil
 	}
 
-	fmt.Println("ROOM NOT FOUND")
 	return errors.New("room with name \"" + roomName + "\" doesn't exist")
 }
 
@@ -59,7 +56,6 @@ func (sbServer *SBServer) LeaveRoom(roomName, player string) error {
 						sbServer.Rooms[roomIndex].Players[:playerIndex],
 						sbServer.Rooms[roomIndex].Players[playerIndex+1:]...,
 					)
-					fmt.Println("LEFT A ROOM")
 					return nil
 				}
 			}
@@ -67,6 +63,5 @@ func (sbServer *SBServer) LeaveRoom(roomName, player string) error {
 		}
 	}
 
-	fmt.Println("ROOM NOT FOUND")
 	return errors.New("room with name \"" + roomName + "\" doesn't exist")
 }
