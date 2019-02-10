@@ -33,9 +33,6 @@ func (sbServer *SBServer) CreateNewRoom(room *rooms.Room) error {
 	if _, err := sbServer.GetRoom(room.Name); err == nil {
 		return errors.New("a room with this name already exists")
 	}
-	// if sbServer.roomCount >= sbServer.roomCapacity {
-	// 	return errors.New("server capacity is full, cannot create new room")
-	// }
 	sbServer.Rooms = append(sbServer.Rooms, *room)
 	sbServer.roomCount++
 	fmt.Println("CREATE NEW ROOM")

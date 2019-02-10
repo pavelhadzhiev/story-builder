@@ -14,16 +14,40 @@
 
 package rooms
 
+import "fmt"
+
 // Room represents a story builder room, in which a select group of players can play the game
 type Room struct {
 	Name    string    `json:"name"`
 	Creator string    `json:"creator,omitempty"`
 	Rules   RoomRules `json:"rules,omitempty"`
+	Admins  []string  `json:"admins,omitempty"`
 	Banned  []string  `json:"banned,omitempty"`
 
 	Turn    string   `json:"turn,omitempty"`
 	Players []string `json:"players,omitempty"`
 	Story   []Entry  `json:"story,omitempty"`
+}
+
+func (room Room) String() string {
+	return fmt.Sprintf("Name: %s\nCreator: %s\nPlayers:%v\n", room.Name, room.Creator, room.Players)
+}
+
+// NewRoom creates a room with the provided name and creator, initializing all required structures and arrays and using the default timeout (180 seconds)
+func NewRoom(name, creator string) *Room {
+	admins := make([]string, 1)
+	admins[0] = creator
+	return &Room{
+		Name:    name,
+		Creator: creator,
+		Rules:   RoomRules{Timeout: 180},
+		Admins:  admins,
+		Banned:  make([]string, 0),
+
+		Turn:    creator,
+		Players: make([]string, 0),
+		Story:   make([]Entry, 0),
+	}
 }
 
 // Entry represents a single player's turn in the story builder game

@@ -54,7 +54,7 @@ func (lrc *ListRoomsCmd) Run() error {
 
 	fmt.Println("All rooms in the current server are:")
 	for _, room := range rooms {
-		fmt.Println(room.Name)
+		fmt.Println(room)
 	}
 	return nil
 }

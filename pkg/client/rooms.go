@@ -88,30 +88,6 @@ func (client *SBClient) GetRoom(roomName string) (*rooms.Room, error) {
 	}
 }
 
-// func (client *SBClient) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Room, error) {
-// 	requestBody, err := json.Marshal(room)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-
-// 	buffer := bytes.NewBuffer(requestBody)
-// 	response, err := client.call(http.MethodPut, "/rooms/"+roomName, buffer)
-// 	if err != nil {
-// 		return nil, err
-// 	}
-// 	switch response.StatusCode {
-// 	// handle status codes
-// 	}
-
-// 	defer response.Body.Close()
-// 	if err := json.NewDecoder(response.Body).Decode(room); err != nil {
-// 		return nil, err
-// 	}
-
-// 	fmt.Println("UPDATE A ROOM")
-// 	return room, nil
-// }
-
 // DeleteRoom deletes the room with the provided name from the server.
 // Returns error if a room with this name doesn't exist or the issuer doesn't have the permissions to delete it.
 func (client *SBClient) DeleteRoom(roomName string) error {
@@ -129,4 +105,23 @@ func (client *SBClient) DeleteRoom(roomName string) error {
 	default:
 		return errors.New("something went really wrong :(")
 	}
+}
+
+func (client *SBClient) JoinRoom(roomName string) error {
+	response, err := client.call(http.MethodPost, "/join-room/"+roomName, nil)
+	if err != nil {
+		return err
+	}
+	switch response.StatusCode {
+	case 200:
+		return nil
+	case 403:
+		return errors.New("user doesn't have permissions to join this room")
+	case 404:
+		return errors.New("room with this name doesn't exist")
+	default:
+		return errors.New("something went really wrong :(")
+	}
+
+	return nil
 }

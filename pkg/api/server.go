@@ -44,6 +44,7 @@ func NewSBServer(sbdb *db.SBDatabase, port string) *SBServer {
 
 	http.HandleFunc("/", defaultHandler)
 	http.HandleFunc("/rooms/", sbServer.RoomHandler)
+	http.HandleFunc("/join-room/", sbServer.JoinRoomHandler)
 	http.HandleFunc("/register/", sbServer.RegistrationHandler)
 	http.HandleFunc("/login/", sbServer.LoginHandler)
 	http.HandleFunc("/healthcheck/", sbServer.HealthcheckHandler)

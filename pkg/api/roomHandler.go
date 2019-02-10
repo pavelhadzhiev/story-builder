@@ -65,14 +65,14 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	var urlSuffix = strings.TrimPrefix(r.URL.Path, "/rooms/")
-	var urlSuffixSplit = strings.Split(urlSuffix, "/")
+	urlSuffix := strings.TrimPrefix(r.URL.Path, "/rooms/")
+	urlSuffixSplit := strings.Split(urlSuffix, "/")
 	if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
 		w.WriteHeader(400)
 		w.Write([]byte("Room name is illegal."))
 		return
 	}
-	var roomName = urlSuffixSplit[0]
+	roomName := urlSuffixSplit[0]
 	fmt.Println("ROOM NAME:", roomName)
 	switch r.Method {
 	case http.MethodGet:
@@ -82,35 +82,15 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Room \"" + roomName + "\" not found."))
 			return
 		}
-		if room != nil {
-			responseBody, err := json.Marshal(room)
-			if err == nil {
-				w.Write(responseBody)
-				return
-			}
+		responseBody, err := json.Marshal(room)
+		if err == nil {
+			w.Write(responseBody)
+			return
 		}
+
 		w.WriteHeader(500)
 		w.Write([]byte("Error during serialization of retrieved room."))
 		return
-	// case http.MethodPut:
-	// 	room, err := server.UpdateRoom(roomName, &rooms.Room{})
-	// 	if err != nil {
-	// 		w.WriteHeader(500)
-	// 		w.Write([]byte("Error while updating room in database."))
-	// 		return
-	// 	}
-	// 	if room != nil {
-	// 		responseBody, err := json.Marshal(room)
-	// 		if err != nil {
-	// 			w.WriteHeader(500)
-	// 			w.Write([]byte("Error during serialization of updated room."))
-	// 			return
-	// 		}
-	// 		w.Write(responseBody)
-	// 		return
-	// 	}
-	// 	w.WriteHeader(404)
-	// 	return
 	case http.MethodDelete:
 		issuer, err := util.DecodeBasicAuthorization(r.Header.Get("Authorization"))
 		if err != nil {

@@ -55,26 +55,25 @@ func (jrc *JoinRoomCmd) Run() error {
 		return errors.New("room name is empty")
 	}
 
-	room, err := jrc.Client.GetRoom(jrc.roomName)
-	if err != nil {
+	if err := jrc.Client.JoinRoom(jrc.roomName); err != nil {
 		return err
 	}
-	cfg.Room = room.Name
+	cfg.Room = jrc.roomName
 	if err := jrc.Configurator.Save(cfg); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've successfully joined room \"%s\".\n", room.Name)
+	fmt.Printf("You've successfully joined room \"%s\".\n", jrc.roomName)
 	return nil
 }
 
 func (jrc *JoinRoomCmd) buildCommand() *cobra.Command {
 	var joinRoomCmd = &cobra.Command{
-		Use:   "join-room",
+		Use:     "join-room",
 		Aliases: []string{"jr"},
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(jrc),
+		Short:   "",
+		Long:    ``,
+		RunE:    cmd.RunE(jrc),
 	}
 
 	joinRoomCmd.Flags().StringVarP(&jrc.roomName, "name", "n", "", "name of the room to join")

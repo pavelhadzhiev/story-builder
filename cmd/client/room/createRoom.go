@@ -60,7 +60,7 @@ func (crc *CreateRoomCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	if err := crc.Client.CreateNewRoom(&rooms.Room{Name: crc.roomName, Creator: user}); err != nil {
+	if err := crc.Client.CreateNewRoom(rooms.NewRoom(crc.roomName, user)); err != nil {
 		return err
 	}
 
