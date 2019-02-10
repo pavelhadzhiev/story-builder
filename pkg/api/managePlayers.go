@@ -47,3 +47,26 @@ func (sbServer *SBServer) JoinRoom(roomName, player string) error {
 	fmt.Println("ROOM NOT FOUND")
 	return errors.New("room with name \"" + roomName + "\" doesn't exist")
 }
+
+// LeaveRoom removes the player from the room with the provided name.
+// Returns error if a room with this name doesn't exist or the user was not in it to begin with.
+func (sbServer *SBServer) LeaveRoom(roomName, player string) error {
+	for roomIndex, room := range sbServer.Rooms {
+		if room.Name == roomName {
+			for playerIndex, playerName := range sbServer.Rooms[roomIndex].Players {
+				if playerName == player {
+					sbServer.Rooms[roomIndex].Players = append(
+						sbServer.Rooms[roomIndex].Players[:playerIndex],
+						sbServer.Rooms[roomIndex].Players[playerIndex+1:]...,
+					)
+					fmt.Println("LEFT A ROOM")
+					return nil
+				}
+			}
+			return errors.New("player \"" + player + "\" is not in room " + roomName + "\".")
+		}
+	}
+
+	fmt.Println("ROOM NOT FOUND")
+	return errors.New("room with name \"" + roomName + "\" doesn't exist")
+}

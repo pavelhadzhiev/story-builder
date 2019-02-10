@@ -58,6 +58,7 @@ func (jrc *JoinRoomCmd) Run() error {
 	if err := jrc.Client.JoinRoom(jrc.roomName); err != nil {
 		return err
 	}
+
 	cfg.Room = jrc.roomName
 	if err := jrc.Configurator.Save(cfg); err != nil {
 		return err

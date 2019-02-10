@@ -60,7 +60,7 @@ func (client *SBClient) CreateNewRoom(room *rooms.Room) error {
 	case 204:
 		return nil
 	case 403:
-		return errors.New("room with this name already exists")
+		return errors.New("room \"" + room.Name + "\" already exists")
 	default:
 		return errors.New("something went really wrong :(")
 	}
@@ -82,7 +82,7 @@ func (client *SBClient) GetRoom(roomName string) (*rooms.Room, error) {
 		}
 		return room, nil
 	case 404:
-		return nil, errors.New("room with this name doesn't exist")
+		return nil, errors.New("room \"" + roomName + "\" doesn't exist")
 	default:
 		return nil, errors.New("something went really wrong :(")
 	}
@@ -101,12 +101,14 @@ func (client *SBClient) DeleteRoom(roomName string) error {
 	case 403:
 		return errors.New("user doesn't have permissions to delete this room")
 	case 404:
-		return errors.New("room with this name doesn't exist")
+		return errors.New("room \"" + roomName + "\" doesn't exist")
 	default:
 		return errors.New("something went really wrong :(")
 	}
 }
 
+// JoinRoom puts the player in the room with the provided name.
+// Returns error if a room with this name doesn't exist or the user doesn't have permission to join that room.
 func (client *SBClient) JoinRoom(roomName string) error {
 	response, err := client.call(http.MethodPost, "/join-room/"+roomName, nil)
 	if err != nil {
@@ -118,10 +120,26 @@ func (client *SBClient) JoinRoom(roomName string) error {
 	case 403:
 		return errors.New("user doesn't have permissions to join this room")
 	case 404:
-		return errors.New("room with this name doesn't exist")
+		return errors.New("room \"" + roomName + "\" doesn't exist")
 	default:
 		return errors.New("something went really wrong :(")
 	}
+}
 
-	return nil
+// LeaveRoom removes the player from the room with the provided name.
+func (client *SBClient) LeaveRoom(roomName string) error {
+	response, err := client.call(http.MethodPost, "/leave-room/"+roomName, nil)
+	if err != nil {
+		return err
+	}
+	switch response.StatusCode {
+	case 200:
+		return nil
+	case 403:
+		return errors.New("user is not in room \"" + roomName + "\".")
+	case 404:
+		return errors.New("room \"" + roomName + "\" doesn't exist")
+	default:
+		return errors.New("something went really wrong :(")
+	}
 }

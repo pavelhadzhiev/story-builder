@@ -49,14 +49,21 @@ func (lrc *LeaveRoomCmd) Run() error {
 	if cfg.Room == "" {
 		return errors.New("user is not in a room")
 	}
-	var roomName = cfg.Room
 
+	var roomName = cfg.Room
 	cfg.Room = ""
 	if err := lrc.Configurator.Save(cfg); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've successfully left room \"%s\".\n", roomName)
+	if err := lrc.Client.LeaveRoom(roomName); err != nil {
+		fmt.Printf("Something went wrong: %s\n", err)
+		fmt.Println("This could've been caused by a problem with the server.")
+		fmt.Println("However, your configuration has been adjusted, so you have \"left\".")
+	} else {
+		fmt.Printf("You've successfully left room \"%s\".\n", roomName)
+	}
+
 	return nil
 }
 
