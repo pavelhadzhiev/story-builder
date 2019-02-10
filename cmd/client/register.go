@@ -21,6 +21,7 @@ import (
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
 	"github.com/pavelhadzhiev/story-builder/pkg/client"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -52,10 +53,18 @@ func (rc *RegisterCmd) Run() error {
 		return errors.New("users is already logged in")
 	}
 	if rc.username == "" {
-		return errors.New("username is empty")
+		if username, err := util.ReadUsername(); err != nil {
+			return err
+		} else {
+			rc.username = username
+		}
 	}
 	if rc.password == "" {
-		return errors.New("password is empty")
+		if password, err := util.ReadPassword(); err != nil {
+			return err
+		} else {
+			rc.password = password
+		}
 	}
 	cfg.Authorization = "Basic " + base64.StdEncoding.EncodeToString([]byte(rc.username+":"+rc.password))
 	rc.Configurator.Save(cfg)
@@ -73,11 +82,11 @@ func (rc *RegisterCmd) Run() error {
 
 func (rc *RegisterCmd) buildCommand() *cobra.Command {
 	var registerCmd = &cobra.Command{
-		Use:   "register",
-		Short: "Registers a non-existing user with the provided username and password.",
-		Long:  `Registers a non-existing user with the provided username and password. If the user does exists, the request is rejected. Requires a valid connection to a server, a username and a password. If any of these are missing a sufficient error message is provided. To connect to a server check the connect command.`,
+		Use:     "register",
+		Short:   "Registers a non-existing user with the provided username and password.",
+		Long:    `Registers a non-existing user with the provided username and password. If the user does exists, the request is rejected. Requires a valid connection to a server, a username and a password. If any of these are missing a sufficient error message is provided. To connect to a server check the connect command.`,
 		PreRunE: cmd.PreRunE(rc),
-		RunE:  cmd.RunE(rc),
+		RunE:    cmd.RunE(rc),
 	}
 
 	registerCmd.Flags().StringVarP(&rc.username, "username", "u", "", "username to register")

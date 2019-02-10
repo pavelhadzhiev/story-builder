@@ -21,6 +21,7 @@ import (
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
 	"github.com/pavelhadzhiev/story-builder/pkg/client"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -52,10 +53,18 @@ func (lc *LoginCmd) Run() error {
 		return errors.New("user is already logged in")
 	}
 	if lc.username == "" {
-		return errors.New("username is empty")
+		if username, err := util.ReadUsername(); err != nil {
+			return err
+		} else {
+			lc.username = username
+		}
 	}
 	if lc.password == "" {
-		return errors.New("password is empty")
+		if password, err := util.ReadPassword(); err != nil {
+			return err
+		} else {
+			lc.password = password
+		}
 	}
 	cfg.Authorization = "Basic " + base64.StdEncoding.EncodeToString([]byte(lc.username+":"+lc.password))
 	lc.Configurator.Save(cfg)
@@ -74,11 +83,11 @@ func (lc *LoginCmd) Run() error {
 
 func (lc *LoginCmd) buildCommand() *cobra.Command {
 	var loginCmd = &cobra.Command{
-		Use:   "login",
-		Short: "Logs in an existing user with the provided username and password.",
-		Long:  `Logs in an existing user with the provided username and password. If the user does not exists, the request is rejected. Requires a valid connection to a server, a username and a password. If any of these are missing a sufficient error message is provided. To connect to a server check the connect command.`,
+		Use:     "login",
+		Short:   "Logs in an existing user with the provided username and password.",
+		Long:    `Logs in an existing user with the provided username and password. If the user does not exists, the request is rejected. Requires a valid connection to a server, a username and a password. If any of these are missing a sufficient error message is provided. To connect to a server check the connect command.`,
 		PreRunE: cmd.PreRunE(lc),
-		RunE:  cmd.RunE(lc),
+		RunE:    cmd.RunE(lc),
 	}
 
 	loginCmd.Flags().StringVarP(&lc.username, "username", "u", "", "username to log in")

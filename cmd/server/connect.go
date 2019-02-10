@@ -37,8 +37,12 @@ func (cc *ConnectCmd) Command() *cobra.Command {
 
 // Validate makes sure all required arguments are legal and are provided
 func (cc *ConnectCmd) Validate(args []string) error {
-	if len(args) != 1 {
-		return fmt.Errorf("requires a single arg")
+	if len(args) > 1 {
+		return fmt.Errorf("requires a single arg or no arg")
+	}
+	if len(args) == 0 { // set default server if not provided
+		cc.host = "http://localhost:8080"
+		return nil
 	}
 
 	cc.host = args[0]
@@ -52,7 +56,7 @@ func (cc *ConnectCmd) Run() error {
 		return err
 	}
 	if cfg.URL != "" {
-		return fmt.Errorf("You are already connected to \"" + cfg.URL + "\". You have to disconnect first.")
+		return fmt.Errorf("you are already connected to \"" + cfg.URL + "\". You have to disconnect first")
 	}
 	cfg.URL = cc.host
 	if err = cfg.ValidateConnection(); err != nil {
@@ -62,7 +66,7 @@ func (cc *ConnectCmd) Run() error {
 	cfg.Authorization = ""
 	cc.Configurator.Save(cfg)
 
-	fmt.Println("You've successfully connected to the server! You can now log in as an existing user or register as a new one.")
+	fmt.Println("You've successfully connected to \"" + cfg.URL + "\"! You can now log in as an existing user or register as a new one.")
 	return nil
 }
 
