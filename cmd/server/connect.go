@@ -45,6 +45,8 @@ func (cc *ConnectCmd) Run() error {
 	if err = cfg.ValidateConnection(); err != nil {
 		return err
 	}
+	cfg.Room = ""
+	cfg.Authorization = ""
 	cc.Configurator.Save(cfg)
 
 	fmt.Println("You've successfully connected to the server! You can now log in as an existing user or register as a new one.")

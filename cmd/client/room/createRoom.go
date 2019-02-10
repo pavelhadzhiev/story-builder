@@ -70,10 +70,11 @@ func (crc *CreateRoomCmd) Run() error {
 
 func (crc *CreateRoomCmd) buildCommand() *cobra.Command {
 	var createRoomCmd = &cobra.Command{
-		Use:   "create-room",
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(crc),
+		Use:     "create-room",
+		Aliases: []string{"cr"},
+		Short:   "",
+		Long:    ``,
+		RunE:    cmd.RunE(crc),
 	}
 
 	createRoomCmd.Flags().StringVarP(&crc.roomName, "name", "n", "", "name of the room to create")

@@ -52,16 +52,20 @@ func (lrc *ListRoomsCmd) Run() error {
 		return err
 	}
 
-	fmt.Println("All rooms in the current server are:", rooms[0].Name, ",", rooms[1].Name)
+	fmt.Println("All rooms in the current server are:")
+	for _, room := range rooms {
+		fmt.Println(room.Name)
+	}
 	return nil
 }
 
 func (lrc *ListRoomsCmd) buildCommand() *cobra.Command {
 	var listRoomsCmd = &cobra.Command{
-		Use:   "list-rooms",
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(lrc),
+		Use:     "list-rooms",
+		Aliases: []string{"list"},
+		Short:   "",
+		Long:    ``,
+		RunE:    cmd.RunE(lrc),
 	}
 	return listRoomsCmd
 }

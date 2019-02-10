@@ -71,6 +71,7 @@ func (jrc *JoinRoomCmd) Run() error {
 func (jrc *JoinRoomCmd) buildCommand() *cobra.Command {
 	var joinRoomCmd = &cobra.Command{
 		Use:   "join-room",
+		Aliases: []string{"jr"},
 		Short: "",
 		Long:  ``,
 		RunE:  cmd.RunE(jrc),

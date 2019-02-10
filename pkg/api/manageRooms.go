@@ -21,47 +21,61 @@ import (
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
 )
 
-// GetAllRooms retrieves all rooms from the server's database and returns them.
-// Returns error in case of a database error.
-func (sbServer *SBServer) GetAllRooms() ([]rooms.Room, error) {
+// GetAllRooms retrieves all rooms from the server and returns them.
+func (sbServer *SBServer) GetAllRooms() []rooms.Room {
 	fmt.Println("GET ALL ROOMS")
-	var roomArray = make([]rooms.Room, 2)
-	roomArray[0] = rooms.Room{Name: "some room"}
-	roomArray[1] = rooms.Room{Name: "some other room"}
-	return roomArray, nil
+	return sbServer.Rooms
 }
 
-// CreateNewRoom creates a new room in the server's database by the provided model.
-// Returns error in case of a database error.
+// CreateNewRoom creates a new room in the server, using the provided model.
+// Returns error if a room with this name already exists.
 func (sbServer *SBServer) CreateNewRoom(room *rooms.Room) error {
+	if _, err := sbServer.GetRoom(room.Name); err == nil {
+		return errors.New("a room with this name already exists")
+	}
+	// if sbServer.roomCount >= sbServer.roomCapacity {
+	// 	return errors.New("server capacity is full, cannot create new room")
+	// }
+	sbServer.Rooms = append(sbServer.Rooms, *room)
+	sbServer.roomCount++
 	fmt.Println("CREATE NEW ROOM")
 	return nil
 }
 
-// GetRoom retrieves the room with the provided name from the server's database.
-// Returns error if room is not found or in case of a database error.
+// GetRoom retrieves the room with the provided name from the server.
+// Returns error if a room with this name doesn't exist.
 func (sbServer *SBServer) GetRoom(roomName string) (*rooms.Room, error) {
-	fmt.Println("GET A ROOM")
-	return &rooms.Room{Name: roomName}, nil
+	for _, room := range sbServer.Rooms {
+		if room.Name == roomName {
+			fmt.Println("GET A ROOM")
+			return &room, nil
+		}
+	}
+	fmt.Println("ROOM NOT FOUND")
+	return nil, errors.New("room with name \"" + roomName + "\" doesn't exist")
 }
 
-// UpdateRoom updates the room with the provided name from the server's database with the provided room model.
-// Returns error if room is not found or in case of a database error.
-func (sbServer *SBServer) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Room, error) {
-	fmt.Println("UPDATE A ROOM")
-	return &rooms.Room{Name: roomName}, nil
-}
-
-// DeleteRoom deletes the room with the provided name from the server's database.
-// Returns error if room is not found or in case of a database error.
+// DeleteRoom deletes the room with the provided name from the server.
+// Returns error if a room with this name doesn't exist or the issuer doesn't have the permissions to delete it.
 func (sbServer *SBServer) DeleteRoom(roomName, issuer string) error {
-	room, err := sbServer.GetRoom(roomName)
-	if err != nil {
-		return err
+	var index int
+	var room rooms.Room
+	roomExists := false
+	for index, room = range sbServer.Rooms {
+		if room.Name == roomName {
+			roomExists = true
+			fmt.Println("FOUND ROOM")
+			break
+		}
+	}
+	if !roomExists {
+		return errors.New("room with name \"" + roomName + "\" doesn't exist")
 	}
 	if room.Creator != issuer {
 		return errors.New("user doesn't have permission to delete this room")
 	}
+
+	sbServer.Rooms = append(sbServer.Rooms[:index], sbServer.Rooms[index+1:]...)
 	fmt.Println("DELETE A ROOM")
 	return nil
 }

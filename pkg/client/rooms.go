@@ -17,113 +17,116 @@ package client
 import (
 	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
 )
 
-// TODO: check docs !!!!!!!!!!!!!!!!!!
-
-// GetAllRooms retrieves all rooms from the server's database and returns them.
-// Returns error in case of a database error.
+// GetAllRooms retrieves all rooms from the server and returns them.
 func (client *SBClient) GetAllRooms() ([]rooms.Room, error) {
 	response, err := client.call(http.MethodGet, "/rooms/", nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error during http request: %e", err)
 	}
 	switch response.StatusCode {
-	// handle status codes
+	case 200:
+		defer response.Body.Close()
+		var rooms = make([]rooms.Room, 0, 100)
+		if err := json.NewDecoder(response.Body).Decode(&rooms); err != nil {
+			return nil, fmt.Errorf("failed to deserialize response from server: %e", err)
+		}
+		return rooms, nil
+	default:
+		return nil, errors.New("something went really wrong :(")
 	}
-	defer response.Body.Close()
-	var rooms = make([]rooms.Room, 1)
-
-	if err := json.NewDecoder(response.Body).Decode(&rooms); err != nil {
-		return nil, err
-	}
-	fmt.Println("GET ALL ROOMS")
-	return rooms, nil
 }
 
-// CreateNewRoom creates a new room in the server's database by the provided model.
-// Returns error in case of a database error.
+// CreateNewRoom creates a new room in the server, using the provided model.
+// Returns error if a room with this name already exists.
 func (client *SBClient) CreateNewRoom(room *rooms.Room) error {
 	requestBody, err := json.Marshal(room)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to serialize room: %e", err)
 	}
 
 	buffer := bytes.NewBuffer(requestBody)
 	response, err := client.call(http.MethodPost, "/rooms/", buffer)
 	if err != nil {
-		return err
+		return fmt.Errorf("error during http request: %e", err)
 	}
 	switch response.StatusCode {
-	// handle status codes
+	case 204:
+		return nil
+	case 403:
+		return errors.New("room with this name already exists")
+	default:
+		return errors.New("something went really wrong :(")
 	}
-
-	fmt.Println("CREATE NEW ROOM")
-	return nil
 }
 
-// GetRoom retrieves the room with the provided name from the server's database.
-// Returns error if room is not found or in case of a database error.
+// GetRoom retrieves the room with the provided name from the server.
+// Returns error if a room with this name doesn't exist.
 func (client *SBClient) GetRoom(roomName string) (*rooms.Room, error) {
 	response, err := client.call(http.MethodGet, "/rooms/"+roomName, nil)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("error during http request: %e", err)
 	}
 	switch response.StatusCode {
-	// handle status codes
+	case 200:
+		defer response.Body.Close()
+		var room = &rooms.Room{}
+		if err := json.NewDecoder(response.Body).Decode(room); err != nil {
+			return nil, err
+		}
+		return room, nil
+	case 404:
+		return nil, errors.New("room with this name doesn't exist")
+	default:
+		return nil, errors.New("something went really wrong :(")
 	}
-
-	defer response.Body.Close()
-	var room = &rooms.Room{}
-	if err := json.NewDecoder(response.Body).Decode(room); err != nil {
-		return nil, err
-	}
-
-	fmt.Println("GET A ROOM")
-	return room, nil
 }
 
-// UpdateRoom updates the room with the provided name from the server's database with the provided room model.
-// Returns error if room is not found or in case of a database error.
-func (client *SBClient) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Room, error) {
-	requestBody, err := json.Marshal(room)
-	if err != nil {
-		return nil, err
-	}
+// func (client *SBClient) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Room, error) {
+// 	requestBody, err := json.Marshal(room)
+// 	if err != nil {
+// 		return nil, err
+// 	}
 
-	buffer := bytes.NewBuffer(requestBody)
-	response, err := client.call(http.MethodPut, "/rooms/"+roomName, buffer)
-	if err != nil {
-		return nil, err
-	}
-	switch response.StatusCode {
-	// handle status codes
-	}
+// 	buffer := bytes.NewBuffer(requestBody)
+// 	response, err := client.call(http.MethodPut, "/rooms/"+roomName, buffer)
+// 	if err != nil {
+// 		return nil, err
+// 	}
+// 	switch response.StatusCode {
+// 	// handle status codes
+// 	}
 
-	defer response.Body.Close()
-	if err := json.NewDecoder(response.Body).Decode(room); err != nil {
-		return nil, err
-	}
+// 	defer response.Body.Close()
+// 	if err := json.NewDecoder(response.Body).Decode(room); err != nil {
+// 		return nil, err
+// 	}
 
-	fmt.Println("UPDATE A ROOM")
-	return room, nil
-}
+// 	fmt.Println("UPDATE A ROOM")
+// 	return room, nil
+// }
 
-// DeleteRoom deletes the room with the provided name from the server's database.
-// Returns error if room is not found or in case of a database error.
+// DeleteRoom deletes the room with the provided name from the server.
+// Returns error if a room with this name doesn't exist or the issuer doesn't have the permissions to delete it.
 func (client *SBClient) DeleteRoom(roomName string) error {
 	response, err := client.call(http.MethodDelete, "/rooms/"+roomName, nil)
 	if err != nil {
 		return err
 	}
 	switch response.StatusCode {
-	// handle status codes
+	case 204:
+		return nil
+	case 403:
+		return errors.New("user doesn't have permissions to delete this room")
+	case 404:
+		return errors.New("room with this name doesn't exist")
+	default:
+		return errors.New("something went really wrong :(")
 	}
-
-	fmt.Println("DELETE A ROOM")
-	return nil
 }

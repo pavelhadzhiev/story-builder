@@ -35,29 +35,29 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/rooms/" {
 		switch r.Method {
 		case http.MethodGet:
-			rooms, err := server.GetAllRooms()
+			rooms := server.GetAllRooms()
+			responseBody, err := json.Marshal(rooms)
 			if err != nil {
 				w.WriteHeader(500)
-				w.Write([]byte("Error while retrieving rooms from database."))
-				fmt.Println("Error while retrieving room from database.")
+				w.Write([]byte("Error during serialization of retrieved rooms."))
 				return
 			}
-			if rooms != nil {
-				responseBody, err := json.Marshal(rooms)
-				if err != nil {
-					w.WriteHeader(500)
-					w.Write([]byte("Error during serialization of retrieved room."))
-					fmt.Println("Error during serialization of retrieved room.")
-					return
-				}
-				fmt.Println("Rooms found and returned as body")
-				w.Write(responseBody)
-				return
-			}
-			w.WriteHeader(404) // REMOVE
+			fmt.Println("Rooms found and returned as body")
+			w.Write(responseBody)
 			return
 		case http.MethodPost:
-			server.CreateNewRoom(&rooms.Room{})
+			var room = &rooms.Room{}
+			defer r.Body.Close()
+			if err := json.NewDecoder(r.Body).Decode(room); err != nil {
+				w.WriteHeader(500)
+				w.Write([]byte("Error during serialization of retrieved rooms."))
+				return
+			}
+			if err := server.CreateNewRoom(room); err != nil {
+				w.WriteHeader(403)
+				w.Write([]byte("Cannot create more room. Either a room with this name exists or server capacity is reached."))
+			}
+			w.WriteHeader(204)
 			return
 		default:
 			w.WriteHeader(405)
@@ -78,45 +78,39 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 	case http.MethodGet:
 		room, err := server.GetRoom(roomName)
 		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Error while retrieving room from database."))
-			fmt.Println("Error while retrieving room from database.")
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" not found."))
 			return
 		}
 		if room != nil {
 			responseBody, err := json.Marshal(room)
-			if err != nil {
-				w.WriteHeader(500)
-				w.Write([]byte("Error during serialization of retrieved room."))
-				fmt.Println("Error during serialization of retrieved room.")
+			if err == nil {
+				w.Write(responseBody)
 				return
 			}
-			fmt.Println("Room found and returned as body")
-			w.Write(responseBody)
-			return
 		}
-		w.WriteHeader(404)
-		fmt.Println("404 ROOM NOT FOUND")
+		w.WriteHeader(500)
+		w.Write([]byte("Error during serialization of retrieved room."))
 		return
-	case http.MethodPut:
-		room, err := server.UpdateRoom(roomName, &rooms.Room{})
-		if err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Error while updating room in database."))
-			return
-		}
-		if room != nil {
-			responseBody, err := json.Marshal(room)
-			if err != nil {
-				w.WriteHeader(500)
-				w.Write([]byte("Error during serialization of updated room."))
-				return
-			}
-			w.Write(responseBody)
-			return
-		}
-		w.WriteHeader(404)
-		return
+	// case http.MethodPut:
+	// 	room, err := server.UpdateRoom(roomName, &rooms.Room{})
+	// 	if err != nil {
+	// 		w.WriteHeader(500)
+	// 		w.Write([]byte("Error while updating room in database."))
+	// 		return
+	// 	}
+	// 	if room != nil {
+	// 		responseBody, err := json.Marshal(room)
+	// 		if err != nil {
+	// 			w.WriteHeader(500)
+	// 			w.Write([]byte("Error during serialization of updated room."))
+	// 			return
+	// 		}
+	// 		w.Write(responseBody)
+	// 		return
+	// 	}
+	// 	w.WriteHeader(404)
+	// 	return
 	case http.MethodDelete:
 		issuer, err := util.DecodeBasicAuthorization(r.Header.Get("Authorization"))
 		if err != nil {
@@ -124,7 +118,17 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Error during decoding of authorization header."))
 			return
 		}
-		server.DeleteRoom(roomName, issuer)
+		if _, err := server.GetRoom(roomName); err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" not found."))
+			return
+		}
+		if err := server.DeleteRoom(roomName, issuer); err != nil {
+			w.WriteHeader(403)
+			w.Write([]byte("You are not authorized to delete this room."))
+			return
+		}
+		w.WriteHeader(204)
 		return
 	default:
 		w.WriteHeader(405)

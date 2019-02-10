@@ -63,6 +63,7 @@ func (drc *DeleteRoomCmd) Run() error {
 func (drc *DeleteRoomCmd) buildCommand() *cobra.Command {
 	var deleteRoomCmd = &cobra.Command{
 		Use:   "delete-room",
+		Aliases: []string{"dr"},
 		Short: "",
 		Long:  ``,
 		RunE:  cmd.RunE(drc),

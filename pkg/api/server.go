@@ -36,7 +36,7 @@ type SBServer struct {
 func NewSBServer(sbdb *db.SBDatabase, port string) *SBServer {
 	sbServer := &SBServer{
 		Database:  sbdb,
-		Rooms:     make([]rooms.Room, 100),
+		Rooms:     make([]rooms.Room, 0),
 		roomCount: 0,
 
 		srv: &http.Server{Addr: fmt.Sprintf(":%s", port)},

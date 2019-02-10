@@ -62,10 +62,11 @@ func (lrc *LeaveRoomCmd) Run() error {
 
 func (lrc *LeaveRoomCmd) buildCommand() *cobra.Command {
 	var leaveRoomsCmd = &cobra.Command{
-		Use:   "leave-room",
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(lrc),
+		Use:     "leave-room",
+		Aliases: []string{"lr"},
+		Short:   "",
+		Long:    ``,
+		RunE:    cmd.RunE(lrc),
 	}
 	return leaveRoomsCmd
 }
