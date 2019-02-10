@@ -16,7 +16,6 @@ package db
 
 import (
 	"database/sql"
-	"log"
 
 	"github.com/go-sql-driver/mysql"
 )
@@ -55,11 +54,13 @@ func (sbdb *SBDatabase) InitializeDB() error {
 
 	_, err = sbdb.database.Exec("use storybuilder")
 	if err != nil {
-		log.Printf("%q\n", err)
 		return err
 	}
 
-	_, err = sbdb.database.Exec("create table if not exists users (username varchar(255) not null primary key, password varchar(255) not null)")
+	_, err = sbdb.database.Exec(`create table if not exists users (
+		username varchar(255) not null primary key, 
+		password varchar(255) not null
+	)`)
 	if err != nil {
 		return err
 	}

@@ -42,6 +42,8 @@ func (cc *DisconnectCmd) Run() error {
 	if err = cfg.ValidateConnection(); err != nil {
 		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
+	cfg.Room = ""
+	cfg.Authorization = ""
 	cfg.URL = ""
 	cc.Configurator.Save(cfg)
 

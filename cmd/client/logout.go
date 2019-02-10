@@ -46,6 +46,7 @@ func (lc *LogoutCmd) Run() error {
 	if cfg.Authorization == "" {
 		return errors.New("there is no logged in user")
 	}
+	cfg.Room = ""
 	cfg.Authorization = ""
 	lc.Configurator.Save(cfg)
 

@@ -19,6 +19,7 @@ type Room struct {
 	Name    string    `json:"name"`
 	Creator string    `json:"creator,omitempty"`
 	Rules   RoomRules `json:"rules,omitempty"`
+	Banned  []string  `json:"banned,omitempty"`
 
 	Turn    string   `json:"turn,omitempty"`
 	Players []string `json:"players,omitempty"`
