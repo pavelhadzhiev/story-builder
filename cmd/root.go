@@ -15,7 +15,6 @@
 package cmd
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/client"
@@ -58,7 +57,6 @@ func BuildRootCommand(ctx *Context) *cobra.Command {
 // This is called by main.main(). It only needs to happen once to the rootCmd.
 func Execute(cmd *cobra.Command) {
 	if err := cmd.Execute(); err != nil {
-		fmt.Println(err)
 		os.Exit(1)
 	}
 }
