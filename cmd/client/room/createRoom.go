@@ -72,8 +72,8 @@ func (crc *CreateRoomCmd) buildCommand() *cobra.Command {
 	var createRoomCmd = &cobra.Command{
 		Use:     "create-room",
 		Aliases: []string{"cr"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Creates a game room with the provided name.",
+		Long:    `Creates a game room with the provided name. Returns an error if a room with this name already exists.`,
 		RunE:    cmd.RunE(crc),
 	}
 

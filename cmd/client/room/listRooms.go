@@ -63,8 +63,8 @@ func (lrc *ListRoomsCmd) buildCommand() *cobra.Command {
 	var listRoomsCmd = &cobra.Command{
 		Use:     "list-rooms",
 		Aliases: []string{"list"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Lists all room in the current server.",
+		Long:    `Lists all room in the current server.`,
 		RunE:    cmd.RunE(lrc),
 	}
 	return listRoomsCmd

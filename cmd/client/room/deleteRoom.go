@@ -62,11 +62,11 @@ func (drc *DeleteRoomCmd) Run() error {
 
 func (drc *DeleteRoomCmd) buildCommand() *cobra.Command {
 	var deleteRoomCmd = &cobra.Command{
-		Use:   "delete-room",
+		Use:     "delete-room",
 		Aliases: []string{"dr"},
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(drc),
+		Short:   "Deletes the game room with the provided name. Requires the user to be the creator of the room.",
+		Long:    `Deletes the game room with the provided name. Requires the user to be the creator of the room. Returns an error if a room with this name doesn't exist or the issuer isn't the room creator.`,
+		RunE:    cmd.RunE(drc),
 	}
 
 	deleteRoomCmd.Flags().StringVarP(&drc.roomName, "name", "n", "", "name of the room to delete")

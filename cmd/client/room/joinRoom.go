@@ -72,8 +72,8 @@ func (jrc *JoinRoomCmd) buildCommand() *cobra.Command {
 	var joinRoomCmd = &cobra.Command{
 		Use:     "join-room",
 		Aliases: []string{"jr"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Joins the room with the provided name.",
+		Long:    `Joins the room with the provided name. If the room doesn't exist or the player is banned from it, an error is returned.`,
 		RunE:    cmd.RunE(jrc),
 	}
 
