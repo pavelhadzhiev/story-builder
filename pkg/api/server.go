@@ -18,20 +18,28 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
+
 	"github.com/pavelhadzhiev/story-builder/pkg/db"
 )
 
 // SBServer implements the story builder server API. It contains a database and some configurations. Use the Start and Shutdown methods to manage.
 type SBServer struct {
-	Database *db.SBDatabase
-	srv      *http.Server
+	Database  *db.SBDatabase
+	Rooms     []rooms.Room
+	roomCount int
+
+	srv *http.Server
 }
 
 // NewSBServer returns a story builder server configured for localhost:<port> that will use the provided database
 func NewSBServer(sbdb *db.SBDatabase, port string) *SBServer {
 	sbServer := &SBServer{
-		Database: sbdb,
-		srv:      &http.Server{Addr: fmt.Sprintf(":%s", port)},
+		Database:  sbdb,
+		Rooms:     make([]rooms.Room, 100),
+		roomCount: 0,
+
+		srv: &http.Server{Addr: fmt.Sprintf(":%s", port)},
 	}
 
 	http.HandleFunc("/", defaultHandler)

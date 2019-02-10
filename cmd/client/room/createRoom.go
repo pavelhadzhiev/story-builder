@@ -64,7 +64,7 @@ func (crc *CreateRoomCmd) Run() error {
 		return err
 	}
 
-	fmt.Printf("You've successfully created room \"%s\", created by \"%s\".\n", crc.roomName, user)
+	fmt.Printf("Room \"%s\" was successfully created by \"%s\".\n", crc.roomName, user)
 	return nil
 }
 

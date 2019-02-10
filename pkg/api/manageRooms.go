@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package db
+package api
 
 import (
 	"errors"
@@ -23,7 +23,7 @@ import (
 
 // GetAllRooms retrieves all rooms from the server's database and returns them.
 // Returns error in case of a database error.
-func (sbdb *SBDatabase) GetAllRooms() ([]rooms.Room, error) {
+func (sbServer *SBServer) GetAllRooms() ([]rooms.Room, error) {
 	fmt.Println("GET ALL ROOMS")
 	var roomArray = make([]rooms.Room, 2)
 	roomArray[0] = rooms.Room{Name: "some room"}
@@ -33,29 +33,29 @@ func (sbdb *SBDatabase) GetAllRooms() ([]rooms.Room, error) {
 
 // CreateNewRoom creates a new room in the server's database by the provided model.
 // Returns error in case of a database error.
-func (sbdb *SBDatabase) CreateNewRoom(room *rooms.Room) error {
+func (sbServer *SBServer) CreateNewRoom(room *rooms.Room) error {
 	fmt.Println("CREATE NEW ROOM")
 	return nil
 }
 
 // GetRoom retrieves the room with the provided name from the server's database.
 // Returns error if room is not found or in case of a database error.
-func (sbdb *SBDatabase) GetRoom(roomName string) (*rooms.Room, error) {
+func (sbServer *SBServer) GetRoom(roomName string) (*rooms.Room, error) {
 	fmt.Println("GET A ROOM")
 	return &rooms.Room{Name: roomName}, nil
 }
 
 // UpdateRoom updates the room with the provided name from the server's database with the provided room model.
 // Returns error if room is not found or in case of a database error.
-func (sbdb *SBDatabase) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Room, error) {
+func (sbServer *SBServer) UpdateRoom(roomName string, room *rooms.Room) (*rooms.Room, error) {
 	fmt.Println("UPDATE A ROOM")
 	return &rooms.Room{Name: roomName}, nil
 }
 
 // DeleteRoom deletes the room with the provided name from the server's database.
 // Returns error if room is not found or in case of a database error.
-func (sbdb *SBDatabase) DeleteRoom(roomName, issuer string) error {
-	room, err := sbdb.GetRoom(roomName)
+func (sbServer *SBServer) DeleteRoom(roomName, issuer string) error {
+	room, err := sbServer.GetRoom(roomName)
 	if err != nil {
 		return err
 	}

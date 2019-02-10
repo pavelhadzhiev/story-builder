@@ -35,7 +35,7 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 	if r.URL.Path == "/rooms/" {
 		switch r.Method {
 		case http.MethodGet:
-			rooms, err := server.Database.GetAllRooms()
+			rooms, err := server.GetAllRooms()
 			if err != nil {
 				w.WriteHeader(500)
 				w.Write([]byte("Error while retrieving rooms from database."))
@@ -57,7 +57,7 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 			w.WriteHeader(404) // REMOVE
 			return
 		case http.MethodPost:
-			server.Database.CreateNewRoom(&rooms.Room{})
+			server.CreateNewRoom(&rooms.Room{})
 			return
 		default:
 			w.WriteHeader(405)
@@ -76,7 +76,7 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("ROOM NAME:", roomName)
 	switch r.Method {
 	case http.MethodGet:
-		room, err := server.Database.GetRoom(roomName)
+		room, err := server.GetRoom(roomName)
 		if err != nil {
 			w.WriteHeader(500)
 			w.Write([]byte("Error while retrieving room from database."))
@@ -99,7 +99,7 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 		fmt.Println("404 ROOM NOT FOUND")
 		return
 	case http.MethodPut:
-		room, err := server.Database.UpdateRoom(roomName, &rooms.Room{})
+		room, err := server.UpdateRoom(roomName, &rooms.Room{})
 		if err != nil {
 			w.WriteHeader(500)
 			w.Write([]byte("Error while updating room in database."))
@@ -124,7 +124,7 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Error during decoding of authorization header."))
 			return
 		}
-		server.Database.DeleteRoom(roomName, issuer)
+		server.DeleteRoom(roomName, issuer)
 		return
 	default:
 		w.WriteHeader(405)
