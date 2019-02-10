@@ -30,7 +30,7 @@ import (
 type CreateRoomCmd struct {
 	*cmd.Context
 
-	roomName string
+	name string
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -38,6 +38,16 @@ func (crc *CreateRoomCmd) Command() *cobra.Command {
 	result := crc.buildCommand()
 
 	return result
+}
+
+// Validate makes sure all required arguments are legal and are provided
+func (crc *CreateRoomCmd) Validate(args []string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("requires a single arg")
+	}
+
+	crc.name = args[0]
+	return nil
 }
 
 // Run is used to build the RunE function for the cobra command
@@ -52,7 +62,7 @@ func (crc *CreateRoomCmd) Run() error {
 	if cfg.Authorization == "" {
 		return errors.New("users is not logged in")
 	}
-	if crc.roomName == "" {
+	if crc.name == "" {
 		return errors.New("room name is empty")
 	}
 
@@ -60,24 +70,23 @@ func (crc *CreateRoomCmd) Run() error {
 	if err != nil {
 		return err
 	}
-	if err := crc.Client.CreateNewRoom(rooms.NewRoom(crc.roomName, user)); err != nil {
+	if err := crc.Client.CreateNewRoom(rooms.NewRoom(crc.name, user)); err != nil {
 		return err
 	}
 
-	fmt.Printf("Room \"%s\" was successfully created by \"%s\".\n", crc.roomName, user)
+	fmt.Printf("Room \"%s\" was successfully created by \"%s\".\n", crc.name, user)
 	return nil
 }
 
 func (crc *CreateRoomCmd) buildCommand() *cobra.Command {
 	var createRoomCmd = &cobra.Command{
-		Use:     "create-room",
+		Use:     "create-room [name]",
 		Aliases: []string{"cr"},
 		Short:   "Creates a game room with the provided name.",
 		Long:    `Creates a game room with the provided name. Returns an error if a room with this name already exists.`,
+		PreRunE: cmd.PreRunE(crc, crc.Context),
 		RunE:    cmd.RunE(crc),
 	}
-
-	createRoomCmd.Flags().StringVarP(&crc.roomName, "name", "n", "", "name of the room to create")
 
 	return createRoomCmd
 }

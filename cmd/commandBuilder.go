@@ -26,6 +26,23 @@ type Command interface {
 	Run() error
 }
 
+// ValidatedCommand should be implemented if a validation method is needed.
+type ValidatedCommand interface {
+	Validate([]string) error
+}
+
+// PreRunE is used to execute some generic preparations for the command execution, depending on interfaces the command impements.
+func PreRunE(cmd Command, ctx *Context) func(*cobra.Command, []string) error {
+	return func(c *cobra.Command, args []string) error {
+		if valCmd, ok := cmd.(ValidatedCommand); ok {
+			if err := valCmd.Validate(args); err != nil {
+				return err
+			}
+		}
+		return nil
+	}
+}
+
 // RunE is used to set the RunE property of a cobra command
 func RunE(cmd Command) func(*cobra.Command, []string) error {
 	return func(c *cobra.Command, args []string) error {
