@@ -39,10 +39,11 @@ func (egc *EndGameCmd) Run() error {
 
 func (egc *EndGameCmd) buildCommand() *cobra.Command {
 	var endGameCmd = &cobra.Command{
-		Use:   "end-game",
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(egc),
+		Use:     "end-game",
+		Aliases: []string{"eg"},
+		Short:   "",
+		Long:    ``,
+		RunE:    cmd.RunE(egc),
 	}
 	return endGameCmd
 }

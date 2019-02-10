@@ -39,10 +39,11 @@ func (uc *UsersCmd) Run() error {
 
 func (uc *UsersCmd) buildCommand() *cobra.Command {
 	var usersCmd = &cobra.Command{
-		Use:   "users",
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(uc),
+		Use:     "get-players",
+		Aliases: []string{"players"},
+		Short:   "",
+		Long:    ``,
+		RunE:    cmd.RunE(uc),
 	}
 	return usersCmd
 }

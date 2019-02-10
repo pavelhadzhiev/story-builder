@@ -39,10 +39,11 @@ func (ac *AddCmd) Run() error {
 
 func (ac *AddCmd) buildCommand() *cobra.Command {
 	var addCmd = &cobra.Command{
-		Use:   "add",
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(ac),
+		Use:     "add-entry",
+		Aliases: []string{"add"},
+		Short:   "",
+		Long:    ``,
+		RunE:    cmd.RunE(ac),
 	}
 	return addCmd
 }

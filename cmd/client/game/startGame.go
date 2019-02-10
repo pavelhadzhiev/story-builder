@@ -39,10 +39,11 @@ func (sgc *StartGameCmd) Run() error {
 
 func (sgc *StartGameCmd) buildCommand() *cobra.Command {
 	var startGameCmd = &cobra.Command{
-		Use:   "start-game",
-		Short: "",
-		Long:  ``,
-		RunE:  cmd.RunE(sgc),
+		Use:     "start-game",
+		Aliases: []string{"sg"},
+		Short:   "",
+		Long:    ``,
+		RunE:    cmd.RunE(sgc),
 	}
 	return startGameCmd
 }
