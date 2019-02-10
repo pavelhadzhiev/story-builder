@@ -33,7 +33,7 @@ type HostCmd struct {
 	username string
 	password string
 
-	port string
+	port int
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -43,25 +43,37 @@ func (hc *HostCmd) Command() *cobra.Command {
 	return result
 }
 
-// Run is used to build the RunE function for the cobra command
-func (hc *HostCmd) Run() error {
+// Validate makes sure all required arguments are legal and are provided
+func (hc *HostCmd) Validate(args []string) error {
+	if len(args) > 1 {
+		return fmt.Errorf("requires a single arg or no args")
+	}
+
 	if hc.username == "" && hc.password == "" { // set default database user if not provided
 		hc.username = "admin"
 		hc.password = "Abcd1234"
 	}
-	if hc.port == "" { // set default server port if not provided
-		hc.port = "8080"
+
+	if len(args) == 0 { // set default server port if not provided
+		hc.port = 8080
 	}
 
+	portString := args[0]
+	portNumber, err := strconv.Atoi(portString)
+	if err != nil || portNumber < 0 {
+		return fmt.Errorf("provided port \"%s\" is not valid", portString)
+	}
+	hc.port = portNumber
+	return nil
+}
+
+// Run is used to build the RunE function for the cobra command
+func (hc *HostCmd) Run() error {
 	hc.database = db.NewSBDatabase(hc.username, hc.password)
 	defer hc.database.CloseDB()
 	err := hc.database.InitializeDB()
 	if err != nil {
 		return err
-	}
-
-	if portNumber, err := strconv.Atoi(hc.port); err != nil || portNumber < 0 {
-		return fmt.Errorf("provided port (%s) is not valid", hc.port)
 	}
 
 	sbServer := api.NewSBServer(hc.database, hc.port)
@@ -78,13 +90,13 @@ func (hc *HostCmd) Run() error {
 
 func (hc *HostCmd) buildCommand() *cobra.Command {
 	var serverCmd = &cobra.Command{
-		Use:   "host",
-		Short: "Hosts a server at the specified port.",
-		Long:  `Hosts a server at the specified port. If the port is invalid or the server cannot be started, a sufficient errog message is returned.`,
-		RunE:  cmd.RunE(hc),
+		Use:     "host [port]",
+		Short:   "Hosts a server at the specified port.",
+		Long:    `Hosts a server at the specified port. If the port is invalid or the server cannot be started, a sufficient errog message is returned.`,
+		PreRunE: cmd.PreRunE(hc),
+		RunE:    cmd.RunE(hc),
 	}
 
-	serverCmd.Flags().StringVarP(&hc.port, "port", "", "", `Port to host server on. Default value is "8080".`)
 	serverCmd.Flags().StringVarP(&hc.username, "username", "u", "", `Username to access database with. Default value is "admin"`)
 	serverCmd.Flags().StringVarP(&hc.password, "password", "p", "", `Password to access database with. Default value is "Abcd1234"`)
 

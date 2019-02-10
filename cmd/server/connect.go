@@ -71,7 +71,7 @@ func (cc *ConnectCmd) buildCommand() *cobra.Command {
 		Use:     "connect [host]",
 		Short:   "Connects to a healthy server with the provided host.",
 		Long:    `Connects to a healthy server with the provided host. If the URL is invalid, or the specified server doesn't have a responing healthcheck, the request is rejected.`,
-		PreRunE: cmd.PreRunE(cc, cc.Context),
+		PreRunE: cmd.PreRunE(cc),
 		RunE:    cmd.RunE(cc),
 	}
 

@@ -76,7 +76,7 @@ func (drc *DeleteRoomCmd) buildCommand() *cobra.Command {
 		Aliases: []string{"dr"},
 		Short:   "Deletes the game room with the provided name. Requires the user to be the creator of the room.",
 		Long:    `Deletes the game room with the provided name. Requires the user to be the creator of the room. Returns an error if a room with this name doesn't exist or the issuer isn't the room creator.`,
-		PreRunE: cmd.PreRunE(drc, drc.Context),
+		PreRunE: cmd.PreRunE(drc),
 		RunE:    cmd.RunE(drc),
 	}
 

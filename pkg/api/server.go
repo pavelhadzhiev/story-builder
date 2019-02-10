@@ -33,13 +33,13 @@ type SBServer struct {
 }
 
 // NewSBServer returns a story builder server configured for localhost:<port> that will use the provided database
-func NewSBServer(sbdb *db.SBDatabase, port string) *SBServer {
+func NewSBServer(sbdb *db.SBDatabase, port int) *SBServer {
 	sbServer := &SBServer{
 		Database: sbdb,
 		Rooms:    make([]rooms.Room, 0),
 		Online:   make([]string, 0),
 
-		srv: &http.Server{Addr: fmt.Sprintf(":%s", port)},
+		srv: &http.Server{Addr: fmt.Sprintf(":%d", port)},
 	}
 
 	http.HandleFunc("/", defaultHandler)
