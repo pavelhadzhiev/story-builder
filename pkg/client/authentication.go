@@ -53,6 +53,8 @@ func (client *SBClient) Login() error {
 		return errors.New("credentials have illegal characters")
 	case 401:
 		return errors.New("user doesn't exist or password is wrong")
+	case 409:
+		return errors.New("user is already logged in")
 	default:
 		return errors.New("something went really wrong :(")
 	}

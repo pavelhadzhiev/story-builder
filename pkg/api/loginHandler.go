@@ -41,6 +41,13 @@ func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 			w.Write([]byte("Could not authenticate user."))
 			return
 		}
+		for _, user := range server.Online {
+			if user == username {
+				w.WriteHeader(409)
+				w.Write([]byte("User is already logged in."))
+				return
+			}
+		}
 
 		fmt.Printf("Logged in user with name \"%s\".\n", username)
 		server.Online = append(server.Online, username)
