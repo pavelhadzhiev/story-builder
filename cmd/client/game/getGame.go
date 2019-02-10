@@ -21,29 +21,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// StoryCmd is a wrapper for the story-builder story command
-type StoryCmd struct{}
+// GetStoryCmd is a wrapper for the story-builder story command
+type GetStoryCmd struct{
+	*cmd.Context
+}
 
 // Command builds and returns a cobra command that will be added to the root command
-func (sc *StoryCmd) Command() *cobra.Command {
-	result := sc.buildCommand()
+func (gsc *GetStoryCmd) Command() *cobra.Command {
+	result := gsc.buildCommand()
 
 	return result
 }
 
 // Run is used to build the RunE function for the cobra command
-func (sc *StoryCmd) Run() error {
+func (gsc *GetStoryCmd) Run() error {
 	fmt.Println("story called")
 	return nil
 }
 
-func (sc *StoryCmd) buildCommand() *cobra.Command {
-	var storyCmd = &cobra.Command{
+func (gsc *GetStoryCmd) buildCommand() *cobra.Command {
+	var getStoryCmd = &cobra.Command{
 		Use:     "get-game",
 		Aliases: []string{"game"},
 		Short:   "",
 		Long:    ``,
-		RunE:    cmd.RunE(sc),
+		PreRunE: cmd.PreRunE(gsc),
+		RunE:    cmd.RunE(gsc),
 	}
-	return storyCmd
+	return getStoryCmd
 }

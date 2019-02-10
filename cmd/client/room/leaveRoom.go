@@ -73,6 +73,7 @@ func (lrc *LeaveRoomCmd) buildCommand() *cobra.Command {
 		Aliases: []string{"lr"},
 		Short:   "Leaves the room in the user configuration.",
 		Long:    `Leaves the room in the user configuration. It's possible that the room doesn't exist or the player is not in it due to a server error or outage. In this case, the configuratin will be adjusted without any server side changes.`,
+		PreRunE: cmd.PreRunE(lrc),
 		RunE:    cmd.RunE(lrc),
 	}
 	return leaveRoomsCmd

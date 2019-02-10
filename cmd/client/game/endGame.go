@@ -22,7 +22,9 @@ import (
 )
 
 // EndGameCmd is a wrapper for the story-builder end-game command
-type EndGameCmd struct{}
+type EndGameCmd struct{
+	*cmd.Context
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (egc *EndGameCmd) Command() *cobra.Command {
@@ -43,6 +45,7 @@ func (egc *EndGameCmd) buildCommand() *cobra.Command {
 		Aliases: []string{"eg"},
 		Short:   "",
 		Long:    ``,
+		PreRunE: cmd.PreRunE(egc),
 		RunE:    cmd.RunE(egc),
 	}
 	return endGameCmd

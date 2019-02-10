@@ -76,6 +76,7 @@ func (rc *RegisterCmd) buildCommand() *cobra.Command {
 		Use:   "register",
 		Short: "Registers a non-existing user with the provided username and password.",
 		Long:  `Registers a non-existing user with the provided username and password. If the user does exists, the request is rejected. Requires a valid connection to a server, a username and a password. If any of these are missing a sufficient error message is provided. To connect to a server check the connect command.`,
+		PreRunE: cmd.PreRunE(rc),
 		RunE:  cmd.RunE(rc),
 	}
 

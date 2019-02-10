@@ -64,6 +64,7 @@ func (dc *DisconnectCmd) buildCommand() *cobra.Command {
 		Use:   "disconnect",
 		Short: "Disconnects from the connected server.",
 		Long:  `Disconnects from the connected server. If there is none, a sufficient error message is returned.`,
+		PreRunE: cmd.PreRunE(dc),
 		RunE:  cmd.RunE(dc),
 	}
 	return disconnectCmd

@@ -22,7 +22,9 @@ import (
 )
 
 // StartGameCmd is a wrapper for the story-builder start-game command
-type StartGameCmd struct{}
+type StartGameCmd struct{
+	*cmd.Context
+}
 
 // Command builds and returns a cobra command that will be added to the root command
 func (sgc *StartGameCmd) Command() *cobra.Command {
@@ -43,6 +45,7 @@ func (sgc *StartGameCmd) buildCommand() *cobra.Command {
 		Aliases: []string{"sg"},
 		Short:   "",
 		Long:    ``,
+		PreRunE: cmd.PreRunE(sgc),
 		RunE:    cmd.RunE(sgc),
 	}
 	return startGameCmd

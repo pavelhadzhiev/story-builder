@@ -40,6 +40,7 @@ func PreRunE(cmd Command) func(*cobra.Command, []string) error {
 				return err
 			}
 		}
+		c.SilenceUsage = true
 		return nil
 	}
 }

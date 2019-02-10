@@ -38,11 +38,11 @@ func main() {
 		&room.JoinRoomCmd{Context: ctx},
 		&room.LeaveRoomCmd{Context: ctx},
 		&room.ListRoomsCmd{Context: ctx},
-		&game.StartGameCmd{},
-		&game.EndGameCmd{},
-		&game.AddCmd{},
-		&game.StoryCmd{},
-		&game.UsersCmd{},
+		&game.StartGameCmd{Context: ctx},
+		&game.EndGameCmd{Context: ctx},
+		&game.AddEntryCmd{Context: ctx},
+		&game.GetStoryCmd{Context: ctx},
+		&game.GetPlayersCmd{Context: ctx},
 	}
 	for _, command := range commands {
 		rootCmd.AddCommand(command.Command())

@@ -21,29 +21,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// UsersCmd is a wrapper for the story-builder users command
-type UsersCmd struct{}
+// GetPlayersCmd is a wrapper for the story-builder users command
+type GetPlayersCmd struct{
+	*cmd.Context
+}
 
 // Command builds and returns a cobra command that will be added to the root command
-func (uc *UsersCmd) Command() *cobra.Command {
-	result := uc.buildCommand()
+func (gpc *GetPlayersCmd) Command() *cobra.Command {
+	result := gpc.buildCommand()
 
 	return result
 }
 
 // Run is used to build the RunE function for the cobra command
-func (uc *UsersCmd) Run() error {
+func (gpc *GetPlayersCmd) Run() error {
 	fmt.Println("users called")
 	return nil
 }
 
-func (uc *UsersCmd) buildCommand() *cobra.Command {
-	var usersCmd = &cobra.Command{
+func (gpc *GetPlayersCmd) buildCommand() *cobra.Command {
+	var getPlayersCmd = &cobra.Command{
 		Use:     "get-players",
 		Aliases: []string{"players"},
 		Short:   "",
 		Long:    ``,
-		RunE:    cmd.RunE(uc),
+		PreRunE: cmd.PreRunE(gpc),
+		RunE:    cmd.RunE(gpc),
 	}
-	return usersCmd
+	return getPlayersCmd
 }

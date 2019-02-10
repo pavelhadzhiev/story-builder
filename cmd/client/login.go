@@ -77,6 +77,7 @@ func (lc *LoginCmd) buildCommand() *cobra.Command {
 		Use:   "login",
 		Short: "Logs in an existing user with the provided username and password.",
 		Long:  `Logs in an existing user with the provided username and password. If the user does not exists, the request is rejected. Requires a valid connection to a server, a username and a password. If any of these are missing a sufficient error message is provided. To connect to a server check the connect command.`,
+		PreRunE: cmd.PreRunE(lc),
 		RunE:  cmd.RunE(lc),
 	}
 

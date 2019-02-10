@@ -63,6 +63,7 @@ func (lc *LogoutCmd) buildCommand() *cobra.Command {
 		Use:   "logout",
 		Short: "Logs the user out.",
 		Long:  `Logs the user out. If a user is not logged in, rejects the request. Requires a valid connection to a server. If it is missing, a sufficient error message is provided. To connect to a server check the connect command.`,
+		PreRunE: cmd.PreRunE(lc),
 		RunE:  cmd.RunE(lc),
 	}
 	return logoutCmd

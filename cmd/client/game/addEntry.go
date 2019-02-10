@@ -21,29 +21,32 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// AddCmd is a wrapper for the story-builder add command
-type AddCmd struct{}
+// AddEntryCmd is a wrapper for the story-builder add command
+type AddEntryCmd struct{
+	*cmd.Context
+}
 
 // Command builds and returns a cobra command that will be added to the root command
-func (ac *AddCmd) Command() *cobra.Command {
-	result := ac.buildCommand()
+func (aec *AddEntryCmd) Command() *cobra.Command {
+	result := aec.buildCommand()
 
 	return result
 }
 
 // Run is used to build the RunE function for the cobra command
-func (ac *AddCmd) Run() error {
+func (aec *AddEntryCmd) Run() error {
 	fmt.Println("add called")
 	return nil
 }
 
-func (ac *AddCmd) buildCommand() *cobra.Command {
-	var addCmd = &cobra.Command{
+func (aec *AddEntryCmd) buildCommand() *cobra.Command {
+	var addEntryCmd = &cobra.Command{
 		Use:     "add-entry",
 		Aliases: []string{"add"},
 		Short:   "",
 		Long:    ``,
-		RunE:    cmd.RunE(ac),
+		PreRunE: cmd.PreRunE(aec),
+		RunE:    cmd.RunE(aec),
 	}
-	return addCmd
+	return addEntryCmd
 }

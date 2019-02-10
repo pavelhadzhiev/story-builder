@@ -56,6 +56,7 @@ func (hc *HostCmd) Validate(args []string) error {
 
 	if len(args) == 0 { // set default server port if not provided
 		hc.port = 8080
+		return nil
 	}
 
 	portString := args[0]
