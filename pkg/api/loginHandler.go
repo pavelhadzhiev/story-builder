@@ -15,10 +15,10 @@
 package api
 
 import (
-	"encoding/base64"
 	"fmt"
 	"net/http"
-	"strings"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
 // LoginHandler is an http handler for the story builder's login endpoint
@@ -29,23 +29,13 @@ func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 	}
 	switch r.Method {
 	case http.MethodPost:
-		authorizationHeader := r.Header.Get("Authorization")
-		authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
-		if authorizationHeader == authorizationHeaderValue {
-			w.WriteHeader(400)
-			w.Write([]byte("Unsupported authorization header."))
-			return
-		}
-
-		credentials, err := base64.StdEncoding.DecodeString(authorizationHeaderValue)
+		username, password, err := util.ExtractCredentialsFromAuthorizationHeader(r.Header.Get("Authorization"))
 		if err != nil {
 			w.WriteHeader(400)
-			w.Write([]byte("Invalid authorization header."))
+			w.Write([]byte(fmt.Sprintf("%v", err)))
 			return
 		}
 
-		split := strings.Split(string(credentials), ":")
-		username, password := split[0], split[1]
 		if err := server.Database.LoginUser(username, password); err != nil {
 			w.WriteHeader(401)
 			w.Write([]byte("Could not authenticate user."))
@@ -53,6 +43,9 @@ func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		fmt.Printf("Logged in user with name \"%s\".\n", username)
+		server.Online = append(server.Online, username)
+		fmt.Println("ONLINE USERS:", server.Online)
+
 		w.Write([]byte("Successfully logged in! Welcome back, " + username + "."))
 	default:
 		w.WriteHeader(405)

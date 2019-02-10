@@ -20,8 +20,8 @@ import (
 	"strings"
 )
 
-// DecodeBasicAuthorization takes a Basic Authorization header and decodes it to return the username
-func DecodeBasicAuthorization(authorizationHeader string) (string, error) {
+// ExtractUsernameFromAuthorizationHeader takes a Basic Authorization header and decodes it to return the username
+func ExtractUsernameFromAuthorizationHeader(authorizationHeader string) (string, error) {
 	authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
 	if authorizationHeader == authorizationHeaderValue {
 		return "", errors.New("unsupported authorization header type")
@@ -36,4 +36,21 @@ func DecodeBasicAuthorization(authorizationHeader string) (string, error) {
 	username := split[0]
 
 	return username, nil
+}
+
+// ExtractCredentialsFromAuthorizationHeader takes a Basic Authorization header and decodes it to return the username and passowrd
+func ExtractCredentialsFromAuthorizationHeader(authorizationHeader string) (string, string, error) {
+	authorizationHeaderValue := strings.TrimPrefix(authorizationHeader, "Basic ")
+	if authorizationHeader == authorizationHeaderValue {
+		return "", "", errors.New("unsupported authorization header type")
+	}
+
+	credentials, err := base64.StdEncoding.DecodeString(authorizationHeaderValue)
+	if err != nil {
+		return "", "", errors.New("invalid authorization header")
+	}
+
+	split := strings.Split(string(credentials), ":")
+	username, password := split[0], split[1]
+	return username, password, nil
 }

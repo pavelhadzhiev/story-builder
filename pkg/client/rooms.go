@@ -93,7 +93,7 @@ func (client *SBClient) GetRoom(roomName string) (*rooms.Room, error) {
 func (client *SBClient) DeleteRoom(roomName string) error {
 	response, err := client.call(http.MethodDelete, "/rooms/"+roomName, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("error during http request: %e", err)
 	}
 	switch response.StatusCode {
 	case 204:
@@ -112,7 +112,7 @@ func (client *SBClient) DeleteRoom(roomName string) error {
 func (client *SBClient) JoinRoom(roomName string) error {
 	response, err := client.call(http.MethodPost, "/join-room/"+roomName, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("error during http request: %e", err)
 	}
 	switch response.StatusCode {
 	case 200:
@@ -130,7 +130,7 @@ func (client *SBClient) JoinRoom(roomName string) error {
 func (client *SBClient) LeaveRoom(roomName string) error {
 	response, err := client.call(http.MethodPost, "/leave-room/"+roomName, nil)
 	if err != nil {
-		return err
+		return fmt.Errorf("error during http request: %e", err)
 	}
 	switch response.StatusCode {
 	case 200:

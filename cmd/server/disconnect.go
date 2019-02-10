@@ -49,7 +49,7 @@ func (dc *DisconnectCmd) Run() error {
 		cfg.Room = ""
 	}
 	if cfg.Authorization != "" {
-		//dc.Client.Logout()
+		dc.Client.Logout()
 		cfg.Authorization = ""
 	}
 	cfg.URL = ""

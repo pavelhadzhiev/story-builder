@@ -21,9 +21,9 @@ import (
 	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
-// RegistrationHandler is an http handler for the story builder's registration endpoint
-func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/register/" {
+// LogoutHandler is an http handler for the story builder's logout endpoint
+func (server *SBServer) LogoutHandler(w http.ResponseWriter, r *http.Request) {
+	if r.URL.Path != "/logout/" {
 		w.WriteHeader(404)
 		return
 	}
@@ -36,26 +36,21 @@ func (server *SBServer) RegistrationHandler(w http.ResponseWriter, r *http.Reque
 			return
 		}
 
-		if usernameTaken, err := server.Database.UserExists(username); err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Database lookup failed."))
-			return
-		} else if usernameTaken {
-			w.WriteHeader(409)
-			w.Write([]byte("Username is already taken."))
-			return
-		}
-		if err := server.Database.RegisterUser(username, password); err != nil {
-			w.WriteHeader(500)
-			w.Write([]byte("Database write failed."))
+		if err := server.Database.LoginUser(username, password); err != nil {
+			w.WriteHeader(401)
+			w.Write([]byte("Could not authenticate user."))
 			return
 		}
 
-		fmt.Printf("Registered a user with name \"%s\".\n", username)
-		server.Online = append(server.Online, username)
+		fmt.Printf("Logged out user with name \"%s\".\n", username)
+		for index, user := range server.Online {
+			if user == username {
+				server.Online = append(server.Online[:index], server.Online[index+1:]...)
+			}
+		}
 		fmt.Println("ONLINE USERS:", server.Online)
 
-		w.Write([]byte("Successfully registered! Welcome, " + username + "."))
+		w.Write([]byte("Successfully logged out. See you soon, " + username + "!"))
 	default:
 		w.WriteHeader(405)
 	}

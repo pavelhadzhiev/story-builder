@@ -16,43 +16,63 @@ package client
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 )
 
 // Register makes a request to the story builder server to register the user in the configuration
-func (client *SBClient) Register() (*http.Response, error) {
+func (client *SBClient) Register() error {
 	response, err := client.call(http.MethodPost, "/register/", nil)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("error during http request: %e", err)
 	}
 
 	switch response.StatusCode {
 	case 200:
-		return response, nil
+		return nil
 	case 400:
-		return response, errors.New("credentials have illegal characters")
+		return errors.New("credentials have illegal characters")
 	case 409:
-		return response, errors.New("username already exists")
+		return errors.New("username already exists")
 	default:
-		return response, errors.New("something went really wrong :(")
+		return errors.New("something went really wrong :(")
 	}
 }
 
 // Login makes a request to the story builder server to check whether the user in the configuration is registered in the server DB.
-func (client *SBClient) Login() (*http.Response, error) {
+func (client *SBClient) Login() error {
 	response, err := client.call(http.MethodPost, "/login/", nil)
 	if err != nil {
-		return nil, err
+		return fmt.Errorf("error during http request: %e", err)
 	}
 
 	switch response.StatusCode {
 	case 200:
-		return response, nil
+		return nil
 	case 400:
-		return response, errors.New("credentials have illegal characters")
+		return errors.New("credentials have illegal characters")
 	case 401:
-		return response, errors.New("user doesn't exist or password is wrong")
+		return errors.New("user doesn't exist or password is wrong")
 	default:
-		return response, errors.New("something went really wrong :(")
+		return errors.New("something went really wrong :(")
+	}
+}
+
+// Logout makes a request to the story builder server to logout the user from the server.
+func (client *SBClient) Logout() error {
+	response, err := client.call(http.MethodPost, "/logout/", nil)
+	if err != nil {
+		return fmt.Errorf("error during http request: %e", err)
+	}
+
+	switch response.StatusCode {
+	case 200:
+		return nil
+	case 400:
+		return errors.New("credentials have illegal characters")
+	case 401:
+		return errors.New("user doesn't exist or password is wrong")
+	default:
+		return errors.New("something went really wrong :(")
 	}
 }

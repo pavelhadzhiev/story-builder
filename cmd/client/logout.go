@@ -50,7 +50,7 @@ func (lc *LogoutCmd) Run() error {
 		lc.Client.LeaveRoom(cfg.Room)
 		cfg.Room = ""
 	}
-	//lc.Client.Logout()
+	lc.Client.Logout()
 	cfg.Authorization = ""
 	lc.Configurator.Save(cfg)
 

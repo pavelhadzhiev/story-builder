@@ -92,7 +92,7 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("Error during serialization of retrieved room."))
 		return
 	case http.MethodDelete:
-		issuer, err := util.DecodeBasicAuthorization(r.Header.Get("Authorization"))
+		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
 		if err != nil {
 			w.WriteHeader(500)
 			w.Write([]byte("Error during decoding of authorization header."))

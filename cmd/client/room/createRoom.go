@@ -56,7 +56,7 @@ func (crc *CreateRoomCmd) Run() error {
 		return errors.New("room name is empty")
 	}
 
-	user, err := util.DecodeBasicAuthorization(cfg.Authorization)
+	user, err := util.ExtractUsernameFromAuthorizationHeader(cfg.Authorization)
 	if err != nil {
 		return err
 	}

@@ -61,7 +61,7 @@ func (rc *RegisterCmd) Run() error {
 	rc.Configurator.Save(cfg)
 
 	rc.Client = client.NewSBClient(cfg)
-	if _, err = rc.Client.Register(); err != nil {
+	if err = rc.Client.Register(); err != nil {
 		cfg.Authorization = ""
 		rc.Configurator.Save(cfg)
 		return err

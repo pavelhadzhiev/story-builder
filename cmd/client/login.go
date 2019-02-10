@@ -62,7 +62,7 @@ func (lc *LoginCmd) Run() error {
 
 	lc.Client = client.NewSBClient(cfg)
 
-	if _, err := lc.Client.Login(); err != nil {
+	if err := lc.Client.Login(); err != nil {
 		cfg.Authorization = ""
 		lc.Configurator.Save(cfg)
 		return err
