@@ -34,75 +34,9 @@ type Room struct {
 	previousGame *game.Game
 }
 
-// StartGame starts a new game, including all online players and giving the provided initiator the first turn.
-// Returns error if a game is already started and still ongoing.
-func (room *Room) StartGame(initiator string) error {
-	isAdmin, isOnline := false, false
-	for _, admin := range room.Admins {
-		if admin == initiator {
-			isAdmin = true
-		}
-	}
-	for _, online := range room.Online {
-		if online == initiator {
-			isOnline = true
-		}
-	}
-	if !isAdmin {
-		return errors.New("game initiator is not an admin")
-	}
-	if !isOnline {
-		return errors.New("game initiator is not in the room")
-	}
-
-	if room.game != nil {
-		return errors.New("cannot start a new game until last one is finished")
-	}
-	room.game = game.NewGame(initiator, room.Online)
-	return nil
-}
-
-// EndGame sets the currently played game to finish after the next move.
-// Returns error if there isn't a started game to end.
-func (room Room) EndGame() error {
-	if room.game == nil {
-		return errors.New("there isn't a started game")
-	}
-	room.game.EndGame()
-	return nil
-}
-
-// AddEntry add the provided entry text to the story on the issuers behalf.
-// Returns error if there isn't a started game or it's not the issuer's turn.
-func (room Room) AddEntry(entry, issuer string) error {
-	if room.game == nil {
-		return errors.New("there isn't a started game")
-	}
-
-	if err := room.game.AddEntry(entry, issuer); err != nil {
-		return err
-	}
-
-	if room.game.Finished {
-		room.previousGame = room.game
-		room.game = nil
-	}
-	return nil
-}
-
-// GetGame returns the current or last finished game.
-func (room Room) GetGame() *game.Game {
-	if room.game != nil {
-		return room.game
-	}
-	if room.previousGame != nil {
-		return room.previousGame
-	}
-	return nil
-}
-
-func (room Room) String() string {
-	return fmt.Sprintf("Name: %s\nCreator: %s\nOnline:%v\n", room.Name, room.Creator, room.Online)
+// RoomRules keeps some configurations for the gameplay in the story builder room.
+type RoomRules struct {
+	Timeout int `json:"timeout,omitempty"`
 }
 
 // NewRoom creates a room with the provided name and creator, initializing all required structures and arrays and using the default timeout (180 seconds)
@@ -122,7 +56,86 @@ func NewRoom(name, creator string) *Room {
 	}
 }
 
-// RoomRules keeps some configurations for the gameplay in the story builder room.
-type RoomRules struct {
-	Timeout int `json:"timeout,omitempty"`
+func (room Room) String() string {
+	return fmt.Sprintf("Name: %s\nCreator: %s\nOnline:%v\n", room.Name, room.Creator, room.Online)
+}
+
+// StartGame starts a new game, including all online players and giving the provided initiator the first turn.
+// Returns error if a game is already started and still ongoing or if user doesn't have admin access or is not in the room.
+func (room *Room) StartGame(initiator string) error {
+	if err := room.checkUserPermissions(initiator); err != nil {
+		return err
+	}
+
+	if room.game != nil {
+		return errors.New("there is an unfinished game")
+	}
+	room.game = game.NewGame(initiator, room.Online)
+	return nil
+}
+
+// AddEntry add the provided entry text to the story on the issuers behalf.
+// Returns error if there isn't a started game or it's not the issuer's turn.
+func (room *Room) AddEntry(entry, issuer string) error {
+	if room.game == nil {
+		return errors.New("there isn't a started game")
+	}
+
+	if err := room.game.AddEntry(entry, issuer); err != nil {
+		return err
+	}
+
+	if room.game.Finished {
+		room.previousGame = room.game
+		room.game = nil
+	}
+	return nil
+}
+
+// GetGame returns the current or last finished game.
+func (room *Room) GetGame() *game.Game {
+	if room.game != nil {
+		return room.game
+	}
+	if room.previousGame != nil {
+		return room.previousGame
+	}
+	return nil
+}
+
+// EndGame sets the currently played game to finish after the next move.
+// Returns error if there isn't a started game to end or if user doesn't have admin access or is not in the room.
+func (room *Room) EndGame(issuer string) error {
+	if err := room.checkUserPermissions(issuer); err != nil {
+		return err
+	}
+
+	if room.game == nil {
+		return errors.New("there isn't a started game")
+	}
+
+	room.game.EndGame()
+	return nil
+}
+
+// checkUserPermissions returns error if the user is not an admin or joined in the room.
+func (room *Room) checkUserPermissions(user string) error {
+	isAdmin, isOnline := false, false
+	for _, admin := range room.Admins {
+		if admin == user {
+			isAdmin = true
+		}
+	}
+	for _, online := range room.Online {
+		if online == user {
+			isOnline = true
+		}
+	}
+	if !isAdmin {
+		return errors.New("user is not an admin")
+	}
+	if !isOnline {
+		return errors.New("user is not in the room")
+	}
+	return nil
 }

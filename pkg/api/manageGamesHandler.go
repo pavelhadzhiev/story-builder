@@ -40,15 +40,16 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 			w.Write([]byte("Room \"" + roomName + "\" doesn't exist."))
 			return
 		}
+		if game, err := server.GetGame(roomName); err == nil && !game.Finished {
+			w.WriteHeader(409)
+			w.Write([]byte("There is already a running game."))
+		}
+
 		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
 		if err != nil {
 			w.WriteHeader(500)
 			w.Write([]byte("Error during decoding of authorization header."))
 			return
-		}
-		if game, err := server.GetGame(roomName); err == nil && !game.Finished {
-			w.WriteHeader(409)
-			w.Write([]byte("There is already a running game."))
 		}
 
 		if err := room.StartGame(issuer); err != nil {
@@ -57,8 +58,31 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 		}
 
 		w.Write([]byte("Game successfully started in room \"" + roomName + "\"."))
-		return
 	case http.MethodDelete:
+		room, err := server.GetRoom(roomName)
+		if err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" doesn't exist."))
+			return
+		}
+		if game, err := server.GetGame(roomName); err != nil || game.Finished {
+			w.WriteHeader(409)
+			w.Write([]byte("There is no running game."))
+		}
+
+		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Error during decoding of authorization header."))
+			return
+		}
+
+		if err := room.EndGame(issuer); err != nil {
+			w.WriteHeader(403)
+			w.Write([]byte("Game cannot be ended. Requires user to be joined and have admin access."))
+		}
+
+		w.Write([]byte("Game end successfully triggered in room \"" + roomName + "\". Next move will be the last."))
 	default:
 		w.WriteHeader(405)
 		return

@@ -30,6 +30,16 @@ type Game struct {
 	turnCounter int
 }
 
+// Entry represents a single player's turn in the story builder game
+type Entry struct {
+	Text   string `json:"text"`
+	Player string `json:"player"`
+}
+
+func (entry Entry) String() string {
+	return fmt.Sprintf("(%s) %s", entry.Text, entry.Player)
+}
+
 // NewGame creates a game, initializing all required structures and arrays, with the provided players and initiator.
 func NewGame(initiator string, players []string) *Game {
 	playersCopy := make([]string, len(players))
@@ -51,11 +61,6 @@ func NewGame(initiator string, players []string) *Game {
 	}
 }
 
-// EndGame sets the game to end after the next turn.
-func (game *Game) EndGame() {
-	game.endGame = true
-}
-
 // AddEntry sets the game to end after the next turn.
 func (game *Game) AddEntry(entry string, issuer string) error {
 	if issuer != game.Turn {
@@ -75,12 +80,7 @@ func (game *Game) AddEntry(entry string, issuer string) error {
 	return nil
 }
 
-// Entry represents a single player's turn in the story builder game
-type Entry struct {
-	Text   string `json:"text"`
-	Player string `json:"player"`
-}
-
-func (entry Entry) String() string {
-	return fmt.Sprintf("(%s) %s", entry.Text, entry.Player)
+// EndGame sets the game to end after the next turn.
+func (game *Game) EndGame() {
+	game.endGame = true
 }
