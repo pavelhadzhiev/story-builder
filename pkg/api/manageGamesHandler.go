@@ -82,6 +82,7 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 			w.Write([]byte("Game cannot be ended. Requires user to be joined and have admin access."))
 		}
 
+		w.WriteHeader(202)
 		w.Write([]byte("Game end successfully triggered in room \"" + roomName + "\". Next move will be the last."))
 	default:
 		w.WriteHeader(405)

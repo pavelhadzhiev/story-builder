@@ -58,6 +58,11 @@ func (server *SBServer) GameHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		if game, err := server.GetGame(roomName); err != nil || game.Finished {
+			w.WriteHeader(404)
+			w.Write([]byte("There is no running game."))
+		}
+
 		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
 		if err != nil {
 			w.WriteHeader(500)
@@ -78,6 +83,7 @@ func (server *SBServer) GameHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		w.WriteHeader(200)
 		w.Write([]byte("Entry successfully submitted."))
 	default:
 		w.WriteHeader(405)
