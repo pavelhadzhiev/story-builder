@@ -38,9 +38,9 @@ func (sbServer *SBServer) CreateNewRoom(room *rooms.Room) error {
 // GetRoom retrieves the room with the provided name from the server.
 // Returns error if a room with this name doesn't exist.
 func (sbServer *SBServer) GetRoom(roomName string) (*rooms.Room, error) {
-	for _, room := range sbServer.Rooms {
+	for index, room := range sbServer.Rooms {
 		if room.Name == roomName {
-			return &room, nil
+			return &sbServer.Rooms[index], nil
 		}
 	}
 	return nil, errors.New("room with name \"" + roomName + "\" doesn't exist")

@@ -38,7 +38,7 @@ func (sbServer *SBServer) JoinRoom(roomName, player string) error {
 		}
 	}
 	if roomExists {
-		sbServer.Rooms[index].Players = append(sbServer.Rooms[index].Players, player)
+		sbServer.Rooms[index].Online = append(sbServer.Rooms[index].Online, player)
 		return nil
 	}
 
@@ -50,11 +50,11 @@ func (sbServer *SBServer) JoinRoom(roomName, player string) error {
 func (sbServer *SBServer) LeaveRoom(roomName, player string) error {
 	for roomIndex, room := range sbServer.Rooms {
 		if room.Name == roomName {
-			for playerIndex, playerName := range sbServer.Rooms[roomIndex].Players {
+			for playerIndex, playerName := range sbServer.Rooms[roomIndex].Online {
 				if playerName == player {
-					sbServer.Rooms[roomIndex].Players = append(
-						sbServer.Rooms[roomIndex].Players[:playerIndex],
-						sbServer.Rooms[roomIndex].Players[playerIndex+1:]...,
+					sbServer.Rooms[roomIndex].Online = append(
+						sbServer.Rooms[roomIndex].Online[:playerIndex],
+						sbServer.Rooms[roomIndex].Online[playerIndex+1:]...,
 					)
 					return nil
 				}

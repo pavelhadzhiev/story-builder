@@ -25,11 +25,6 @@ import (
 
 // RoomHandler is an http handler for the story builder's room API
 func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
-	if !strings.HasPrefix(r.URL.Path, "/rooms/") {
-		w.WriteHeader(404)
-		return
-	}
-
 	if r.URL.Path == "/rooms/" {
 		switch r.Method {
 		case http.MethodGet:
@@ -50,6 +45,7 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("Error during serialization of retrieved rooms."))
 				return
 			}
+
 			if err := server.CreateNewRoom(room); err != nil {
 				w.WriteHeader(403)
 				w.Write([]byte("Cannot create more room. Either a room with this name exists or server capacity is reached."))

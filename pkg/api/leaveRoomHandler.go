@@ -23,11 +23,6 @@ import (
 
 // LeaveRoomHandler is an http handler for the story builder's leave room API
 func (server *SBServer) LeaveRoomHandler(w http.ResponseWriter, r *http.Request) {
-	if !strings.HasPrefix(r.URL.Path, "/leave-room/") {
-		w.WriteHeader(404)
-		return
-	}
-
 	urlSuffix := strings.TrimPrefix(r.URL.Path, "/leave-room/")
 	urlSuffixSplit := strings.Split(urlSuffix, "/")
 	if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {

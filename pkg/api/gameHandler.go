@@ -15,15 +15,16 @@
 package api
 
 import (
+	"encoding/json"
 	"net/http"
 	"strings"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
-// JoinRoomHandler is an http handler for the story builder's join room API
-func (server *SBServer) JoinRoomHandler(w http.ResponseWriter, r *http.Request) {
-	urlSuffix := strings.TrimPrefix(r.URL.Path, "/join-room/")
+// GameHandler is an http handler for the story builder's gameplay API
+func (server *SBServer) GameHandler(w http.ResponseWriter, r *http.Request) {
+	urlSuffix := strings.TrimPrefix(r.URL.Path, "/game/")
 	urlSuffixSplit := strings.Split(urlSuffix, "/")
 	if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
 		w.WriteHeader(400)
@@ -33,25 +34,49 @@ func (server *SBServer) JoinRoomHandler(w http.ResponseWriter, r *http.Request) 
 	roomName := urlSuffixSplit[0]
 
 	switch r.Method {
+	case http.MethodGet:
+		game, err := server.GetGame(roomName)
+		if err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" doesn't exist or no games have been started."))
+			return
+		}
+
+		if responseBody, err := json.Marshal(game); err == nil {
+			w.Write(responseBody)
+			return
+		}
+
+		w.WriteHeader(500)
+		w.Write([]byte("Error during serialization of retrieved game."))
+		return
 	case http.MethodPost:
-		player, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
+		room, err := server.GetRoom(roomName)
+		if err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" doesn't exist or no games have been started."))
+			return
+		}
+
+		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
 		if err != nil {
 			w.WriteHeader(500)
 			w.Write([]byte("Error during decoding of authorization header."))
 			return
 		}
-		if _, err := server.GetRoom(roomName); err != nil {
-			w.WriteHeader(404)
-			w.Write([]byte("Room \"" + roomName + "\" not found."))
+
+		entry := r.Header.Get("Entry-Text")
+		if entry == "" {
+			w.WriteHeader(400)
+			w.Write([]byte("Missing Entry-Text header."))
 			return
 		}
-		if err := server.JoinRoom(roomName, player); err != nil {
+
+		if err := room.AddEntry(entry, issuer); err != nil {
 			w.WriteHeader(403)
-			w.Write([]byte("The user doesn't have permissions to join that room."))
+			w.Write([]byte("It's not your turn or there isn't a started game."))
 			return
 		}
-		w.Write([]byte("Joined room \"" + roomName + "\" successfully."))
-		return
 	default:
 		w.WriteHeader(405)
 		return

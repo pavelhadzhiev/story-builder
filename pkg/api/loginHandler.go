@@ -27,6 +27,7 @@ func (server *SBServer) LoginHandler(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(404)
 		return
 	}
+
 	switch r.Method {
 	case http.MethodPost:
 		username, password, err := util.ExtractCredentialsFromAuthorizationHeader(r.Header.Get("Authorization"))

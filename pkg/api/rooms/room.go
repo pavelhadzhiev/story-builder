@@ -14,7 +14,12 @@
 
 package rooms
 
-import "fmt"
+import (
+	"errors"
+	"fmt"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/api/game"
+)
 
 // Room represents a story builder room, in which a select group of players can play the game
 type Room struct {
@@ -23,14 +28,63 @@ type Room struct {
 	Rules   RoomRules `json:"rules,omitempty"`
 	Admins  []string  `json:"admins,omitempty"`
 	Banned  []string  `json:"banned,omitempty"`
+	Online  []string  `json:"online,omitempty"`
 
-	Turn    string   `json:"turn,omitempty"`
-	Players []string `json:"players,omitempty"`
-	Story   []Entry  `json:"story,omitempty"`
+	game         *game.Game
+	previousGame *game.Game
+}
+
+// StartGame starts a new game, including all online players and giving the provided initiator the first turn.
+// Returns error if a game is already started and still ongoing.
+func (room *Room) StartGame(initiator string) error {
+	if room.game != nil {
+		return errors.New("cannot start a new game until last one is finished")
+	}
+	room.game = game.NewGame(initiator, room.Online)
+	return nil
+}
+
+// EndGame sets the currently played game to finish after the next move.
+// Returns error if there isn't a started game to end.
+func (room Room) EndGame() error {
+	if room.game == nil {
+		return errors.New("there isn't a started game")
+	}
+	room.game.EndGame()
+	return nil
+}
+
+// AddEntry add the provided entry text to the story on the issuers behalf.
+// Returns error if there isn't a started game or it's not the issuer's turn.
+func (room Room) AddEntry(entry, issuer string) error {
+	if room.game == nil {
+		return errors.New("there isn't a started game")
+	}
+
+	if err := room.game.AddEntry(entry, issuer); err != nil {
+		return err
+	}
+
+	if room.game.Finished {
+		room.previousGame = room.game
+		room.game = nil
+	}
+	return nil
+}
+
+// GetGame returns the current or last finished game.
+func (room Room) GetGame() *game.Game {
+	if room.game != nil {
+		return room.game
+	}
+	if room.previousGame != nil {
+		return room.previousGame
+	}
+	return nil
 }
 
 func (room Room) String() string {
-	return fmt.Sprintf("Name: %s\nCreator: %s\nPlayers:%v\n", room.Name, room.Creator, room.Players)
+	return fmt.Sprintf("Name: %s\nCreator: %s\nOnline:%v\n", room.Name, room.Creator, room.Online)
 }
 
 // NewRoom creates a room with the provided name and creator, initializing all required structures and arrays and using the default timeout (180 seconds)
@@ -43,16 +97,11 @@ func NewRoom(name, creator string) *Room {
 		Rules:   RoomRules{Timeout: 180},
 		Admins:  admins,
 		Banned:  make([]string, 0),
+		Online:  make([]string, 0),
 
-		Players: make([]string, 0),
-		Story:   make([]Entry, 0),
+		game:         nil,
+		previousGame: nil,
 	}
-}
-
-// Entry represents a single player's turn in the story builder game
-type Entry struct {
-	Text   string `json:"text"`
-	Player string `json:"player"`
 }
 
 // RoomRules keeps some configurations for the gameplay in the story builder room.
