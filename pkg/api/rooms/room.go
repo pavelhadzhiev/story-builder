@@ -37,6 +37,24 @@ type Room struct {
 // StartGame starts a new game, including all online players and giving the provided initiator the first turn.
 // Returns error if a game is already started and still ongoing.
 func (room *Room) StartGame(initiator string) error {
+	isAdmin, isOnline := false, false
+	for _, admin := range room.Admins {
+		if admin == initiator {
+			isAdmin = true
+		}
+	}
+	for _, online := range room.Online {
+		if online == initiator {
+			isOnline = true
+		}
+	}
+	if !isAdmin {
+		return errors.New("game initiator is not an admin")
+	}
+	if !isOnline {
+		return errors.New("game initiator is not in the room")
+	}
+
 	if room.game != nil {
 		return errors.New("cannot start a new game until last one is finished")
 	}

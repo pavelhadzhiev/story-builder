@@ -46,9 +46,14 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 			w.Write([]byte("Error during decoding of authorization header."))
 			return
 		}
-		if err := room.StartGame(issuer); err != nil {
+		if game, err := server.GetGame(roomName); err == nil && !game.Finished {
 			w.WriteHeader(409)
 			w.Write([]byte("There is already a running game."))
+		}
+
+		if err := room.StartGame(issuer); err != nil {
+			w.WriteHeader(403)
+			w.Write([]byte("Game cannot be started. Requires user to be joined and have admin access."))
 		}
 
 		w.Write([]byte("Game successfully started in room \"" + roomName + "\"."))
