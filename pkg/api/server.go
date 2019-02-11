@@ -53,7 +53,8 @@ func NewSBServer(sbdb *db.SBDatabase, port int) *SBServer {
 	http.HandleFunc("/join-room/", sbServer.JoinRoomHandler)
 	http.HandleFunc("/leave-room/", sbServer.LeaveRoomHandler)
 
-	http.HandleFunc("/game/", sbServer.GameHandler)
+	http.HandleFunc("/games/", sbServer.GameHandler)
+	http.HandleFunc("/manage-games/", sbServer.ManageGamesHandler)
 
 	return sbServer
 }
