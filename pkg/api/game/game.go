@@ -29,8 +29,8 @@ type Game struct {
 	Finished  bool     `json:"finished,omitempty"`
 	TimeLeft  int      `json:"timeLeft,omitempty"`
 	MaxLength int      `json:"maxLength,omitempty"`
+	EndGame   bool     `json:"endGame,omitempty"`
 
-	endGame    bool
 	playerTurn int
 	timeLimit  int
 }
@@ -42,7 +42,7 @@ type Entry struct {
 }
 
 func (game Game) String() string {
-	gameString := "Players in the current game: "
+	gameString := "Players in the game: "
 	for _, player := range game.Players {
 		gameString += player + ","
 	}
@@ -63,6 +63,9 @@ func (game Game) String() string {
 		}
 		if game.TimeLeft != 0 {
 			gameString += fmt.Sprintf("Time left: %d seconds\n", game.TimeLeft)
+		}
+		if game.EndGame {
+			gameString += "\nNext entry will be the story ending. Make it a good one!\n"
 		}
 	}
 
@@ -92,8 +95,8 @@ func StartGame(initiator string, players []string, timeLimit, maxLength int) *Ga
 		Finished:  false,
 		TimeLeft:  timeLimit,
 		MaxLength: maxLength,
+		EndGame:   false,
 
-		endGame:    false,
 		playerTurn: 1,
 		timeLimit:  timeLimit,
 	}
@@ -117,15 +120,10 @@ func (game *Game) AddEntry(entry string, issuer string) error {
 	game.Story = append(game.Story, Entry{Text: entry, Player: issuer})
 	game.setNextTurn()
 
-	if game.endGame {
+	if game.EndGame {
 		game.Finished = true
 	}
 	return nil
-}
-
-// EndGame sets the game to end after the next turn.
-func (game *Game) EndGame() {
-	game.endGame = true
 }
 
 func (game *Game) monitorTime() {

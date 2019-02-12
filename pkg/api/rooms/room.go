@@ -114,7 +114,7 @@ func (room *Room) EndGame(issuer string) error {
 		return errors.New("there isn't a started game")
 	}
 
-	room.game.EndGame()
+	room.game.EndGame = true
 	return nil
 }
 
