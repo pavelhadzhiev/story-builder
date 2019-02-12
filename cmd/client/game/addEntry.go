@@ -73,10 +73,10 @@ func (aec *AddEntryCmd) Run() error {
 
 func (aec *AddEntryCmd) buildCommand() *cobra.Command {
 	var addEntryCmd = &cobra.Command{
-		Use:     "add-entry",
+		Use:     "add-entry [entry]",
 		Aliases: []string{"add"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Adds an entry to the current game if its your turn.",
+		Long:    `Adds an entry to the current game if its your turn. If the game is not started or finished or its not your turn, returns error.`,
 		PreRunE: cmd.PreRunE(aec),
 		RunE:    cmd.RunE(aec),
 	}

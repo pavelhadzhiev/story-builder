@@ -63,8 +63,8 @@ func (sgc *StartGameCmd) buildCommand() *cobra.Command {
 	var startGameCmd = &cobra.Command{
 		Use:     "start-game",
 		Aliases: []string{"sg"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Starts a game in the joined room.",
+		Long:    `Starts a game in the joined room. Requires admin access. If a game is already started, returns error.`,
 		PreRunE: cmd.PreRunE(sgc),
 		RunE:    cmd.RunE(sgc),
 	}

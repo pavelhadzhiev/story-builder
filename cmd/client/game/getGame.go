@@ -62,8 +62,8 @@ func (ggc *GetGameCmd) buildCommand() *cobra.Command {
 	var getGameCmd = &cobra.Command{
 		Use:     "get-game",
 		Aliases: []string{"game"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Prints the status of the current or last played game.",
+		Long:    `Prints the status of the current or last played game. If no game has ever been started in the room, returns error.`,
 		PreRunE: cmd.PreRunE(ggc),
 		RunE:    cmd.RunE(ggc),
 	}

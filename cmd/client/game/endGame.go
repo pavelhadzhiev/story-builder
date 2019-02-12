@@ -63,8 +63,8 @@ func (egc *EndGameCmd) buildCommand() *cobra.Command {
 	var endGameCmd = &cobra.Command{
 		Use:     "end-game",
 		Aliases: []string{"eg"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Ends the game in the joined room. Executing this means that the next move will finish the game.",
+		Long:    `Ends the game in the joined room. Executing this means that the next move will finish the game. Requires admin access. If there is no running game, returns error.`,
 		PreRunE: cmd.PreRunE(egc),
 		RunE:    cmd.RunE(egc),
 	}
