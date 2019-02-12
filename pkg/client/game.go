@@ -74,3 +74,51 @@ func (client *SBClient) AddEntry(roomName, entry string) error {
 		return errors.New("something went really wrong :(")
 	}
 }
+
+// StartGame triggers a game in the room with the provided name.
+// Returns error if room doesn't exist, a game is already running or the user doesn't have the required permissions.
+func (client *SBClient) StartGame(roomName string) error {
+	if client.config.Room != roomName {
+		return errors.New("cannot start game: requires user to be joined in the room")
+	}
+	response, err := client.call(http.MethodPost, "/manage-games/"+roomName, nil)
+	if err != nil {
+		return fmt.Errorf("error during http request: %e", err)
+	}
+	switch response.StatusCode {
+	case 200:
+		return nil
+	case 403:
+		return errors.New("cannot start game: requires admin access")
+	case 404:
+		return errors.New("room \"" + roomName + "\" doesn't exist")
+	case 409:
+		return errors.New("a game is already running in \"" + roomName + "\"")
+	default:
+		return errors.New("something went really wrong :(")
+	}
+}
+
+// EndGame ends a running game. Once called, the next entry will set the game's state to finished and not allow any further entries.
+// Returns error if room doesn't exist, no game is running or the user doesn't have the required permissions.
+func (client *SBClient) EndGame(roomName string) error {
+	if client.config.Room != roomName {
+		return errors.New("cannot end game: requires user to be joined in the room")
+	}
+	response, err := client.call(http.MethodDelete, "/manage-games/"+roomName, nil)
+	if err != nil {
+		return fmt.Errorf("error during http request: %e", err)
+	}
+	switch response.StatusCode {
+	case 202:
+		return nil
+	case 403:
+		return errors.New("cannot end game: requires admin access")
+	case 404:
+		return errors.New("room \"" + roomName + "\" doesn't exist")
+	case 409:
+		return errors.New("there is no running game in \"" + roomName + "\"")
+	default:
+		return errors.New("something went really wrong :(")
+	}
+}
