@@ -111,13 +111,18 @@ func (client *SBClient) StartGame(roomName string, timeLimit, maxLength, entries
 	}
 }
 
-// EndGame ends a running game. Once called, the next entry will set the game's state to finished and not allow any further entries.
+// EndGame ends a running game. Once called it will set the game's remaining entries to the provided number and the game will effectively end after the count is reached.
 // Returns error if room doesn't exist, no game is running or the user doesn't have the required permissions.
-func (client *SBClient) EndGame(roomName string) error {
+func (client *SBClient) EndGame(roomName string, entriesCount int) error {
+	if entriesCount < 0 {
+		return errors.New("cannost start game: negative entires value")
+	}
 	if client.config.Room != roomName {
 		return errors.New("cannot end game: requires user to be joined in the room")
 	}
-	response, err := client.call(http.MethodDelete, "/manage-games/"+roomName, nil, nil)
+	headers := make(map[string]string)
+	headers["Entries-Count"] = fmt.Sprint(entriesCount)
+	response, err := client.call(http.MethodDelete, "/manage-games/"+roomName, nil, headers)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}

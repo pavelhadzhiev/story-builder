@@ -135,10 +135,10 @@ func (game *Game) AddEntry(entry string, issuer string) error {
 	return nil
 }
 
-// EndGame sets the entries count to one, meaning the next move will finish the story.
-func (game *Game) EndGame() {
-	game.MaxEntries = 1
-	game.EntriesLeft = 1
+// EndGame sets the left entries count to one, meaning the next move will finish the story.
+func (game *Game) EndGame(entries int) {
+	game.MaxEntries = entries
+	game.EntriesLeft = entries
 }
 
 func (game *Game) monitorTime() {

@@ -118,7 +118,20 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		if err := room.EndGame(issuer); err != nil {
+		var entriesCount int
+		entriesCountString := r.Header.Get("Entries-Count")
+		if entriesCountString != "" {
+			entriesCount, err = strconv.Atoi(entriesCountString)
+			if err != nil || entriesCount < 0 {
+				w.WriteHeader(400)
+				w.Write([]byte("Illegal Entries-Count header value."))
+				return
+			}
+		} else {
+			entriesCount = 0 // Set default entries count, if one is not provided
+		}
+
+		if err := room.EndGame(issuer, entriesCount); err != nil {
 			w.WriteHeader(403)
 			w.Write([]byte("Game cannot be ended. Requires user to be joined and have admin access."))
 			return

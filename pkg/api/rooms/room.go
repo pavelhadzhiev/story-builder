@@ -105,7 +105,7 @@ func (room *Room) GetGame() *game.Game {
 
 // EndGame sets the currently played game to finish after the next move.
 // Returns error if there isn't a started game to end or if user doesn't have admin access or is not in the room.
-func (room *Room) EndGame(issuer string) error {
+func (room *Room) EndGame(issuer string, entries int) error {
 	if err := room.checkUserPermissions(issuer); err != nil {
 		return err
 	}
@@ -114,7 +114,7 @@ func (room *Room) EndGame(issuer string) error {
 		return errors.New("there isn't a started game")
 	}
 
-	room.game.EndGame()
+	room.game.EndGame(entries)
 	return nil
 }
 

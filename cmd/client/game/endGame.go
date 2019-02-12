@@ -17,6 +17,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"strconv"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
 	"github.com/spf13/cobra"
@@ -25,6 +26,8 @@ import (
 // EndGameCmd is a wrapper for the story-builder end-game command
 type EndGameCmd struct {
 	*cmd.Context
+
+	entriesCount int
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -32,6 +35,24 @@ func (egc *EndGameCmd) Command() *cobra.Command {
 	result := egc.buildCommand()
 
 	return result
+}
+
+// Validate makes sure all required arguments are legal and are provided
+func (egc *EndGameCmd) Validate(args []string) error {
+	if len(args) > 1 {
+		return fmt.Errorf("requires a single arg or no args")
+	}
+
+	if len(args) == 1 {
+		count, err := strconv.Atoi(args[0])
+		if err != nil {
+			return err
+		}
+		egc.entriesCount = count
+	} else {
+		egc.entriesCount = 1 // Set default end game countdown in case one is not provided
+	}
+	return nil
 }
 
 // Run is used to build the RunE function for the cobra command
@@ -50,7 +71,7 @@ func (egc *EndGameCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
-	if err := egc.Client.EndGame(cfg.Room); err != nil {
+	if err := egc.Client.EndGame(cfg.Room, egc.entriesCount); err != nil {
 		return err
 	}
 
@@ -61,10 +82,10 @@ func (egc *EndGameCmd) Run() error {
 
 func (egc *EndGameCmd) buildCommand() *cobra.Command {
 	var endGameCmd = &cobra.Command{
-		Use:     "end-game",
+		Use:     "end-game [entries-left]",
 		Aliases: []string{"eg"},
-		Short:   "Ends the game in the joined room. Executing this means that the next move will finish the game.",
-		Long:    `Ends the game in the joined room. Executing this means that the next move will finish the game. Requires admin access. If there is no running game, returns error.`,
+		Short:   "Ends the game in the joined room. Executing this means that game will have the provided number of entries left until it is finished. If not provided it will allow only one turn.",
+		Long:    `Ends the game in the joined room. Executing this means that game will have the provided number of entries left until it is finished. If not provided it will allow only one turn. Requires admin access. If there is no running game, returns error.`,
 		PreRunE: cmd.PreRunE(egc),
 		RunE:    cmd.RunE(egc),
 	}
