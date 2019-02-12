@@ -21,7 +21,7 @@ import (
 	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
-// ManageGamesHandler is an http handler for the story builder's start/end game API
+// ManageGamesHandler is an http handler for the story builder's game management API
 func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Request) {
 	urlSuffix := strings.TrimPrefix(r.URL.Path, "/manage-games/")
 	urlSuffixSplit := strings.Split(urlSuffix, "/")
