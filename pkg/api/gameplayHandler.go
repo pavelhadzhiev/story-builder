@@ -16,6 +16,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"strings"
 
@@ -80,7 +81,7 @@ func (server *SBServer) GameplayHandler(w http.ResponseWriter, r *http.Request) 
 
 		if err := room.AddEntry(entry, issuer); err != nil {
 			w.WriteHeader(403)
-			w.Write([]byte("It's not your turn or there isn't a started game."))
+			w.Write([]byte(fmt.Sprintf("There was an error while adding your entry: %v", err)))
 			return
 		}
 

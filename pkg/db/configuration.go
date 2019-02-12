@@ -23,6 +23,7 @@ import (
 // SBDatabase represents the database layer for the story builder server
 type SBDatabase struct {
 	database *sql.DB // a database variable to close on program exit
+
 	username string
 	password string
 }

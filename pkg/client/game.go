@@ -18,6 +18,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/api/game"
@@ -60,7 +61,12 @@ func (client *SBClient) AddEntry(roomName, entry string) error {
 	case 400:
 		return errors.New("missing Entry-Text header from request")
 	case 403:
-		return errors.New("it's not your turn")
+		defer response.Body.Close()
+		errorMessage, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("illegal entry: %s", string(errorMessage))
 	case 404:
 		return errors.New("room \"" + roomName + "\" doesn't exist or no games have been started")
 	default:
@@ -70,15 +76,19 @@ func (client *SBClient) AddEntry(roomName, entry string) error {
 
 // StartGame triggers a game in the room with the provided name.
 // Returns error if room doesn't exist, a game is already running or the user doesn't have the required permissions.
-func (client *SBClient) StartGame(roomName string, timeLimit int) error {
-	if timeLimit <= 0 {
+func (client *SBClient) StartGame(roomName string, timeLimit, maxLength int) error {
+	if timeLimit < 0 {
 		return errors.New("cannost start game: negative time limit value")
+	}
+	if maxLength < 0 {
+		return errors.New("cannost start game: negative max length value")
 	}
 	if client.config.Room != roomName {
 		return errors.New("cannot start game: requires user to be joined in the room")
 	}
 	headers := make(map[string]string)
 	headers["Time-Limit"] = fmt.Sprint(timeLimit)
+	headers["Max-Length"] = fmt.Sprint(maxLength)
 	response, err := client.call(http.MethodPost, "/manage-games/"+roomName, nil, headers)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)

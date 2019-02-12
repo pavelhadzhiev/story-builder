@@ -27,6 +27,7 @@ type StartGameCmd struct {
 	*cmd.Context
 
 	timeLimit int
+	maxLength int
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -52,7 +53,7 @@ func (sgc *StartGameCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
-	if err := sgc.Client.StartGame(cfg.Room, sgc.timeLimit); err != nil {
+	if err := sgc.Client.StartGame(cfg.Room, sgc.timeLimit, sgc.maxLength); err != nil {
 		return err
 	}
 
@@ -66,12 +67,13 @@ func (sgc *StartGameCmd) buildCommand() *cobra.Command {
 		Use:     "start-game",
 		Aliases: []string{"sg"},
 		Short:   "Starts a game in the joined room.",
-		Long:    `Starts a game in the joined room. Requires admin access. If a game is already started, returns error.`,
+		Long:    `Starts a game in the joined room. Requires admin access. If a game is already started, returns error. Supports configurations of time limit per turn and max length of entries. Default values are 60 seconds and 100 symbols. If you don't want to use any of these features, pass 0 with the according flag.`,
 		PreRunE: cmd.PreRunE(sgc),
 		RunE:    cmd.RunE(sgc),
 	}
 
-	startGameCmd.Flags().IntVarP(&sgc.timeLimit, "timelimit", "t", 60, "the time limit for a single turn in seconds")
+	startGameCmd.Flags().IntVarP(&sgc.timeLimit, "timelimit", "t", 60, "the time limit to complete a turn in seconds")
+	startGameCmd.Flags().IntVarP(&sgc.maxLength, "maxlength", "m", 100, "the max length for an entry in symbols")
 
 	return startGameCmd
 }
