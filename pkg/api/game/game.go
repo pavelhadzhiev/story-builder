@@ -78,7 +78,7 @@ func (game Game) String() string {
 }
 
 func (entry Entry) String() string {
-	return fmt.Sprintf("%s (By \"%s\")", entry.Text, entry.Player)
+	return fmt.Sprintf("%s (by \"%s\")", entry.Text, entry.Player)
 }
 
 // StartGame creates a game, initializing all required structures and arrays, with the provided players and initiator.

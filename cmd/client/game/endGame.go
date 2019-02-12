@@ -20,6 +20,7 @@ import (
 	"strconv"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -71,6 +72,11 @@ func (egc *EndGameCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
+	prompt := fmt.Sprintf("end game in room \"%s\" after %d moves", cfg.Room, egc.entriesCount)
+	if !util.ConfirmationPrompt(prompt) {
+		fmt.Println("Operation cancelled. No action taken.")
+		return nil
+	}
 	if err := egc.Client.EndGame(cfg.Room, egc.entriesCount); err != nil {
 		return err
 	}

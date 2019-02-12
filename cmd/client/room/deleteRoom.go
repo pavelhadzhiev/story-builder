@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -62,6 +63,10 @@ func (drc *DeleteRoomCmd) Run() error {
 		return errors.New("room name is empty")
 	}
 
+	if !util.ConfirmationPrompt("delete room \"" + drc.name + "\"") {
+		fmt.Println("Operation cancelled. No action taken.")
+		return nil
+	}
 	if err := drc.Client.DeleteRoom(drc.name); err != nil {
 		return err
 	}
