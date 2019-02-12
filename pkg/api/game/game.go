@@ -23,13 +23,14 @@ import (
 
 // Game represents a story builder game. It holds a
 type Game struct {
-	Turn      string   `json:"turn,omitempty"`
-	Story     []Entry  `json:"story,omitempty"`
-	Players   []string `json:"players,omitempty"`
-	Finished  bool     `json:"finished,omitempty"`
-	TimeLeft  int      `json:"timeLeft,omitempty"`
-	MaxLength int      `json:"maxLength,omitempty"`
-	EndGame   bool     `json:"endGame,omitempty"`
+	Turn        string   `json:"turn,omitempty"`
+	Story       []Entry  `json:"story,omitempty"`
+	Players     []string `json:"players,omitempty"`
+	Finished    bool     `json:"finished,omitempty"`
+	TimeLeft    int      `json:"timeLeft,omitempty"`
+	MaxLength   int      `json:"maxLength,omitempty"`
+	MaxEntries  int      `json:"maxEntries,omitempty"`
+	EntriesLeft int      `json:"entriesLeft,omitempty"`
 
 	playerTurn int
 	timeLimit  int
@@ -64,8 +65,12 @@ func (game Game) String() string {
 		if game.TimeLeft != 0 {
 			gameString += fmt.Sprintf("Time left: %d seconds\n", game.TimeLeft)
 		}
-		if game.EndGame {
-			gameString += "\nNext entry will be the story ending. Make it a good one!\n"
+		if game.MaxEntries != 0 {
+			if game.EntriesLeft == 1 {
+				gameString += "\nNext entry will be the story ending. Make it a good one!\n"
+			} else {
+				gameString += fmt.Sprintf("Entires left: %d \n", game.EntriesLeft)
+			}
 		}
 	}
 
@@ -78,7 +83,7 @@ func (entry Entry) String() string {
 
 // StartGame creates a game, initializing all required structures and arrays, with the provided players and initiator.
 // Supports configuration of time limit for turns (in seconds) and max length of entries (in symbols). Pass 0 if you don't want any of these features.
-func StartGame(initiator string, players []string, timeLimit, maxLength int) *Game {
+func StartGame(initiator string, players []string, timeLimit, maxLength, entriesCount int) *Game {
 	playersCopy := make([]string, len(players))
 	copy(playersCopy, players)
 	for index, player := range playersCopy {
@@ -89,13 +94,14 @@ func StartGame(initiator string, players []string, timeLimit, maxLength int) *Ga
 	}
 
 	game := &Game{
-		Turn:      initiator,
-		Story:     make([]Entry, 0),
-		Players:   playersCopy,
-		Finished:  false,
-		TimeLeft:  timeLimit,
-		MaxLength: maxLength,
-		EndGame:   false,
+		Turn:        initiator,
+		Story:       make([]Entry, 0),
+		Players:     playersCopy,
+		Finished:    false,
+		TimeLeft:    timeLimit,
+		MaxLength:   maxLength,
+		MaxEntries:  entriesCount,
+		EntriesLeft: entriesCount,
 
 		playerTurn: 1,
 		timeLimit:  timeLimit,
@@ -120,10 +126,19 @@ func (game *Game) AddEntry(entry string, issuer string) error {
 	game.Story = append(game.Story, Entry{Text: entry, Player: issuer})
 	game.setNextTurn()
 
-	if game.EndGame {
-		game.Finished = true
+	if game.MaxEntries != 0 {
+		game.EntriesLeft--
+		if game.EntriesLeft <= 0 {
+			game.Finished = true
+		}
 	}
 	return nil
+}
+
+// EndGame sets the entries count to one, meaning the next move will finish the story.
+func (game *Game) EndGame() {
+	game.MaxEntries = 1
+	game.EntriesLeft = 1
 }
 
 func (game *Game) monitorTime() {

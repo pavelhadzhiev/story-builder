@@ -62,7 +62,7 @@ func (room Room) String() string {
 
 // StartGame starts a new game, including all online players and giving the provided initiator the first turn.
 // Returns error if a game is already started and still ongoing or if user doesn't have admin access or is not in the room.
-func (room *Room) StartGame(initiator string, timeLimit, maxLength int) error {
+func (room *Room) StartGame(initiator string, timeLimit, maxLength, entriesCount int) error {
 	if err := room.checkUserPermissions(initiator); err != nil {
 		return err
 	}
@@ -70,7 +70,7 @@ func (room *Room) StartGame(initiator string, timeLimit, maxLength int) error {
 	if room.game != nil {
 		return errors.New("there is an unfinished game")
 	}
-	room.game = game.StartGame(initiator, room.Online, timeLimit, maxLength)
+	room.game = game.StartGame(initiator, room.Online, timeLimit, maxLength, entriesCount)
 	return nil
 }
 
@@ -114,7 +114,7 @@ func (room *Room) EndGame(issuer string) error {
 		return errors.New("there isn't a started game")
 	}
 
-	room.game.EndGame = true
+	room.game.EndGame()
 	return nil
 }
 

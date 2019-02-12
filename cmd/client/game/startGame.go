@@ -26,8 +26,9 @@ import (
 type StartGameCmd struct {
 	*cmd.Context
 
-	timeLimit int
-	maxLength int
+	timeLimit    int
+	maxLength    int
+	entriesCount int
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -53,7 +54,7 @@ func (sgc *StartGameCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
-	if err := sgc.Client.StartGame(cfg.Room, sgc.timeLimit, sgc.maxLength); err != nil {
+	if err := sgc.Client.StartGame(cfg.Room, sgc.timeLimit, sgc.maxLength, sgc.entriesCount); err != nil {
 		return err
 	}
 
@@ -72,8 +73,9 @@ func (sgc *StartGameCmd) buildCommand() *cobra.Command {
 		RunE:    cmd.RunE(sgc),
 	}
 
-	startGameCmd.Flags().IntVarP(&sgc.timeLimit, "timelimit", "t", 60, "the time limit to complete a turn in seconds")
-	startGameCmd.Flags().IntVarP(&sgc.maxLength, "maxlength", "m", 100, "the max length for an entry in symbols")
+	startGameCmd.Flags().IntVarP(&sgc.timeLimit, "time", "t", 60, "the time limit to complete a turn in seconds")
+	startGameCmd.Flags().IntVarP(&sgc.maxLength, "length", "l", 100, "the max length for an entry in symbols")
+	startGameCmd.Flags().IntVarP(&sgc.entriesCount, "entires", "e", 0, "the amount of entries that will be played out before the game ends")
 
 	return startGameCmd
 }

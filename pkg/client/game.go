@@ -76,12 +76,15 @@ func (client *SBClient) AddEntry(roomName, entry string) error {
 
 // StartGame triggers a game in the room with the provided name.
 // Returns error if room doesn't exist, a game is already running or the user doesn't have the required permissions.
-func (client *SBClient) StartGame(roomName string, timeLimit, maxLength int) error {
+func (client *SBClient) StartGame(roomName string, timeLimit, maxLength, entriesCount int) error {
 	if timeLimit < 0 {
 		return errors.New("cannost start game: negative time limit value")
 	}
 	if maxLength < 0 {
 		return errors.New("cannost start game: negative max length value")
+	}
+	if entriesCount < 0 {
+		return errors.New("cannost start game: negative entires value")
 	}
 	if client.config.Room != roomName {
 		return errors.New("cannot start game: requires user to be joined in the room")
@@ -89,6 +92,7 @@ func (client *SBClient) StartGame(roomName string, timeLimit, maxLength int) err
 	headers := make(map[string]string)
 	headers["Time-Limit"] = fmt.Sprint(timeLimit)
 	headers["Max-Length"] = fmt.Sprint(maxLength)
+	headers["Entries-Count"] = fmt.Sprint(entriesCount)
 	response, err := client.call(http.MethodPost, "/manage-games/"+roomName, nil, headers)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
