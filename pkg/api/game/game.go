@@ -18,6 +18,7 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 )
 
 // Game represents a story builder game. It holds a
@@ -26,9 +27,11 @@ type Game struct {
 	Story    []Entry  `json:"story,omitempty"`
 	Players  []string `json:"players,omitempty"`
 	Finished bool     `json:"finished,omitempty"`
+	TimeLeft int      `json:"timeleft,omitempty"`
 
-	endGame     bool
-	turnCounter int
+	endGame    bool
+	playerTurn int
+	timeLimit  int
 }
 
 // Entry represents a single player's turn in the story builder game
@@ -54,6 +57,7 @@ func (game Game) String() string {
 		gameString += "The game has finished. You can now start the next one!\n"
 	} else {
 		gameString += fmt.Sprintf("Next turn: Player \"%s\"\n", game.Turn)
+		gameString += fmt.Sprintf("Time left: %d\n", game.TimeLeft)
 	}
 
 	return gameString
@@ -63,8 +67,8 @@ func (entry Entry) String() string {
 	return fmt.Sprintf("%s (By \"%s\")", entry.Text, entry.Player)
 }
 
-// NewGame creates a game, initializing all required structures and arrays, with the provided players and initiator.
-func NewGame(initiator string, players []string) *Game {
+// StartGame creates a game, initializing all required structures and arrays, with the provided players and initiator.
+func StartGame(initiator string, players []string, timeLimit int) *Game {
 	playersCopy := make([]string, len(players))
 	copy(playersCopy, players)
 	for index, player := range playersCopy {
@@ -73,15 +77,22 @@ func NewGame(initiator string, players []string) *Game {
 			break
 		}
 	}
-	return &Game{
+
+	game := &Game{
 		Turn:     initiator,
 		Story:    make([]Entry, 0),
 		Players:  playersCopy,
 		Finished: false,
+		TimeLeft: timeLimit,
 
-		endGame:     false,
-		turnCounter: 1,
+		endGame:    false,
+		playerTurn: 1,
+		timeLimit:  timeLimit,
 	}
+
+	go game.monitorTime()
+
+	return game
 }
 
 // AddEntry sets the game to end after the next turn.
@@ -89,13 +100,9 @@ func (game *Game) AddEntry(entry string, issuer string) error {
 	if issuer != game.Turn {
 		return errors.New("invalid entry - not this player's turn")
 	}
-	game.Story = append(game.Story, Entry{Text: entry, Player: issuer})
-	game.turnCounter++
-	if game.turnCounter > len(game.Players) {
-		game.turnCounter = 1
-	}
 
-	game.Turn = game.Players[game.turnCounter-1]
+	game.Story = append(game.Story, Entry{Text: entry, Player: issuer})
+	game.setNextTurn()
 
 	if game.endGame {
 		game.Finished = true
@@ -106,4 +113,24 @@ func (game *Game) AddEntry(entry string, issuer string) error {
 // EndGame sets the game to end after the next turn.
 func (game *Game) EndGame() {
 	game.endGame = true
+}
+
+func (game *Game) monitorTime() {
+	for !game.Finished {
+		game.TimeLeft--
+		if game.TimeLeft <= 0 {
+			game.setNextTurn()
+		}
+		time.Sleep(1 * time.Second)
+	}
+}
+
+func (game *Game) setNextTurn() {
+	game.playerTurn++
+	if game.playerTurn > len(game.Players) {
+		game.playerTurn = 1
+	}
+
+	game.Turn = game.Players[game.playerTurn-1]
+	game.TimeLeft = game.timeLimit
 }
