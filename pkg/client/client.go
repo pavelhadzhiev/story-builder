@@ -41,14 +41,18 @@ func NewSBClient(config *config.SBConfiguration) *SBClient {
 	return client
 }
 
-func (client *SBClient) call(method string, path string, body io.Reader) (*http.Response, error) {
+func (client *SBClient) call(method string, path string, body io.Reader, headers map[string]string) (*http.Response, error) {
 	fullURL := client.config.URL + path
 
 	req, err := http.NewRequest(method, fullURL, body)
 	if err != nil {
 		return nil, err
 	}
+
 	req.Header = *client.headers
+	for key, value := range headers {
+		req.Header.Add(key, value)
+	}
 
 	resp, err := client.httpClient.Do(req)
 	if err != nil {

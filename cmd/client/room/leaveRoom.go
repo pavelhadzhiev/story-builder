@@ -59,7 +59,7 @@ func (lrc *LeaveRoomCmd) Run() error {
 	if err := lrc.Client.LeaveRoom(roomName); err != nil {
 		fmt.Printf("Something went wrong: %s\n", err)
 		fmt.Println("This could've been caused by a problem with the server.")
-		fmt.Println("However, your configuration has been adjusted, so you have \"left\".")
+		fmt.Println("However, your configuration has been adjusted, so you have technically \"left\".")
 	} else {
 		fmt.Printf("You've successfully left room \"%s\".\n", roomName)
 	}

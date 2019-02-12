@@ -25,6 +25,8 @@ import (
 // StartGameCmd is a wrapper for the story-builder start-game command
 type StartGameCmd struct {
 	*cmd.Context
+
+	timeLimit int
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -50,7 +52,7 @@ func (sgc *StartGameCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
-	if err := sgc.Client.StartGame(cfg.Room); err != nil {
+	if err := sgc.Client.StartGame(cfg.Room, sgc.timeLimit); err != nil {
 		return err
 	}
 
@@ -68,5 +70,8 @@ func (sgc *StartGameCmd) buildCommand() *cobra.Command {
 		PreRunE: cmd.PreRunE(sgc),
 		RunE:    cmd.RunE(sgc),
 	}
+
+	startGameCmd.Flags().IntVarP(&sgc.timeLimit, "timelimit", "t", 60, "the time limit for a single turn in seconds")
+
 	return startGameCmd
 }

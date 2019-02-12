@@ -22,7 +22,7 @@ import (
 
 // Register makes a request to the story builder server to register the user in the configuration
 func (client *SBClient) Register() error {
-	response, err := client.call(http.MethodPost, "/register/", nil)
+	response, err := client.call(http.MethodPost, "/register/", nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}
@@ -41,7 +41,7 @@ func (client *SBClient) Register() error {
 
 // Login makes a request to the story builder server to check whether the user in the configuration is registered in the server DB.
 func (client *SBClient) Login() error {
-	response, err := client.call(http.MethodPost, "/login/", nil)
+	response, err := client.call(http.MethodPost, "/login/", nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}
@@ -62,7 +62,7 @@ func (client *SBClient) Login() error {
 
 // Logout makes a request to the story builder server to logout the user from the server.
 func (client *SBClient) Logout() error {
-	response, err := client.call(http.MethodPost, "/logout/", nil)
+	response, err := client.call(http.MethodPost, "/logout/", nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}

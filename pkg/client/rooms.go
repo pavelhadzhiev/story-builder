@@ -26,7 +26,7 @@ import (
 
 // GetAllRooms retrieves all rooms from the server and returns them.
 func (client *SBClient) GetAllRooms() ([]rooms.Room, error) {
-	response, err := client.call(http.MethodGet, "/rooms/", nil)
+	response, err := client.call(http.MethodGet, "/rooms/", nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error during http request: %e", err)
 	}
@@ -52,7 +52,7 @@ func (client *SBClient) CreateNewRoom(room *rooms.Room) error {
 	}
 
 	buffer := bytes.NewBuffer(requestBody)
-	response, err := client.call(http.MethodPost, "/rooms/", buffer)
+	response, err := client.call(http.MethodPost, "/rooms/", buffer, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}
@@ -69,7 +69,7 @@ func (client *SBClient) CreateNewRoom(room *rooms.Room) error {
 // GetRoom retrieves the room with the provided name from the server.
 // Returns error if a room with this name doesn't exist.
 func (client *SBClient) GetRoom(roomName string) (*rooms.Room, error) {
-	response, err := client.call(http.MethodGet, "/rooms/"+roomName, nil)
+	response, err := client.call(http.MethodGet, "/rooms/"+roomName, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error during http request: %e", err)
 	}
@@ -91,7 +91,7 @@ func (client *SBClient) GetRoom(roomName string) (*rooms.Room, error) {
 // DeleteRoom deletes the room with the provided name from the server.
 // Returns error if a room with this name doesn't exist or the issuer doesn't have the permissions to delete it.
 func (client *SBClient) DeleteRoom(roomName string) error {
-	response, err := client.call(http.MethodDelete, "/rooms/"+roomName, nil)
+	response, err := client.call(http.MethodDelete, "/rooms/"+roomName, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}
@@ -110,7 +110,7 @@ func (client *SBClient) DeleteRoom(roomName string) error {
 // JoinRoom puts the player in the room with the provided name.
 // Returns error if a room with this name doesn't exist or the user doesn't have permission to join that room.
 func (client *SBClient) JoinRoom(roomName string) error {
-	response, err := client.call(http.MethodPost, "/join-room/"+roomName, nil)
+	response, err := client.call(http.MethodPost, "/join-room/"+roomName, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}
@@ -128,7 +128,7 @@ func (client *SBClient) JoinRoom(roomName string) error {
 
 // LeaveRoom removes the player from the room with the provided name.
 func (client *SBClient) LeaveRoom(roomName string) error {
-	response, err := client.call(http.MethodPost, "/leave-room/"+roomName, nil)
+	response, err := client.call(http.MethodPost, "/leave-room/"+roomName, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}

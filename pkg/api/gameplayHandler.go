@@ -61,6 +61,7 @@ func (server *SBServer) GameplayHandler(w http.ResponseWriter, r *http.Request) 
 		if game, err := server.GetGame(roomName); err != nil || game.Finished {
 			w.WriteHeader(404)
 			w.Write([]byte("There is no running game."))
+			return
 		}
 
 		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))

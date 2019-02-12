@@ -26,7 +26,7 @@ import (
 // GetGame retrieves the game of the room with the provided name.
 // Returns error if room doesn't exist or game is not started.
 func (client *SBClient) GetGame(roomName string) (*game.Game, error) {
-	response, err := client.call(http.MethodGet, "/gameplay/"+roomName, nil)
+	response, err := client.call(http.MethodGet, "/gameplay/"+roomName, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error during http request: %e", err)
 	}
@@ -48,16 +48,9 @@ func (client *SBClient) GetGame(roomName string) (*game.Game, error) {
 // AddEntry adds the provided entry in the game of the room with the provided name on behalf of the user.
 // Returns error if room doesn't exist, game is not started or it's not the users turn.
 func (client *SBClient) AddEntry(roomName, entry string) error {
-	fullURL := client.config.URL + "/gameplay/" + roomName
-
-	req, err := http.NewRequest(http.MethodPost, fullURL, nil)
-	if err != nil {
-		return err
-	}
-	req.Header = *client.headers
-	req.Header.Add("Entry-Text", entry)
-
-	response, err := client.httpClient.Do(req)
+	headers := make(map[string]string)
+	headers["Entry-Text"] = entry
+	response, err := client.call(http.MethodPost, "/gameplay/"+roomName, nil, headers)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}
@@ -77,11 +70,16 @@ func (client *SBClient) AddEntry(roomName, entry string) error {
 
 // StartGame triggers a game in the room with the provided name.
 // Returns error if room doesn't exist, a game is already running or the user doesn't have the required permissions.
-func (client *SBClient) StartGame(roomName string) error {
+func (client *SBClient) StartGame(roomName string, timeLimit int) error {
+	if timeLimit <= 0 {
+		return errors.New("cannost start game: negative time limit value")
+	}
 	if client.config.Room != roomName {
 		return errors.New("cannot start game: requires user to be joined in the room")
 	}
-	response, err := client.call(http.MethodPost, "/manage-games/"+roomName, nil)
+	headers := make(map[string]string)
+	headers["Time-Limit"] = fmt.Sprint(timeLimit)
+	response, err := client.call(http.MethodPost, "/manage-games/"+roomName, nil, headers)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}
@@ -105,7 +103,7 @@ func (client *SBClient) EndGame(roomName string) error {
 	if client.config.Room != roomName {
 		return errors.New("cannot end game: requires user to be joined in the room")
 	}
-	response, err := client.call(http.MethodDelete, "/manage-games/"+roomName, nil)
+	response, err := client.call(http.MethodDelete, "/manage-games/"+roomName, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}

@@ -16,6 +16,7 @@ package api
 
 import (
 	"net/http"
+	"strconv"
 	"strings"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/util"
@@ -52,7 +53,20 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 			return
 		}
 
-		if err := room.StartGame(issuer, 30); err != nil {
+		var timeLimit int
+		timeLimitString := r.Header.Get("Time-Limit")
+		if timeLimitString != "" {
+			timeLimit, err = strconv.Atoi(timeLimitString)
+			if err != nil || timeLimit <= 0 {
+				w.WriteHeader(400)
+				w.Write([]byte("Illegal Time-Limit header value."))
+				return
+			}
+		} else {
+			timeLimit = 60 // Set default time limit, if one is not provided
+		}
+
+		if err := room.StartGame(issuer, timeLimit); err != nil {
 			w.WriteHeader(403)
 			w.Write([]byte("Game cannot be started. Requires user to be joined and have admin access."))
 			return
