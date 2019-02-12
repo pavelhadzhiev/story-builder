@@ -22,9 +22,9 @@ import (
 	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
-// GameHandler is an http handler for the story builder's gameplay API
-func (server *SBServer) GameHandler(w http.ResponseWriter, r *http.Request) {
-	urlSuffix := strings.TrimPrefix(r.URL.Path, "/games/")
+// GameplayHandler is an http handler for the story builder's gameplay API
+func (server *SBServer) GameplayHandler(w http.ResponseWriter, r *http.Request) {
+	urlSuffix := strings.TrimPrefix(r.URL.Path, "/gameplay/")
 	urlSuffixSplit := strings.Split(urlSuffix, "/")
 	if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
 		w.WriteHeader(400)

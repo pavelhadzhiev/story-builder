@@ -22,21 +22,21 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// GetStoryCmd is a wrapper for the story-builder story command
-type GetStoryCmd struct {
+// GetGameCmd is a wrapper for the story-builder story command
+type GetGameCmd struct {
 	*cmd.Context
 }
 
 // Command builds and returns a cobra command that will be added to the root command
-func (gsc *GetStoryCmd) Command() *cobra.Command {
-	result := gsc.buildCommand()
+func (ggc *GetGameCmd) Command() *cobra.Command {
+	result := ggc.buildCommand()
 
 	return result
 }
 
 // Run is used to build the RunE function for the cobra command
-func (gsc *GetStoryCmd) Run() error {
-	cfg, err := gsc.Configurator.Load()
+func (ggc *GetGameCmd) Run() error {
+	cfg, err := ggc.Configurator.Load()
 	if err != nil {
 		return err
 	}
@@ -50,7 +50,7 @@ func (gsc *GetStoryCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
-	game, err := gsc.Client.GetGame(cfg.Room)
+	game, err := ggc.Client.GetGame(cfg.Room)
 	if err != nil {
 		return err
 	}
@@ -58,14 +58,14 @@ func (gsc *GetStoryCmd) Run() error {
 	return nil
 }
 
-func (gsc *GetStoryCmd) buildCommand() *cobra.Command {
-	var getStoryCmd = &cobra.Command{
+func (ggc *GetGameCmd) buildCommand() *cobra.Command {
+	var getGameCmd = &cobra.Command{
 		Use:     "get-game",
 		Aliases: []string{"game"},
 		Short:   "",
 		Long:    ``,
-		PreRunE: cmd.PreRunE(gsc),
-		RunE:    cmd.RunE(gsc),
+		PreRunE: cmd.PreRunE(ggc),
+		RunE:    cmd.RunE(ggc),
 	}
-	return getStoryCmd
+	return getGameCmd
 }

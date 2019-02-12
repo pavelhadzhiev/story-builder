@@ -26,7 +26,7 @@ import (
 // GetGame retrieves the game of the room with the provided name.
 // Returns error if room doesn't exist or game is not started.
 func (client *SBClient) GetGame(roomName string) (*game.Game, error) {
-	response, err := client.call(http.MethodGet, "/games/"+roomName, nil)
+	response, err := client.call(http.MethodGet, "/gameplay/"+roomName, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error during http request: %e", err)
 	}
@@ -48,7 +48,7 @@ func (client *SBClient) GetGame(roomName string) (*game.Game, error) {
 // AddEntry adds the provided entry in the game of the room with the provided name on behalf of the user.
 // Returns error if room doesn't exist, game is not started or it's not the users turn.
 func (client *SBClient) AddEntry(roomName, entry string) error {
-	fullURL := client.config.URL + "/games/" + roomName
+	fullURL := client.config.URL + "/gameplay/" + roomName
 
 	req, err := http.NewRequest(http.MethodPost, fullURL, nil)
 	if err != nil {

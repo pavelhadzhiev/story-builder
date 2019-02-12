@@ -41,7 +41,7 @@ func main() {
 		&game.StartGameCmd{Context: ctx},
 		&game.EndGameCmd{Context: ctx},
 		&game.AddEntryCmd{Context: ctx},
-		&game.GetStoryCmd{Context: ctx},
+		&game.GetGameCmd{Context: ctx},
 		&game.GetPlayersCmd{Context: ctx},
 	}
 	for _, command := range commands {
