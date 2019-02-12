@@ -15,6 +15,7 @@
 package game
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -22,7 +23,7 @@ import (
 )
 
 // GetStoryCmd is a wrapper for the story-builder story command
-type GetStoryCmd struct{
+type GetStoryCmd struct {
 	*cmd.Context
 }
 
@@ -35,7 +36,25 @@ func (gsc *GetStoryCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (gsc *GetStoryCmd) Run() error {
-	fmt.Println("story called")
+	cfg, err := gsc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err := cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	if cfg.Authorization == "" {
+		return errors.New("users is not logged in")
+	}
+	if cfg.Room == "" {
+		return errors.New("user is not in a room")
+	}
+
+	game, err := gsc.Client.GetGame(cfg.Room)
+	if err != nil {
+		return err
+	}
+	fmt.Println(game)
 	return nil
 }
 

@@ -15,6 +15,7 @@
 package game
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -22,7 +23,7 @@ import (
 )
 
 // StartGameCmd is a wrapper for the story-builder start-game command
-type StartGameCmd struct{
+type StartGameCmd struct {
 	*cmd.Context
 }
 
@@ -35,7 +36,26 @@ func (sgc *StartGameCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (sgc *StartGameCmd) Run() error {
-	fmt.Println("start-game called")
+	cfg, err := sgc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err := cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	if cfg.Authorization == "" {
+		return errors.New("users is not logged in")
+	}
+	if cfg.Room == "" {
+		return errors.New("user is not in a room")
+	}
+
+	if err := sgc.Client.StartGame(cfg.Room); err != nil {
+		return err
+	}
+
+	fmt.Printf("You've successfully started a game in room \"%s\".\n", cfg.Room)
+	fmt.Println("You can use the get-game and add-entry commands to play.")
 	return nil
 }
 

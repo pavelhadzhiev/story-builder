@@ -15,6 +15,7 @@
 package game
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -22,8 +23,10 @@ import (
 )
 
 // AddEntryCmd is a wrapper for the story-builder add command
-type AddEntryCmd struct{
+type AddEntryCmd struct {
 	*cmd.Context
+
+	entry string
 }
 
 // Command builds and returns a cobra command that will be added to the root command
@@ -33,9 +36,38 @@ func (aec *AddEntryCmd) Command() *cobra.Command {
 	return result
 }
 
+// Validate makes sure all required arguments are legal and are provided
+func (aec *AddEntryCmd) Validate(args []string) error {
+	if len(args) != 1 {
+		return fmt.Errorf("requires a single arg")
+	}
+
+	aec.entry = args[0]
+	return nil
+}
+
 // Run is used to build the RunE function for the cobra command
 func (aec *AddEntryCmd) Run() error {
-	fmt.Println("add called")
+	cfg, err := aec.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err := cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	if cfg.Authorization == "" {
+		return errors.New("users is not logged in")
+	}
+	if cfg.Room == "" {
+		return errors.New("user is not in a room")
+	}
+
+	if err := aec.Client.AddEntry(cfg.Room, aec.entry); err != nil {
+		return err
+	}
+
+	fmt.Println("You've successfully submitted your entry.")
+	fmt.Println("You can use the get-game command to check the story status.")
 	return nil
 }
 

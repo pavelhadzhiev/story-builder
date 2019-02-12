@@ -55,6 +55,7 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 		if err := room.StartGame(issuer); err != nil {
 			w.WriteHeader(403)
 			w.Write([]byte("Game cannot be started. Requires user to be joined and have admin access."))
+			return
 		}
 
 		w.Write([]byte("Game successfully started in room \"" + roomName + "\"."))
@@ -80,6 +81,7 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 		if err := room.EndGame(issuer); err != nil {
 			w.WriteHeader(403)
 			w.Write([]byte("Game cannot be ended. Requires user to be joined and have admin access."))
+			return
 		}
 
 		w.WriteHeader(202)

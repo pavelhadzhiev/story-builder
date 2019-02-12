@@ -17,6 +17,7 @@ package game
 import (
 	"errors"
 	"fmt"
+	"strings"
 )
 
 // Game represents a story builder game. It holds a
@@ -36,8 +37,30 @@ type Entry struct {
 	Player string `json:"player"`
 }
 
+func (game Game) String() string {
+	gameString := "Players in the current game: "
+	for _, player := range game.Players {
+		gameString += player + ","
+	}
+	gameString = strings.TrimSuffix(gameString, ",")
+
+	gameString += "\n--------------------------------\n"
+	for _, entry := range game.Story {
+		gameString += entry.String() + "\n"
+	}
+	gameString += "--------------------------------\n"
+
+	if game.Finished {
+		gameString += "The game has finished. You can now start the next one!\n"
+	} else {
+		gameString += fmt.Sprintf("Next turn: Player \"%s\"\n", game.Turn)
+	}
+
+	return gameString
+}
+
 func (entry Entry) String() string {
-	return fmt.Sprintf("(%s) %s", entry.Text, entry.Player)
+	return fmt.Sprintf("%s (By \"%s\")", entry.Text, entry.Player)
 }
 
 // NewGame creates a game, initializing all required structures and arrays, with the provided players and initiator.

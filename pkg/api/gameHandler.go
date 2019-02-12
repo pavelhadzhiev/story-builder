@@ -83,7 +83,6 @@ func (server *SBServer) GameHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
-		w.WriteHeader(200)
 		w.Write([]byte("Entry successfully submitted."))
 	default:
 		w.WriteHeader(405)

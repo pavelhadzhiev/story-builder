@@ -15,6 +15,7 @@
 package game
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -22,7 +23,7 @@ import (
 )
 
 // EndGameCmd is a wrapper for the story-builder end-game command
-type EndGameCmd struct{
+type EndGameCmd struct {
 	*cmd.Context
 }
 
@@ -35,7 +36,26 @@ func (egc *EndGameCmd) Command() *cobra.Command {
 
 // Run is used to build the RunE function for the cobra command
 func (egc *EndGameCmd) Run() error {
-	fmt.Println("end-game called")
+	cfg, err := egc.Configurator.Load()
+	if err != nil {
+		return err
+	}
+	if err := cfg.ValidateConnection(); err != nil {
+		return fmt.Errorf("there is no valid connection with a server: %v", err)
+	}
+	if cfg.Authorization == "" {
+		return errors.New("users is not logged in")
+	}
+	if cfg.Room == "" {
+		return errors.New("user is not in a room")
+	}
+
+	if err := egc.Client.EndGame(cfg.Room); err != nil {
+		return err
+	}
+
+	fmt.Printf("You've successfully triggered a game end in room \"%s\".\n", cfg.Room)
+	fmt.Println("Next play will be the last. Afterwards, the game will finish.")
 	return nil
 }
 
