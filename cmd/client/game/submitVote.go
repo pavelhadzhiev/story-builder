@@ -63,8 +63,8 @@ func (svc *SubmitVoteCmd) buildCommand() *cobra.Command {
 	var submitVoteCmd = &cobra.Command{
 		Use:     "submit-vote",
 		Aliases: []string{"sv"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Submits your approval of the ongoing voting.",
+		Long:    `Submits your approval of the ongoing voting. Returns error if a game is not running or there is no currently ongoing vote.`,
 		PreRunE: cmd.PreRunE(svc),
 		RunE:    cmd.RunE(svc),
 	}
