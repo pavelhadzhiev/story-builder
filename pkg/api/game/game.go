@@ -17,33 +17,36 @@ package game
 import (
 	"errors"
 	"fmt"
+	"math"
 	"strings"
 	"time"
 )
 
 // Game represents a story builder game. It holds a
 type Game struct {
-	Turn        string   `json:"turn,omitempty"`
-	Story       []Entry  `json:"story,omitempty"`
-	Players     []string `json:"players,omitempty"`
-	Finished    bool     `json:"finished,omitempty"`
-	TimeLeft    int      `json:"timeLeft,omitempty"`
-	MaxLength   int      `json:"maxLength,omitempty"`
-	MaxEntries  int      `json:"maxEntries,omitempty"`
-	EntriesLeft int      `json:"entriesLeft,omitempty"`
+	Turn        string    `json:"turn,omitempty"`
+	Story       []Entry   `json:"story,omitempty"`
+	Players     []string  `json:"players,omitempty"`
+	Finished    bool      `json:"finished,omitempty"`
+	TimeLeft    int       `json:"timeLeft,omitempty"`
+	MaxLength   int       `json:"maxLength,omitempty"`
+	MaxEntries  int       `json:"maxEntries,omitempty"`
+	EntriesLeft int       `json:"entriesLeft,omitempty"`
+	VoteKick    *VoteKick `json:"votekick,omiempty"`
 
 	playerTurn int
 	timeLimit  int
 }
 
-// Entry represents a single player's turn in the story builder game
-type Entry struct {
-	Text   string `json:"text"`
-	Player string `json:"player"`
-}
+func (game *Game) String() string {
+	gameString := "\n"
+	if game.VoteKick != nil {
+		gameString += "ATTENTION: There is a kick vote going on!\n"
+		gameString += game.VoteKick.String()
+		gameString += "\nYou can cast your vote using the vote command.\n\n"
+	}
 
-func (game Game) String() string {
-	gameString := "Players in the game: "
+	gameString += "Players in the game: "
 	for _, player := range game.Players {
 		gameString += player + ","
 	}
@@ -77,10 +80,6 @@ func (game Game) String() string {
 	return gameString
 }
 
-func (entry Entry) String() string {
-	return fmt.Sprintf("%s (by \"%s\")", entry.Text, entry.Player)
-}
-
 // StartGame creates a game, initializing all required structures and arrays, with the provided players and initiator.
 // Supports configuration of time limit for turns (in seconds) and max length of entries (in symbols). Pass 0 if you don't want any of these features.
 func StartGame(initiator string, players []string, timeLimit, maxLength, entriesCount int) *Game {
@@ -102,6 +101,7 @@ func StartGame(initiator string, players []string, timeLimit, maxLength, entries
 		MaxLength:   maxLength,
 		MaxEntries:  entriesCount,
 		EntriesLeft: entriesCount,
+		VoteKick:    nil,
 
 		playerTurn: 1,
 		timeLimit:  timeLimit,
@@ -141,6 +141,38 @@ func (game *Game) EndGame(entries int) {
 	game.EntriesLeft = entries
 }
 
+func (game *Game) TriggerVoteKick(issuer, playerToKick string, acceptanceRatio float64, timeLimit int) error {
+	if game.VoteKick != nil {
+		return fmt.Errorf("there is an ongoing vote to kick player \"%s\"", game.VoteKick.Player)
+	}
+	for _, player := range game.Players {
+		if player == playerToKick {
+			voteTreshold := int(math.Ceil(float64(len(game.Players)) * acceptanceRatio))
+			game.VoteKick = NewVoteKick(issuer, playerToKick, voteTreshold, timeLimit)
+			go game.monitorVote()
+			return nil
+		}
+	}
+	return fmt.Errorf("player \"%s\" is not in the game", playerToKick)
+}
+
+func (game *Game) Vote(voter string) error {
+	if game.VoteKick == nil {
+		return errors.New("there is no ongoing vote")
+	}
+	for _, player := range game.Players {
+		if player == voter {
+			if !game.VoteKick.hasVoted(voter) {
+				game.VoteKick.voted = append(game.VoteKick.voted, player)
+				game.VoteKick.Count++
+				return nil
+			}
+			return fmt.Errorf("player \"%s\" has already voted for this vote", voter)
+		}
+	}
+	return fmt.Errorf("player \"%s\" cannot vote as he's not part of the game", voter)
+}
+
 func (game *Game) monitorTime() {
 	for !game.Finished {
 		game.TimeLeft--
@@ -157,6 +189,40 @@ func (game *Game) setNextTurn() {
 		game.playerTurn = 1
 	}
 
-	game.Turn = game.Players[game.playerTurn-1]
-	game.TimeLeft = game.timeLimit
+	if len(game.Players) > 0 {
+		game.Turn = game.Players[game.playerTurn-1]
+		game.TimeLeft = game.timeLimit
+	} else {
+		game.Finished = true
+		game.Turn = ""
+	}
+}
+
+func (game *Game) monitorVote() {
+	for game.VoteKick != nil {
+		if game.VoteKick.Count >= game.VoteKick.Treshold {
+			game.removePlayer(game.VoteKick.Player)
+			game.VoteKick = nil
+			return
+		}
+		time.Sleep(1 * time.Second)
+		game.VoteKick.TimeLeft--
+		if game.VoteKick.TimeLeft <= 0 {
+			game.VoteKick = nil
+			return
+		}
+	}
+}
+
+func (game *Game) removePlayer(toRemove string) error {
+	for index, player := range game.Players {
+		if player == toRemove {
+			game.Players = append(game.Players[:index], game.Players[index+1:]...)
+			if player == game.Turn {
+				game.setNextTurn()
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("player \"%s\" is not part of the game", toRemove)
 }

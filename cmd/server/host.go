@@ -82,7 +82,7 @@ func (hc *HostCmd) Run() error {
 	defer sbServer.Shutdown()
 
 	fmt.Println("Server was started at http://localhost:", hc.port)
-	fmt.Print("Press ENTER to shut down...")
+	fmt.Println("Press ENTER to shut down...")
 	reader := bufio.NewReader(os.Stdin)
 	reader.ReadString('\n')
 

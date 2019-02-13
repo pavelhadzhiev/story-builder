@@ -50,7 +50,7 @@ func NewRoom(name, creator string) *Room {
 }
 
 func (room Room) String() string {
-	return fmt.Sprintf("Name: %s\nCreator: %s\nOnline:%v\n", room.Name, room.Creator, room.Online)
+	return fmt.Sprintf("Name: %s\nCreator: %s\nOnline: %v\nAdmins: %v\n", room.Name, room.Creator, room.Online, room.Admins)
 }
 
 // StartGame starts a new game, including all online players and giving the provided initiator the first turn.
@@ -61,7 +61,12 @@ func (room *Room) StartGame(initiator string, timeLimit, maxLength, entriesCount
 	}
 
 	if room.game != nil {
-		return errors.New("there is an unfinished game")
+		if room.game.Finished {
+			room.previousGame = room.game
+			room.game = nil
+		} else {
+			return errors.New("there is an unfinished game")
+		}
 	}
 	room.game = game.StartGame(initiator, room.Online, timeLimit, maxLength, entriesCount)
 	return nil
