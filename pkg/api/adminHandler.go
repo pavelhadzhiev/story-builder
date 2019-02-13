@@ -21,7 +21,7 @@ import (
 	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
-// BanHandler is an http handler for the story builder's gameplay API
+// BanHandler is an http handler for the story builder's admin API
 func (server *SBServer) BanHandler(w http.ResponseWriter, r *http.Request) {
 	urlSuffix := strings.TrimPrefix(r.URL.Path, "/admin/ban/")
 	urlSuffixSplit := strings.Split(urlSuffix, "/")
@@ -35,7 +35,7 @@ func (server *SBServer) BanHandler(w http.ResponseWriter, r *http.Request) {
 	playerToBan := urlSuffixSplit[1]
 
 	switch r.Method {
-	case http.MethodPost:
+	case http.MethodDelete:
 		room, err := server.GetRoom(roomName)
 		if err != nil {
 			w.WriteHeader(404)
@@ -73,7 +73,7 @@ func (server *SBServer) BanHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		room.GetGame().Kick(playerToBan)
-		w.Write([]byte("Player \"" + playerToBan + "\" has been banned from \"" + roomName + "\"."))
+		w.Write([]byte("Player \"" + playerToBan + "\" has been banned from room \"" + roomName + "\"."))
 		return
 	default:
 		w.WriteHeader(405)
@@ -81,7 +81,7 @@ func (server *SBServer) BanHandler(w http.ResponseWriter, r *http.Request) {
 	}
 }
 
-// KickHandler is an http handler for the story builder's gameplay API
+// KickHandler is an http handler for the story builder's admin API
 func (server *SBServer) KickHandler(w http.ResponseWriter, r *http.Request) {
 	urlSuffix := strings.TrimPrefix(r.URL.Path, "/admin/kick/")
 	urlSuffixSplit := strings.Split(urlSuffix, "/")
@@ -95,7 +95,7 @@ func (server *SBServer) KickHandler(w http.ResponseWriter, r *http.Request) {
 	playerToKick := urlSuffixSplit[1]
 
 	switch r.Method {
-	case http.MethodPost:
+	case http.MethodDelete:
 		room, err := server.GetRoom(roomName)
 		if err != nil {
 			w.WriteHeader(404)
@@ -144,8 +144,59 @@ func (server *SBServer) KickHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		game.Kick(playerToKick)
-		w.Write([]byte("Player \"" + playerToKick + "\" has been kicked from the game in \"" + roomName + "\"."))
+		w.Write([]byte("Player \"" + playerToKick + "\" has been kicked from the game in room \"" + roomName + "\"."))
 		return
+	default:
+		w.WriteHeader(405)
+		return
+	}
+}
+
+// PromoteAdminHandler is an http handler for the story builder's admin API
+func (server *SBServer) PromoteAdminHandler(w http.ResponseWriter, r *http.Request) {
+	urlSuffix := strings.TrimPrefix(r.URL.Path, "/admin/")
+	urlSuffixSplit := strings.Split(urlSuffix, "/")
+
+	if len(urlSuffixSplit) == 1 || len(urlSuffixSplit) > 3 || (len(urlSuffixSplit) == 3 && urlSuffixSplit[2] != "") {
+		w.WriteHeader(400)
+		w.Write([]byte("Request URL is illegal."))
+		return
+	}
+	roomName := urlSuffixSplit[0]
+	userToPromote := urlSuffixSplit[1]
+
+	switch r.Method {
+	case http.MethodPost:
+		room, err := server.GetRoom(roomName)
+		if err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" doesn't exist."))
+			return
+		}
+
+		if userExists, err := server.Database.UserExists(userToPromote); err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Database lookup failed."))
+			return
+		} else if !userExists {
+			w.WriteHeader(404)
+			w.Write([]byte("User \"" + userToPromote + "\" doesn't exist."))
+			return
+		}
+
+		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Error during decoding of authorization header."))
+			return
+		}
+		if err := room.PromoteAdmin(userToPromote, issuer); err != nil {
+			w.WriteHeader(403)
+			w.Write([]byte("You don't have admin access for room \"" + roomName + "\"."))
+			return
+		}
+
+		w.Write([]byte("User \"" + userToPromote + "\" has been promoted to admin in room \"" + roomName + "\"."))
 	default:
 		w.WriteHeader(405)
 		return

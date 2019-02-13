@@ -47,6 +47,7 @@ func main() {
 		&game.VoteCmd{Context: ctx},
 		&admin.BanCmd{Context: ctx},
 		&admin.KickCmd{Context: ctx},
+		&admin.PromoteCmd{Context: ctx},
 	}
 	for _, command := range commands {
 		rootCmd.AddCommand(command.Command())

@@ -116,6 +116,17 @@ func (room *Room) EndGame(issuer string, entries int) error {
 	return nil
 }
 
+// PromoteAdmin makes the provided user an admin in the room.
+// Returns error if the issuer of the promotion is not an admin.
+func (room *Room) PromoteAdmin(userToPromote, issuer string) error {
+	if err := room.checkUserPermissions(issuer); err != nil {
+		return err
+	}
+
+	room.Admins = append(room.Admins, userToPromote)
+	return nil
+}
+
 // BanPlayer bans the provided player, on behalf of the provider issuer. The banned player is instantly removed from the room and prevented from joining again.
 // Returns error if the issuer doesn't have admin access.
 func (room *Room) BanPlayer(playerToBan, issuer string) error {

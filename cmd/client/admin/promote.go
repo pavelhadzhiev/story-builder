@@ -22,33 +22,33 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// KickCmd is a wrapper for the story-builder kick command
-type KickCmd struct {
+// PromoteCmd is a wrapper for the story-builder promote command
+type PromoteCmd struct {
 	*cmd.Context
 
-	player string
+	user string
 }
 
 // Command builds and returns a cobra command that will be added to the root command
-func (kc *KickCmd) Command() *cobra.Command {
-	result := kc.buildCommand()
+func (pc *PromoteCmd) Command() *cobra.Command {
+	result := pc.buildCommand()
 
 	return result
 }
 
 // Validate makes sure all required arguments are legal and are provided
-func (kc *KickCmd) Validate(args []string) error {
+func (pc *PromoteCmd) Validate(args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("requires a single arg")
 	}
 
-	kc.player = args[0]
+	pc.user = args[0]
 	return nil
 }
 
 // Run is used to build the RunE function for the cobra command
-func (kc *KickCmd) Run() error {
-	cfg, err := kc.Configurator.Load()
+func (pc *PromoteCmd) Run() error {
+	cfg, err := pc.Configurator.Load()
 	if err != nil {
 		return err
 	}
@@ -62,22 +62,22 @@ func (kc *KickCmd) Run() error {
 		return errors.New("user has not joined in a room")
 	}
 
-	if err := kc.Client.KickPlayer(cfg.Room, kc.player); err != nil {
+	if err := pc.Client.PromoteAdmin(cfg.Room, pc.user); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've kicked \"%s\" from the game in room \"%s\".\n", kc.player, cfg.Room)
+	fmt.Printf("You've promoted \"%s\" to admin in room \"%s\".\n", pc.user, cfg.Room)
 	return nil
 }
 
-func (kc *KickCmd) buildCommand() *cobra.Command {
-	var KickCmd = &cobra.Command{
-		Use:     "kick [player]",
-		Short:   "An admin command that kicks the player provided as argument.",
-		Long:    `An admin command that kicks the player provided as argument from the game in the current room. Returns error if you don't have admin access for the room.`,
-		PreRunE: cmd.PreRunE(kc),
-		RunE:    cmd.RunE(kc),
+func (pc *PromoteCmd) buildCommand() *cobra.Command {
+	var PromoteCmd = &cobra.Command{
+		Use:     "promote [user]",
+		Short:   "An admin command that promotes the user provided as argument to an admin.",
+		Long:    `An admin command that promotes the user provided as argument to an admin in the current room. Returns error if you don't have admin access for the room.`,
+		PreRunE: cmd.PreRunE(pc),
+		RunE:    cmd.RunE(pc),
 	}
 
-	return KickCmd
+	return PromoteCmd
 }
