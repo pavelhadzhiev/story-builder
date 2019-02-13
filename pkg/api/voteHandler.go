@@ -25,16 +25,17 @@ import (
 func (server *SBServer) VoteHandler(w http.ResponseWriter, r *http.Request) {
 	urlSuffix := strings.TrimPrefix(r.URL.Path, "/vote/")
 	urlSuffixSplit := strings.Split(urlSuffix, "/")
-	if len(urlSuffixSplit) == 1 || len(urlSuffixSplit) > 3 || (len(urlSuffixSplit) == 3 && urlSuffixSplit[2] != "") {
-		w.WriteHeader(400)
-		w.Write([]byte("Request URL is illegal."))
-		return
-	}
-	roomName := urlSuffixSplit[0]
-	playerToKick := urlSuffixSplit[1]
 
 	switch r.Method {
 	case http.MethodPost:
+		if len(urlSuffixSplit) == 1 || len(urlSuffixSplit) > 3 || (len(urlSuffixSplit) == 3 && urlSuffixSplit[2] != "") {
+			w.WriteHeader(400)
+			w.Write([]byte("Request URL is illegal."))
+			return
+		}
+		roomName := urlSuffixSplit[0]
+		playerToKick := urlSuffixSplit[1]
+
 		game, err := server.GetGame(roomName)
 		if err != nil {
 			w.WriteHeader(404)
@@ -65,6 +66,13 @@ func (server *SBServer) VoteHandler(w http.ResponseWriter, r *http.Request) {
 		w.Write([]byte("A vote to kick player \"" + playerToKick + "\" was successfully triggered."))
 		return
 	case http.MethodPut:
+		if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
+			w.WriteHeader(400)
+			w.Write([]byte("Room name is illegal."))
+			return
+		}
+		roomName := urlSuffixSplit[0]
+
 		game, err := server.GetGame(roomName)
 		if err != nil {
 			w.WriteHeader(404)
@@ -105,7 +113,7 @@ func (server *SBServer) VoteHandler(w http.ResponseWriter, r *http.Request) {
 		}
 
 		w.WriteHeader(200)
-		w.Write([]byte("Your vote to kick player \"" + playerToKick + "\" was accepted."))
+		w.Write([]byte("Your vote to kick player \"" + game.VoteKick.Player + "\" was accepted."))
 	default:
 		w.WriteHeader(405)
 		return

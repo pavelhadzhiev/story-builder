@@ -42,6 +42,8 @@ func main() {
 		&game.EndGameCmd{Context: ctx},
 		&game.AddEntryCmd{Context: ctx},
 		&game.GetGameCmd{Context: ctx},
+		&game.TriggerVoteCmd{Context: ctx},
+		&game.SubmitVoteCmd{Context: ctx},
 	}
 	for _, command := range commands {
 		rootCmd.AddCommand(command.Command())
