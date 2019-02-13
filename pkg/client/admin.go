@@ -22,7 +22,7 @@ import (
 )
 
 // BanPlayer bans the provided player from entering the room with the provided name.
-// Returns error if either the room or the player doesn't exist or if the issuer doesn't have admin access.
+// Returns error if either the room or the player doesn't exist or if the issuer doesn't have admin access for the room.
 func (client *SBClient) BanPlayer(roomName, player string) error {
 	response, err := client.call(http.MethodPost, "/admin/ban/"+roomName+"/"+player, nil, nil)
 	if err != nil {
@@ -42,6 +42,30 @@ func (client *SBClient) BanPlayer(roomName, player string) error {
 		return fmt.Errorf("could not ban player: %s", string(errorMessage))
 	case 409:
 		return errors.New("player is already banned")
+	default:
+		return errors.New("something went really wrong :(")
+	}
+}
+
+// KickPlayer kicks the provided player from the current game in the room with the provided name.
+// Returns error if either the room, the game or the player doesn't exist, the player is not in the game, or the issuer doesn't have admin access for the room.
+func (client *SBClient) KickPlayer(roomName, player string) error {
+	response, err := client.call(http.MethodPost, "/admin/kick/"+roomName+"/"+player, nil, nil)
+	if err != nil {
+		return fmt.Errorf("error during http request: %e", err)
+	}
+	switch response.StatusCode {
+	case 200:
+		return nil
+	case 403:
+		return errors.New("user does not have permissions to kick in room \"" + roomName + "\"")
+	case 404:
+		defer response.Body.Close()
+		errorMessage, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("could not kick player: %s", string(errorMessage))
 	default:
 		return errors.New("something went really wrong :(")
 	}

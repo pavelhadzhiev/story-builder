@@ -58,6 +58,7 @@ func NewSBServer(sbdb *db.SBDatabase, port int) *SBServer {
 	http.HandleFunc("/manage-games/", sbServer.ManageGamesHandler)
 
 	http.HandleFunc("/admin/ban/", sbServer.BanHandler)
+	http.HandleFunc("/admin/kick/", sbServer.KickHandler)
 
 	return sbServer
 }

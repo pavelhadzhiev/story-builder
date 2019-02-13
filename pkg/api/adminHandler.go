@@ -72,7 +72,79 @@ func (server *SBServer) BanHandler(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 
+		room.GetGame().Kick(playerToBan)
 		w.Write([]byte("Player \"" + playerToBan + "\" has been banned from \"" + roomName + "\"."))
+		return
+	default:
+		w.WriteHeader(405)
+		return
+	}
+}
+
+// KickHandler is an http handler for the story builder's gameplay API
+func (server *SBServer) KickHandler(w http.ResponseWriter, r *http.Request) {
+	urlSuffix := strings.TrimPrefix(r.URL.Path, "/admin/kick/")
+	urlSuffixSplit := strings.Split(urlSuffix, "/")
+
+	if len(urlSuffixSplit) == 1 || len(urlSuffixSplit) > 3 || (len(urlSuffixSplit) == 3 && urlSuffixSplit[2] != "") {
+		w.WriteHeader(400)
+		w.Write([]byte("Request URL is illegal."))
+		return
+	}
+	roomName := urlSuffixSplit[0]
+	playerToKick := urlSuffixSplit[1]
+
+	switch r.Method {
+	case http.MethodPost:
+		room, err := server.GetRoom(roomName)
+		if err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" doesn't exist."))
+			return
+		}
+
+		game, err := server.GetGame(roomName)
+		if err != nil || game.Finished {
+			w.WriteHeader(404)
+			w.Write([]byte("There is no runnig game in room \"" + roomName + "\"."))
+			return
+		}
+
+		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Error during decoding of authorization header."))
+			return
+		}
+
+		inGame := false
+		for _, player := range game.Players {
+			if player == playerToKick {
+				inGame = true
+				break
+			}
+		}
+		if !inGame {
+			w.WriteHeader(404)
+			w.Write([]byte("The user to kick is not in the game."))
+			return
+		}
+
+		isAdmin := false
+		for _, admin := range room.Admins {
+			if admin == issuer {
+				isAdmin = true
+				break
+			}
+		}
+		if !isAdmin {
+			w.WriteHeader(403)
+			w.Write([]byte("You don't have admin access for room \"" + roomName + "\"."))
+			return
+		}
+
+		game.Kick(playerToKick)
+		w.Write([]byte("Player \"" + playerToKick + "\" has been kicked from the game in \"" + roomName + "\"."))
 		return
 	default:
 		w.WriteHeader(405)

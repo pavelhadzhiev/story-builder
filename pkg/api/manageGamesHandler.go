@@ -44,6 +44,7 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 		if game, err := server.GetGame(roomName); err == nil && !game.Finished {
 			w.WriteHeader(409)
 			w.Write([]byte("There is already a running game."))
+			return
 		}
 
 		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
@@ -109,6 +110,7 @@ func (server *SBServer) ManageGamesHandler(w http.ResponseWriter, r *http.Reques
 		if game, err := server.GetGame(roomName); err != nil || game.Finished {
 			w.WriteHeader(409)
 			w.Write([]byte("There is no running game."))
+			return
 		}
 
 		issuer, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))

@@ -17,6 +17,7 @@ package main
 import (
 	"github.com/pavelhadzhiev/story-builder/cmd"
 	"github.com/pavelhadzhiev/story-builder/cmd/client"
+	"github.com/pavelhadzhiev/story-builder/cmd/client/admin"
 	"github.com/pavelhadzhiev/story-builder/cmd/client/game"
 	"github.com/pavelhadzhiev/story-builder/cmd/client/room"
 	"github.com/pavelhadzhiev/story-builder/cmd/server"
@@ -38,13 +39,14 @@ func main() {
 		&room.JoinRoomCmd{Context: ctx},
 		&room.LeaveRoomCmd{Context: ctx},
 		&room.ListRoomsCmd{Context: ctx},
-		&room.BanCmd{Context: ctx},
 		&game.StartGameCmd{Context: ctx},
 		&game.EndGameCmd{Context: ctx},
 		&game.AddEntryCmd{Context: ctx},
 		&game.GetGameCmd{Context: ctx},
 		&game.TriggerVoteCmd{Context: ctx},
 		&game.VoteCmd{Context: ctx},
+		&admin.BanCmd{Context: ctx},
+		&admin.KickCmd{Context: ctx},
 	}
 	for _, command := range commands {
 		rootCmd.AddCommand(command.Command())

@@ -173,6 +173,19 @@ func (game *Game) Vote(voter string) error {
 	return fmt.Errorf("player \"%s\" cannot vote as he's not part of the game", voter)
 }
 
+func (game *Game) Kick(toRemove string) error {
+	for index, player := range game.Players {
+		if player == toRemove {
+			game.Players = append(game.Players[:index], game.Players[index+1:]...)
+			if player == game.Turn {
+				game.setNextTurn()
+			}
+			return nil
+		}
+	}
+	return fmt.Errorf("player \"%s\" is not part of the game", toRemove)
+}
+
 func (game *Game) monitorTime() {
 	for !game.Finished {
 		game.TimeLeft--
@@ -201,7 +214,7 @@ func (game *Game) setNextTurn() {
 func (game *Game) monitorVote() {
 	for game.VoteKick != nil {
 		if game.VoteKick.Count >= game.VoteKick.Treshold {
-			game.removePlayer(game.VoteKick.Player)
+			game.Kick(game.VoteKick.Player)
 			game.VoteKick = nil
 			return
 		}
@@ -212,17 +225,4 @@ func (game *Game) monitorVote() {
 			return
 		}
 	}
-}
-
-func (game *Game) removePlayer(toRemove string) error {
-	for index, player := range game.Players {
-		if player == toRemove {
-			game.Players = append(game.Players[:index], game.Players[index+1:]...)
-			if player == game.Turn {
-				game.setNextTurn()
-			}
-			return nil
-		}
-	}
-	return fmt.Errorf("player \"%s\" is not part of the game", toRemove)
 }

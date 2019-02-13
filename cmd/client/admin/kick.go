@@ -12,7 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package room
+package admin
 
 import (
 	"errors"
@@ -22,33 +22,33 @@ import (
 	"github.com/spf13/cobra"
 )
 
-// BanCmd is a wrapper for the story-builder ban command
-type BanCmd struct {
+// KickCmd is a wrapper for the story-builder ban command
+type KickCmd struct {
 	*cmd.Context
 
 	player string
 }
 
 // Command builds and returns a cobra command that will be added to the root command
-func (bc *BanCmd) Command() *cobra.Command {
-	result := bc.buildCommand()
+func (kc *KickCmd) Command() *cobra.Command {
+	result := kc.buildCommand()
 
 	return result
 }
 
 // Validate makes sure all required arguments are legal and are provided
-func (bc *BanCmd) Validate(args []string) error {
+func (kc *KickCmd) Validate(args []string) error {
 	if len(args) != 1 {
 		return fmt.Errorf("requires a single arg")
 	}
 
-	bc.player = args[0]
+	kc.player = args[0]
 	return nil
 }
 
 // Run is used to build the RunE function for the cobra command
-func (bc *BanCmd) Run() error {
-	cfg, err := bc.Configurator.Load()
+func (kc *KickCmd) Run() error {
+	cfg, err := kc.Configurator.Load()
 	if err != nil {
 		return err
 	}
@@ -62,22 +62,22 @@ func (bc *BanCmd) Run() error {
 		return errors.New("user has not joined in a room")
 	}
 
-	if err := bc.Client.BanPlayer(cfg.Room, bc.player); err != nil {
+	if err := kc.Client.KickPlayer(cfg.Room, kc.player); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've banned \"%s\" from room \"%s\".\n", bc.player, cfg.Room)
+	fmt.Printf("You've kicked \"%s\" from the game in room \"%s\".\n", kc.player, cfg.Room)
 	return nil
 }
 
-func (bc *BanCmd) buildCommand() *cobra.Command {
-	var banCmd = &cobra.Command{
-		Use:     "ban [player]",
-		Short:   "An admin command that bans the player provided as argument.",
-		Long:    `An admin command that bans the player provided as argument from the current room. Return error if you don't have admin access for the room.`,
-		PreRunE: cmd.PreRunE(bc),
-		RunE:    cmd.RunE(bc),
+func (kc *KickCmd) buildCommand() *cobra.Command {
+	var KickCmd = &cobra.Command{
+		Use:     "kick [player]",
+		Short:   "An admin command that kicks the player provided as argument.",
+		Long:    `An admin command that kicks the player provided as argument from the game in the current room. Returns error if you don't have admin access for the room.`,
+		PreRunE: cmd.PreRunE(kc),
+		RunE:    cmd.RunE(kc),
 	}
 
-	return banCmd
+	return KickCmd
 }
