@@ -23,20 +23,14 @@ import (
 
 // Room represents a story builder room, in which a select group of players can play the game
 type Room struct {
-	Name    string    `json:"name"`
-	Creator string    `json:"creator,omitempty"`
-	Rules   RoomRules `json:"rules,omitempty"`
-	Admins  []string  `json:"admins,omitempty"`
-	Banned  []string  `json:"banned,omitempty"`
-	Online  []string  `json:"online,omitempty"`
+	Name    string   `json:"name"`
+	Creator string   `json:"creator,omitempty"`
+	Admins  []string `json:"admins,omitempty"`
+	Banned  []string `json:"banned,omitempty"`
+	Online  []string `json:"online,omitempty"`
 
 	game         *game.Game
 	previousGame *game.Game
-}
-
-// RoomRules keeps some configurations for the gameplay in the story builder room.
-type RoomRules struct {
-	Timeout int `json:"timeout,omitempty"`
 }
 
 // NewRoom creates a room with the provided name and creator, initializing all required structures and arrays and using the default timeout (180 seconds)
@@ -46,7 +40,6 @@ func NewRoom(name, creator string) *Room {
 	return &Room{
 		Name:    name,
 		Creator: creator,
-		Rules:   RoomRules{Timeout: 180},
 		Admins:  admins,
 		Banned:  make([]string, 0),
 		Online:  make([]string, 0),
