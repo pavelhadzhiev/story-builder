@@ -63,7 +63,8 @@ func (drc *DeleteRoomCmd) Run() error {
 		return errors.New("room name is empty")
 	}
 
-	if !util.ConfirmationPrompt("delete room \"" + drc.name + "\"") {
+	action := fmt.Sprintf("delete room \"%s\"", drc.name)
+	if !util.ConfirmationPrompt(action) {
 		fmt.Println("Operation cancelled. No action taken.")
 		return nil
 	}

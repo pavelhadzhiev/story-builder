@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -62,6 +63,11 @@ func (tvc *TriggerVoteCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
+	action := fmt.Sprintf("trigger a vote to kick player \"%s\" from the game in room \"%s\"", tvc.playerToKick, cfg.Room)
+	if !util.ConfirmationPrompt(action) {
+		fmt.Println("Operation cancelled. No action taken.")
+		return nil
+	}
 	if err := tvc.Client.TriggerVoteKick(cfg.Room, tvc.playerToKick); err != nil {
 		return err
 	}

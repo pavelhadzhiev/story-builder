@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -62,6 +63,11 @@ func (pc *PromoteCmd) Run() error {
 		return errors.New("user has not joined in a room")
 	}
 
+	action := fmt.Sprintf("promote user \"%s\" to admin in room \"%s\"", pc.user, cfg.Room)
+	if !util.ConfirmationPrompt(action) {
+		fmt.Println("Operation cancelled. No action taken.")
+		return nil
+	}
 	if err := pc.Client.PromoteAdmin(cfg.Room, pc.user); err != nil {
 		return err
 	}

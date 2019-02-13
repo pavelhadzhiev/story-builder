@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -62,6 +63,11 @@ func (kc *KickCmd) Run() error {
 		return errors.New("user has not joined in a room")
 	}
 
+	action := fmt.Sprintf("kick player \"%s\" from the game in room \"%s\"", kc.player, cfg.Room)
+	if !util.ConfirmationPrompt(action) {
+		fmt.Println("Operation cancelled. No action taken.")
+		return nil
+	}
 	if err := kc.Client.KickPlayer(cfg.Room, kc.player); err != nil {
 		return err
 	}

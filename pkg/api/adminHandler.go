@@ -106,7 +106,7 @@ func (server *SBServer) KickHandler(w http.ResponseWriter, r *http.Request) {
 		game, err := server.GetGame(roomName)
 		if err != nil || game.Finished {
 			w.WriteHeader(404)
-			w.Write([]byte("There is no runnig game in room \"" + roomName + "\"."))
+			w.Write([]byte("There is no running game in room \"" + roomName + "\"."))
 			return
 		}
 

@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -50,6 +51,11 @@ func (vc *VoteCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
+	action := "submit your approval of the currently running vote"
+	if !util.ConfirmationPrompt(action) {
+		fmt.Println("Operation cancelled. No action taken.")
+		return nil
+	}
 	if err := vc.Client.SubmitVote(cfg.Room); err != nil {
 		return err
 	}

@@ -19,6 +19,7 @@ import (
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 	"github.com/spf13/cobra"
 )
 
@@ -62,6 +63,11 @@ func (bc *BanCmd) Run() error {
 		return errors.New("user has not joined in a room")
 	}
 
+	action := fmt.Sprintf("ban player \"%s\" from room \"%s\"", bc.player, cfg.Room)
+	if !util.ConfirmationPrompt(action) {
+		fmt.Println("Operation cancelled. No action taken.")
+		return nil
+	}
 	if err := bc.Client.BanPlayer(cfg.Room, bc.player); err != nil {
 		return err
 	}
