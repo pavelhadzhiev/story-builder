@@ -75,8 +75,8 @@ func (tvc *TriggerVoteCmd) buildCommand() *cobra.Command {
 	var triggerVoteCmd = &cobra.Command{
 		Use:     "trigger-vote [player-to-kick]",
 		Aliases: []string{"tv"},
-		Short:   "",
-		Long:    ``,
+		Short:   "Triggers a democratic vote to kick the provided player from the game.",
+		Long:    `Triggers a democratic vote to kick the provided player from the game. Returns error if a game is not running, the player is not in the game or there is currently an ongoing vote.`,
 		PreRunE: cmd.PreRunE(tvc),
 		RunE:    cmd.RunE(tvc),
 	}

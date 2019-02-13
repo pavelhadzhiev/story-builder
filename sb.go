@@ -38,12 +38,13 @@ func main() {
 		&room.JoinRoomCmd{Context: ctx},
 		&room.LeaveRoomCmd{Context: ctx},
 		&room.ListRoomsCmd{Context: ctx},
+		&room.BanCmd{Context: ctx},
 		&game.StartGameCmd{Context: ctx},
 		&game.EndGameCmd{Context: ctx},
 		&game.AddEntryCmd{Context: ctx},
 		&game.GetGameCmd{Context: ctx},
 		&game.TriggerVoteCmd{Context: ctx},
-		&game.SubmitVoteCmd{Context: ctx},
+		&game.VoteCmd{Context: ctx},
 	}
 	for _, command := range commands {
 		rootCmd.AddCommand(command.Command())

@@ -28,10 +28,8 @@ func (sbServer *SBServer) JoinRoom(roomName, player string) error {
 	roomExists := false
 	for index, room = range sbServer.Rooms {
 		if room.Name == roomName {
-			for _, banned := range room.Banned {
-				if banned == player {
-					return errors.New("player doesn't have permissions to join room \"" + roomName + "\"")
-				}
+			if room.IsBanned(player) {
+				return errors.New("player is not allowed to join room \"" + roomName + "\"")
 			}
 			roomExists = true
 			break

@@ -46,7 +46,7 @@ func (egc *EndGameCmd) Validate(args []string) error {
 
 	if len(args) == 1 {
 		count, err := strconv.Atoi(args[0])
-		if err != nil {
+		if err != nil || count <= 0 {
 			return err
 		}
 		egc.entriesCount = count
@@ -72,8 +72,8 @@ func (egc *EndGameCmd) Run() error {
 		return errors.New("user is not in a room")
 	}
 
-	prompt := fmt.Sprintf("end game in room \"%s\" after %d moves", cfg.Room, egc.entriesCount)
-	if !util.ConfirmationPrompt(prompt) {
+	action := fmt.Sprintf("end game in room \"%s\" after %d moves", cfg.Room, egc.entriesCount)
+	if !util.ConfirmationPrompt(action) {
 		fmt.Println("Operation cancelled. No action taken.")
 		return nil
 	}
@@ -82,7 +82,6 @@ func (egc *EndGameCmd) Run() error {
 	}
 
 	fmt.Printf("You've successfully triggered a game end in room \"%s\".\n", cfg.Room)
-	fmt.Println("Next play will be the last. Afterwards, the game will finish.")
 	return nil
 }
 

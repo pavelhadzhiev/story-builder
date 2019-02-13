@@ -116,6 +116,31 @@ func (room *Room) EndGame(issuer string, entries int) error {
 	return nil
 }
 
+// BanPlayer bans the provided player, on behalf of the provider issuer. The banned player is instantly removed from the room and prevented from joining again.
+// Returns error if the issuer doesn't have admin access.
+func (room *Room) BanPlayer(playerToBan, issuer string) error {
+	if err := room.checkUserPermissions(issuer); err != nil {
+		return err
+	}
+	for index, online := range room.Online {
+		if online == playerToBan {
+			room.Online = append(room.Online[:index], room.Online[index+1:]...)
+		}
+	}
+	room.Banned = append(room.Banned, playerToBan)
+	return nil
+}
+
+// IsBanned returns true of the provided player has been banned from the room and false otherwise.
+func (room *Room) IsBanned(player string) bool {
+	for _, banned := range room.Banned {
+		if banned == player {
+			return true
+		}
+	}
+	return false
+}
+
 // checkUserPermissions returns error if the user is not an admin or joined in the room.
 func (room *Room) checkUserPermissions(user string) error {
 	isAdmin, isOnline := false, false
