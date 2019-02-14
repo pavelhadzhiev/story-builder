@@ -35,14 +35,16 @@ func (vc *VoteCmd) Command() *cobra.Command {
 	return result
 }
 
+// RequiresConnection makes sure that the configured server is valid and online before executing the command logic
+func (vc *VoteCmd) RequiresConnection() *cmd.Context {
+	return vc.Context
+}
+
 // Run is used to build the RunE function for the cobra command
 func (vc *VoteCmd) Run() error {
 	cfg, err := vc.Configurator.Load()
 	if err != nil {
 		return err
-	}
-	if err := cfg.ValidateConnection(); err != nil {
-		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
 	if cfg.Authorization == "" {
 		return errors.New("users is not logged in")

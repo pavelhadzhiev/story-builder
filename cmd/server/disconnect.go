@@ -18,7 +18,6 @@ import (
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
-	"github.com/pavelhadzhiev/story-builder/pkg/config"
 	"github.com/spf13/cobra"
 )
 
@@ -34,15 +33,16 @@ func (dc *DisconnectCmd) Command() *cobra.Command {
 	return result
 }
 
+// RequiresConnection makes sure that the configured server is valid and online before executing the command logic
+func (dc *DisconnectCmd) RequiresConnection() *cmd.Context {
+	return dc.Context
+}
+
 // Run is used to build the RunE function for the cobra command
 func (dc *DisconnectCmd) Run() error {
 	cfg, err := dc.Configurator.Load()
 	if err != nil {
 		return err
-	}
-	if err = cfg.ValidateConnection(); err != nil {
-		dc.Configurator.Save(&config.SBConfiguration{})
-		return fmt.Errorf("there is no valid connection with a server: %v. Existing configuration will be reset", err)
 	}
 	if cfg.Room != "" {
 		dc.Client.LeaveRoom(cfg.Room)
@@ -61,11 +61,11 @@ func (dc *DisconnectCmd) Run() error {
 
 func (dc *DisconnectCmd) buildCommand() *cobra.Command {
 	var disconnectCmd = &cobra.Command{
-		Use:   "disconnect",
-		Short: "Disconnects from the connected server.",
-		Long:  `Disconnects from the connected server. If there is none, a sufficient error message is returned.`,
+		Use:     "disconnect",
+		Short:   "Disconnects from the connected server.",
+		Long:    `Disconnects from the connected server. If there is none, a sufficient error message is returned.`,
 		PreRunE: cmd.PreRunE(dc),
-		RunE:  cmd.RunE(dc),
+		RunE:    cmd.RunE(dc),
 	}
 	return disconnectCmd
 }

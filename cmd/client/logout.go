@@ -34,14 +34,16 @@ func (lc *LogoutCmd) Command() *cobra.Command {
 	return result
 }
 
+// RequiresConnection makes sure that the configured server is valid and online before executing the command logic
+func (lc *LogoutCmd) RequiresConnection() *cmd.Context {
+	return lc.Context
+}
+
 // Run is used to build the RunE function for the cobra command
 func (lc *LogoutCmd) Run() error {
 	cfg, err := lc.Configurator.Load()
 	if err != nil {
 		return err
-	}
-	if err = cfg.ValidateConnection(); err != nil {
-		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
 	if cfg.Authorization == "" {
 		return errors.New("there is no logged in user")
@@ -60,11 +62,11 @@ func (lc *LogoutCmd) Run() error {
 
 func (lc *LogoutCmd) buildCommand() *cobra.Command {
 	var logoutCmd = &cobra.Command{
-		Use:   "logout",
-		Short: "Logs the user out.",
-		Long:  `Logs the user out. If a user is not logged in, rejects the request. Requires a valid connection to a server. If it is missing, a sufficient error message is provided. To connect to a server check the connect command.`,
+		Use:     "logout",
+		Short:   "Logs the user out.",
+		Long:    `Logs the user out. If a user is not logged in, rejects the request. Requires a valid connection to a server. If it is missing, a sufficient error message is provided. To connect to a server check the connect command.`,
 		PreRunE: cmd.PreRunE(lc),
-		RunE:  cmd.RunE(lc),
+		RunE:    cmd.RunE(lc),
 	}
 	return logoutCmd
 }

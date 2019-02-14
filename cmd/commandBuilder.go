@@ -14,7 +14,11 @@
 
 package cmd
 
-import "github.com/spf13/cobra"
+import (
+	"fmt"
+
+	"github.com/spf13/cobra"
+)
 
 // CommandWrapper represents a wrapper struct for a cobra command. It has a method to build the cobra struct.
 type CommandWrapper interface {
@@ -31,6 +35,12 @@ type ValidatedCommand interface {
 	Validate([]string) error
 }
 
+// ConnectionCommand should be implemented if the command requires a valid connection.
+type ConnectionCommand interface {
+	// RequiresConnection should return the command's context in order to be validated
+	RequiresConnection() *Context
+}
+
 // PreRunE is used to execute some generic preparations for the command execution, depending on interfaces the command impements.
 // Set this function to the PreRunE property of a cobra command.
 func PreRunE(cmd Command) func(*cobra.Command, []string) error {
@@ -40,7 +50,16 @@ func PreRunE(cmd Command) func(*cobra.Command, []string) error {
 				return err
 			}
 		}
+
+		// Silences the usage output in case of error, since errors cause by bad usage should be covered by the Validate method
 		c.SilenceUsage = true
+
+		if connCmd, ok := cmd.(ConnectionCommand); ok {
+			ctx := connCmd.RequiresConnection()
+			if err := ctx.Client.HealthCheck(ctx.Configurator); err != nil {
+				return fmt.Errorf("illegal configuration: %v", err)
+			}
+		}
 		return nil
 	}
 }

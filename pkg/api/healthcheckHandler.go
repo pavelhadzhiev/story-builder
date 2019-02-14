@@ -16,17 +16,56 @@ package api
 
 import (
 	"net/http"
+	"strings"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
 // HealthcheckHandler is an http handler for the story builder's healthcheck endpoint
 func (server *SBServer) HealthcheckHandler(w http.ResponseWriter, r *http.Request) {
-	if r.URL.Path != "/healthcheck/" {
-		w.WriteHeader(404)
-		return
-	}
 	switch r.Method {
-	case http.MethodGet:
-		// Returns status code 200 to show server is online and healthy
+	case http.MethodPost:
+		authHeader := r.Header.Get("Authorization")
+		if authHeader != "" {
+
+			// Validate authentication
+			user, pass, err := util.ExtractCredentialsFromAuthorizationHeader(authHeader)
+			if err != nil {
+				w.WriteHeader(500)
+				w.Write([]byte("Error during decoding of authorization header."))
+				return
+			}
+			if err := server.Database.LoginUser(user, pass); err != nil {
+				w.WriteHeader(401)
+				w.Write([]byte("Authentication for user \"" + user + "\" failed."))
+				return
+			}
+
+			// Validate room
+			urlSuffix := strings.TrimPrefix(r.URL.Path, "/healthcheck/")
+			if urlSuffix != "" {
+				urlSuffixSplit := strings.Split(urlSuffix, "/")
+				if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
+					w.WriteHeader(400)
+					w.Write([]byte("Room name is illegal."))
+					return
+				}
+				roomName := urlSuffixSplit[0]
+				room, err := server.GetRoom(roomName)
+				if err != nil {
+					w.WriteHeader(404)
+					w.Write([]byte("Room \"" + roomName + "\" not found."))
+					return
+				}
+				if !room.IsOnline(user) {
+					w.WriteHeader(403)
+					w.Write([]byte("Room \"" + roomName + "\" exists but player \"" + user + "\" is not int it."))
+					return
+				}
+			}
+		}
+
+		// Returns status code 200 to show server is online and healthy and all configurations are valid
 		w.WriteHeader(200)
 	default:
 		w.WriteHeader(405)

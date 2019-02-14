@@ -152,6 +152,16 @@ func (room *Room) IsBanned(player string) bool {
 	return false
 }
 
+// IsOnline returns true of the provided player is currently in the room and false otherwise.
+func (room *Room) IsOnline(player string) bool {
+	for _, online := range room.Online {
+		if online == player {
+			return true
+		}
+	}
+	return false
+}
+
 // checkUserPermissions returns error if the user is not an admin or joined in the room.
 func (room *Room) checkUserPermissions(user string) error {
 	isAdmin, isOnline := false, false

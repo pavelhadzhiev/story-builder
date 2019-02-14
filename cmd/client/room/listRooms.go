@@ -34,14 +34,16 @@ func (lrc *ListRoomsCmd) Command() *cobra.Command {
 	return result
 }
 
+// RequiresConnection makes sure that the configured server is valid and online before executing the command logic
+func (lrc *ListRoomsCmd) RequiresConnection() *cmd.Context {
+	return lrc.Context
+}
+
 // Run is used to build the RunE function for the cobra command
 func (lrc *ListRoomsCmd) Run() error {
 	cfg, err := lrc.Configurator.Load()
 	if err != nil {
 		return err
-	}
-	if err := cfg.ValidateConnection(); err != nil {
-		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
 	if cfg.Authorization == "" {
 		return errors.New("users is not logged in")

@@ -19,6 +19,8 @@ import (
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
 	"github.com/spf13/cobra"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/client"
 )
 
 // ConnectCmd is a wrapper for the story-builder connect command
@@ -59,12 +61,10 @@ func (cc *ConnectCmd) Run() error {
 		return fmt.Errorf("you are already connected to \"" + cfg.URL + "\". You have to disconnect first")
 	}
 	cfg.URL = cc.host
-	if err = cfg.ValidateConnection(); err != nil {
+	cc.Client = client.NewSBClient(cfg)
+	if err = cc.Client.HealthCheck(cc.Configurator); err != nil {
 		return err
 	}
-	cfg.Room = ""
-	cfg.Authorization = ""
-	cc.Configurator.Save(cfg)
 
 	fmt.Println("You've successfully connected to \"" + cfg.URL + "\"! You can now log in as an existing user or register as a new one.")
 	return nil

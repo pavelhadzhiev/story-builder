@@ -46,14 +46,17 @@ func (aec *AddEntryCmd) Validate(args []string) error {
 	return nil
 }
 
+// RequiresConnection makes sure that the configured server is valid and online before executing the command logic
+func (aec *AddEntryCmd) RequiresConnection() *cmd.Context {
+	return aec.Context
+}
+
+
 // Run is used to build the RunE function for the cobra command
 func (aec *AddEntryCmd) Run() error {
 	cfg, err := aec.Configurator.Load()
 	if err != nil {
 		return err
-	}
-	if err := cfg.ValidateConnection(); err != nil {
-		return fmt.Errorf("there is no valid connection with a server: %v", err)
 	}
 	if cfg.Authorization == "" {
 		return errors.New("users is not logged in")
