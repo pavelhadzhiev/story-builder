@@ -72,8 +72,7 @@ func (hc *HostCmd) Validate(args []string) error {
 func (hc *HostCmd) Run() error {
 	hc.database = db.NewSBDatabase(hc.username, hc.password)
 	defer hc.database.CloseDB()
-	err := hc.database.InitializeDB()
-	if err != nil {
+	if err := hc.database.InitializeDB(); err != nil {
 		return err
 	}
 

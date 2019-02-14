@@ -33,8 +33,8 @@ type SBServer struct {
 }
 
 // NewSBServer returns a story builder server configured for localhost:<port> that will use the provided database
-func NewSBServer(sbdb *db.SBDatabase, port int) *SBServer {
-	sbServer := &SBServer{
+func NewSBServer(sbdb *db.SBDatabase, port int) (sbServer *SBServer) {
+	sbServer = &SBServer{
 		Database: sbdb,
 		Rooms:    make([]rooms.Room, 0),
 		Online:   make([]string, 0),
@@ -61,7 +61,7 @@ func NewSBServer(sbdb *db.SBDatabase, port int) *SBServer {
 	http.HandleFunc("/admin/ban/", sbServer.BanHandler)
 	http.HandleFunc("/admin/kick/", sbServer.KickHandler)
 
-	return sbServer
+	return
 }
 
 // Start starts an HTTP server, using the available configuration

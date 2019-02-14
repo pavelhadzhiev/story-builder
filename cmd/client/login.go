@@ -71,9 +71,7 @@ func (lc *LoginCmd) Run() error {
 	cfg.Authorization = "Basic " + base64.StdEncoding.EncodeToString([]byte(lc.username+":"+lc.password))
 	lc.Configurator.Save(cfg)
 
-	lc.Client = client.NewSBClient(cfg)
-
-	if err := lc.Client.Login(); err != nil {
+	if err := client.NewSBClient(cfg).Login(); err != nil {
 		cfg.Authorization = ""
 		lc.Configurator.Save(cfg)
 		return err

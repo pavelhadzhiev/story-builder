@@ -16,11 +16,11 @@ package db
 
 import "errors"
 
-const GET_USER_BY_USERNAME = "select * from users where username = ?"
+const getUserByUsername = "select * from users where username = ?"
 
 // UserExists returns true if the provided username is already taken according to the server database.
 func (sbdb *SBDatabase) UserExists(username string) (bool, error) {
-	stmt, err := sbdb.database.Prepare(GET_USER_BY_USERNAME)
+	stmt, err := sbdb.database.Prepare(getUserByUsername)
 	if err != nil {
 		return false, err
 	}
@@ -41,7 +41,7 @@ func (sbdb *SBDatabase) UserExists(username string) (bool, error) {
 
 // LoginUser returns true if the provided user exists and the password matches the one that is saved for that username in the server database.
 func (sbdb *SBDatabase) LoginUser(username, password string) error {
-	stmt, err := sbdb.database.Prepare(GET_USER_BY_USERNAME)
+	stmt, err := sbdb.database.Prepare(getUserByUsername)
 	if err != nil {
 		return err
 	}

@@ -61,8 +61,7 @@ func (cc *ConnectCmd) Run() error {
 		return fmt.Errorf("you are already connected to \"" + cfg.URL + "\". You have to disconnect first")
 	}
 	cfg.URL = cc.host
-	cc.Client = client.NewSBClient(cfg)
-	if err = cc.Client.HealthCheck(cc.Configurator); err != nil {
+	if err = client.NewSBClient(cfg).HealthCheck(cc.Configurator); err != nil {
 		return err
 	}
 
