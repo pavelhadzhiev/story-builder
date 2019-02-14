@@ -80,18 +80,19 @@ func (client *SBClient) AddEntry(entry string) error {
 // Returns error if room doesn't exist, a game is already running or the user doesn't have the required permissions.
 func (client *SBClient) StartGame(timeLimit, maxLength, entriesCount int) error {
 	if timeLimit < 0 {
-		return errors.New("cannost start game: negative time limit value")
+		return errors.New("cannot start game: negative time limit value")
 	}
 	if maxLength < 0 {
-		return errors.New("cannost start game: negative max length value")
+		return errors.New("cannot start game: negative max length value")
 	}
 	if entriesCount < 0 {
-		return errors.New("cannost start game: negative entires value")
+		return errors.New("cannot start game: negative entries value")
 	}
-	roomName := client.config.Room
-	if client.config.Room != roomName {
+	if client.config.Room == "" {
 		return errors.New("cannot start game: requires user to be joined in the room")
 	}
+	roomName := client.config.Room
+
 	headers := make(map[string]string)
 	headers["Time-Limit"] = fmt.Sprint(timeLimit)
 	headers["Max-Length"] = fmt.Sprint(maxLength)
@@ -117,13 +118,13 @@ func (client *SBClient) StartGame(timeLimit, maxLength, entriesCount int) error 
 // EndGame ends a running game. Once called it will set the game's remaining entries to the provided number and the game will effectively end after the count is reached.
 // Returns error if room doesn't exist, no game is running or the user doesn't have the required permissions.
 func (client *SBClient) EndGame(entriesCount int) error {
-	roomName := client.config.Room
 	if entriesCount < 0 {
-		return errors.New("cannost start game: negative entires value")
+		return errors.New("cannot end game: negative entries value")
 	}
-	if client.config.Room != roomName {
+	if client.config.Room == "" {
 		return errors.New("cannot end game: requires user to be joined in the room")
 	}
+	roomName := client.config.Room
 	headers := make(map[string]string)
 	headers["Entries-Count"] = fmt.Sprint(entriesCount)
 	response, err := client.call(http.MethodDelete, "/manage-games/"+roomName, nil, headers)

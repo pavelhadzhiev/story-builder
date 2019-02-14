@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"net/http"
 	"net/http/httptest"
-	"testing"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/config"
 
@@ -15,16 +14,6 @@ import (
 	. "github.com/onsi/ginkgo"
 	. "github.com/onsi/gomega"
 )
-
-func TestSmClient(t *testing.T) {
-	RegisterFailHandler(Fail)
-	RunSpecs(t, "")
-}
-
-type BadRoom struct {
-	Name    bool   `json:"name"`
-	Creator string `json:"creator,omitempty"`
-}
 
 var _ = Describe("Story Builder Room Client test", func() {
 	var client *SBClient
@@ -105,7 +94,7 @@ var _ = Describe("Story Builder Room Client test", func() {
 				setupFaultyServer()
 
 				responseBody, _ = json.Marshal(roomList)
-				responseStatusCode = http.StatusCreated
+				responseStatusCode = http.StatusOK
 
 				responseRooms, err := client.GetAllRooms()
 
