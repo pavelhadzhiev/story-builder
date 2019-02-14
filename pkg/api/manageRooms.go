@@ -65,6 +65,11 @@ func (sbServer *SBServer) DeleteRoom(roomName, issuer string) error {
 		return errors.New("user doesn't have permission to delete this room")
 	}
 
-	sbServer.Rooms = append(sbServer.Rooms[:index], sbServer.Rooms[index+1:]...)
+	if len(sbServer.Rooms) > index+1 {
+		sbServer.Rooms = append(sbServer.Rooms[:index], sbServer.Rooms[index+1:]...)
+	} else {
+		sbServer.Rooms = sbServer.Rooms[:index]
+	}
+
 	return nil
 }

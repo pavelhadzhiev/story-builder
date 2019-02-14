@@ -18,6 +18,7 @@ import (
 	"errors"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/api/rooms"
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
 // JoinRoom puts the player in the room with the provided name.
@@ -50,10 +51,7 @@ func (sbServer *SBServer) LeaveRoom(roomName, player string) error {
 		if room.Name == roomName {
 			for playerIndex, playerName := range sbServer.Rooms[roomIndex].Online {
 				if playerName == player {
-					sbServer.Rooms[roomIndex].Online = append(
-						sbServer.Rooms[roomIndex].Online[:playerIndex],
-						sbServer.Rooms[roomIndex].Online[playerIndex+1:]...,
-					)
+					sbServer.Rooms[roomIndex].Online = util.DeleteFromSlice(sbServer.Rooms[roomIndex].Online, playerIndex)
 					return nil
 				}
 			}

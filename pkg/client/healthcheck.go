@@ -28,12 +28,12 @@ import (
 func (client *SBClient) HealthCheck(configurator config.SBConfigurator) error {
 	defer configurator.Save(client.config)
 	if err := validateURL(client.config.URL); err != nil {
-		client.wipeConnection()
+		defer client.wipeConnection()
 		return fmt.Errorf("%v. Configuration was wiped clean. Use the connect command to connect to a server", err)
 	}
 	response, err := client.call(http.MethodPost, "/healthcheck/"+client.config.Room, nil, nil)
 	if err != nil {
-		client.wipeConnection()
+		defer client.wipeConnection()
 		return errors.New("server is not valid or unhealthy: Configuration was wiped clean. Use the connect command to connect to a server")
 	}
 	switch response.StatusCode {
