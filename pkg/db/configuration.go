@@ -48,21 +48,18 @@ func (sbdb *SBDatabase) InitializeDB() error {
 		return err
 	}
 
-	_, err = sbdb.database.Exec("create database if not exists storybuilder")
-	if err != nil {
+	if _, err := sbdb.database.Exec("create database if not exists storybuilder"); err != nil {
 		return err
 	}
 
-	_, err = sbdb.database.Exec("use storybuilder")
-	if err != nil {
+	if _, err := sbdb.database.Exec("use storybuilder"); err != nil {
 		return err
 	}
 
-	_, err = sbdb.database.Exec(`create table if not exists users (
+	if _, err = sbdb.database.Exec(`create table if not exists users (
 		username varchar(255) not null primary key, 
 		password varchar(255) not null
-	)`)
-	if err != nil {
+	)`); err != nil {
 		return err
 	}
 
