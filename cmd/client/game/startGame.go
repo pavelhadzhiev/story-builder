@@ -15,7 +15,6 @@
 package game
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -43,24 +42,19 @@ func (sgc *StartGameCmd) RequiresConnection() *cmd.Context {
 	return sgc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (sgc *StartGameCmd) RequiresAuthorization() {}
+
+// RequiresRoom marks the command to require the configuration to have a user logged in.
+func (sgc *StartGameCmd) RequiresRoom() {}
+
 // Run is used to build the RunE function for the cobra command
 func (sgc *StartGameCmd) Run() error {
-	cfg, err := sgc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if cfg.Room == "" {
-		return errors.New("user is not in a room")
-	}
-
-	if err := sgc.Client.StartGame(cfg.Room, sgc.timeLimit, sgc.maxLength, sgc.entriesCount); err != nil {
+	if err := sgc.Client.StartGame(sgc.timeLimit, sgc.maxLength, sgc.entriesCount); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've successfully started a game in room \"%s\".\n", cfg.Room)
+	fmt.Println("You've successfully started a game.")
 	fmt.Println("You can use the get-game and add-entry commands to play.")
 	return nil
 }

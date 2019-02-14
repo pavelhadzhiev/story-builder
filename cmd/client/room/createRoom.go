@@ -15,7 +15,6 @@
 package room
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/util"
@@ -55,17 +54,14 @@ func (crc *CreateRoomCmd) RequiresConnection() *cmd.Context {
 	return crc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (crc *CreateRoomCmd) RequiresAuthorization() {}
+
 // Run is used to build the RunE function for the cobra command
 func (crc *CreateRoomCmd) Run() error {
 	cfg, err := crc.Configurator.Load()
 	if err != nil {
 		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if crc.name == "" {
-		return errors.New("room name is empty")
 	}
 
 	user, err := util.ExtractUsernameFromAuthorizationHeader(cfg.Authorization)

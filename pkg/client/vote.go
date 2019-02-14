@@ -23,8 +23,8 @@ import (
 
 // TriggerVoteKick triggers a democratic vote to kick the player with the provided username from the game in the room with the provided room name.
 // Returns error if room doesn't exist, game is not started, the player is not in the game, or another vote is currently ongoing.
-func (client *SBClient) TriggerVoteKick(roomName, playerToKick string) error {
-	response, err := client.call(http.MethodPost, "/vote/"+roomName+"/"+playerToKick, nil, nil)
+func (client *SBClient) TriggerVoteKick(playerToKick string) error {
+	response, err := client.call(http.MethodPost, "/vote/"+client.config.Room+"/"+playerToKick, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}
@@ -47,8 +47,8 @@ func (client *SBClient) TriggerVoteKick(roomName, playerToKick string) error {
 
 // SubmitVote tells the server that the user agrees with the ongoing vote.
 // Returns error if room doesn't exist, game is not started or no vote is currently running.
-func (client *SBClient) SubmitVote(roomName string) error {
-	response, err := client.call(http.MethodPut, "/vote/"+roomName, nil, nil)
+func (client *SBClient) SubmitVote() error {
+	response, err := client.call(http.MethodPut, "/vote/"+client.config.Room, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
 	}

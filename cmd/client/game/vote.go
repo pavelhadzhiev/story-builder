@@ -15,7 +15,6 @@
 package game
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -40,25 +39,20 @@ func (vc *VoteCmd) RequiresConnection() *cmd.Context {
 	return vc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (vc *VoteCmd) RequiresAuthorization() {}
+
+// RequiresRoom marks the command to require the configuration to have a user logged in.
+func (vc *VoteCmd) RequiresRoom() {}
+
 // Run is used to build the RunE function for the cobra command
 func (vc *VoteCmd) Run() error {
-	cfg, err := vc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if cfg.Room == "" {
-		return errors.New("user is not in a room")
-	}
-
 	action := "submit your approval of the currently running vote"
 	if !util.ConfirmationPrompt(action) {
 		fmt.Println("Operation cancelled. No action taken.")
 		return nil
 	}
-	if err := vc.Client.SubmitVote(cfg.Room); err != nil {
+	if err := vc.Client.SubmitVote(); err != nil {
 		return err
 	}
 

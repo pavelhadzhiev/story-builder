@@ -15,6 +15,7 @@
 package cmd
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/spf13/cobra"
@@ -37,8 +38,22 @@ type ValidatedCommand interface {
 
 // ConnectionCommand should be implemented if the command requires a valid connection.
 type ConnectionCommand interface {
-	// RequiresConnection should return the command's context in order to be validated
+	// RequiresConnection should return the command's context in order to have its connection validated.
 	RequiresConnection() *Context
+}
+
+// AuthorizedCommand should be implemented if the command requires a user to be logged in.
+// Should be implemented only when ConnectionCommand is implemented.
+type AuthorizedCommand interface {
+	// RequiresAuthorization is only a marker method
+	RequiresAuthorization()
+}
+
+// RoomCommand should be implemented if the command requires a the user to be joined in a room.
+// Should be implemented only when ConnectionCommand is implemented.
+type RoomCommand interface {
+	// RequiresRoom is only a marker method
+	RequiresRoom()
 }
 
 // PreRunE is used to execute some generic preparations for the command execution, depending on interfaces the command impements.
@@ -59,7 +74,21 @@ func PreRunE(cmd Command) func(*cobra.Command, []string) error {
 			if err := ctx.Client.HealthCheck(ctx.Configurator); err != nil {
 				return fmt.Errorf("illegal configuration: %v", err)
 			}
+
+			cfg, err := ctx.Configurator.Load()
+			if err != nil {
+				return err
+			}
+
+			if _, ok := cmd.(AuthorizedCommand); ok && cfg.Authorization == "" {
+				return errors.New("users is not logged in")
+			}
+
+			if _, ok := cmd.(RoomCommand); ok && cfg.Room == "" {
+				return errors.New("user is not in a room")
+			}
 		}
+
 		return nil
 	}
 }

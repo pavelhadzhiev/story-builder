@@ -15,7 +15,6 @@
 package game
 
 import (
-	"errors"
 	"fmt"
 	"strconv"
 
@@ -61,29 +60,24 @@ func (egc *EndGameCmd) RequiresConnection() *cmd.Context {
 	return egc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (egc *EndGameCmd) RequiresAuthorization() {}
+
+// RequiresRoom marks the command to require the configuration to have a user logged in.
+func (egc *EndGameCmd) RequiresRoom() {}
+
 // Run is used to build the RunE function for the cobra command
 func (egc *EndGameCmd) Run() error {
-	cfg, err := egc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if cfg.Room == "" {
-		return errors.New("user is not in a room")
-	}
-
-	action := fmt.Sprintf("end game in room \"%s\" after %d moves", cfg.Room, egc.entriesCount)
+	action := fmt.Sprintf("end game in room after %d moves", egc.entriesCount)
 	if !util.ConfirmationPrompt(action) {
 		fmt.Println("Operation cancelled. No action taken.")
 		return nil
 	}
-	if err := egc.Client.EndGame(cfg.Room, egc.entriesCount); err != nil {
+	if err := egc.Client.EndGame(egc.entriesCount); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've successfully triggered a game end in room \"%s\".\n", cfg.Room)
+	fmt.Println("You've successfully triggered a game end.")
 	return nil
 }
 

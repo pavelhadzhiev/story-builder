@@ -23,7 +23,8 @@ import (
 
 // BanPlayer bans the provided player from entering the room with the provided name.
 // Returns error if either the room or the player doesn't exist or if the issuer doesn't have admin access for the room.
-func (client *SBClient) BanPlayer(roomName, player string) error {
+func (client *SBClient) BanPlayer(player string) error {
+	roomName := client.config.Room
 	response, err := client.call(http.MethodDelete, "/admin/ban/"+roomName+"/"+player, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
@@ -49,7 +50,8 @@ func (client *SBClient) BanPlayer(roomName, player string) error {
 
 // KickPlayer kicks the provided player from the current game in the room with the provided name.
 // Returns error if either the room, the game or the player doesn't exist, the player is not in the game, or the issuer doesn't have admin access for the room.
-func (client *SBClient) KickPlayer(roomName, player string) error {
+func (client *SBClient) KickPlayer(player string) error {
+	roomName := client.config.Room
 	response, err := client.call(http.MethodDelete, "/admin/kick/"+roomName+"/"+player, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)
@@ -73,7 +75,8 @@ func (client *SBClient) KickPlayer(roomName, player string) error {
 
 // PromoteAdmin gives admin permissions to the provider user in the room with the provided name.
 // Returns error if the room or user doesn't exist or the issuer doesn't have admin access.
-func (client *SBClient) PromoteAdmin(roomName, user string) error {
+func (client *SBClient) PromoteAdmin(user string) error {
+	roomName := client.config.Room
 	response, err := client.call(http.MethodPost, "/admin/"+roomName+"/"+user, nil, nil)
 	if err != nil {
 		return fmt.Errorf("error during http request: %e", err)

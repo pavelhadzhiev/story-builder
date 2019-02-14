@@ -55,18 +55,18 @@ func (rc *RegisterCmd) Run() error {
 		return errors.New("users is already logged in")
 	}
 	if rc.username == "" {
-		if username, err := util.ReadUsername(); err != nil {
+		username, err := util.ReadUsername()
+		if err != nil {
 			return err
-		} else {
-			rc.username = username
 		}
+		rc.username = username
 	}
 	if rc.password == "" {
-		if password, err := util.ReadPassword(); err != nil {
+		password, err := util.ReadPassword()
+		if err != nil {
 			return err
-		} else {
-			rc.password = password
 		}
+		rc.password = password
 	}
 	cfg.Authorization = "Basic " + base64.StdEncoding.EncodeToString([]byte(rc.username+":"+rc.password))
 	rc.Configurator.Save(cfg)

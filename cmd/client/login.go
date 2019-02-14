@@ -55,18 +55,18 @@ func (lc *LoginCmd) Run() error {
 		return errors.New("user is already logged in")
 	}
 	if lc.username == "" {
-		if username, err := util.ReadUsername(); err != nil {
+		username, err := util.ReadUsername()
+		if err != nil {
 			return err
-		} else {
-			lc.username = username
 		}
+		lc.username = username
 	}
 	if lc.password == "" {
-		if password, err := util.ReadPassword(); err != nil {
+		password, err := util.ReadPassword()
+		if err != nil {
 			return err
-		} else {
-			lc.password = password
 		}
+		lc.password = password
 	}
 	cfg.Authorization = "Basic " + base64.StdEncoding.EncodeToString([]byte(lc.username+":"+lc.password))
 	lc.Configurator.Save(cfg)

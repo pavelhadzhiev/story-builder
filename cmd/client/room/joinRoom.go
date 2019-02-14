@@ -51,20 +51,17 @@ func (jrc *JoinRoomCmd) RequiresConnection() *cmd.Context {
 	return jrc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (jrc *JoinRoomCmd) RequiresAuthorization() {}
+
 // Run is used to build the RunE function for the cobra command
 func (jrc *JoinRoomCmd) Run() error {
 	cfg, err := jrc.Configurator.Load()
 	if err != nil {
 		return err
 	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
 	if cfg.Room != "" {
 		return errors.New("user is already in a room")
-	}
-	if jrc.name == "" {
-		return errors.New("room name is empty")
 	}
 
 	if err := jrc.Client.JoinRoom(jrc.name); err != nil {

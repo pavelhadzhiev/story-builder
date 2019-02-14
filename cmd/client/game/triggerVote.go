@@ -15,7 +15,6 @@
 package game
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -52,25 +51,20 @@ func (tvc *TriggerVoteCmd) RequiresConnection() *cmd.Context {
 	return tvc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (tvc *TriggerVoteCmd) RequiresAuthorization() {}
+
+// RequiresRoom marks the command to require the configuration to have a user logged in.
+func (tvc *TriggerVoteCmd) RequiresRoom() {}
+
 // Run is used to build the RunE function for the cobra command
 func (tvc *TriggerVoteCmd) Run() error {
-	cfg, err := tvc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if cfg.Room == "" {
-		return errors.New("user is not in a room")
-	}
-
-	action := fmt.Sprintf("trigger a vote to kick player \"%s\" from the game in room \"%s\"", tvc.playerToKick, cfg.Room)
+	action := fmt.Sprintf("trigger a vote to kick player \"%s\" from the game", tvc.playerToKick)
 	if !util.ConfirmationPrompt(action) {
 		fmt.Println("Operation cancelled. No action taken.")
 		return nil
 	}
-	if err := tvc.Client.TriggerVoteKick(cfg.Room, tvc.playerToKick); err != nil {
+	if err := tvc.Client.TriggerVoteKick(tvc.playerToKick); err != nil {
 		return err
 	}
 

@@ -15,7 +15,6 @@
 package room
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -39,16 +38,11 @@ func (lrc *ListRoomsCmd) RequiresConnection() *cmd.Context {
 	return lrc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (lrc *ListRoomsCmd) RequiresAuthorization() {}
+
 // Run is used to build the RunE function for the cobra command
 func (lrc *ListRoomsCmd) Run() error {
-	cfg, err := lrc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-
 	rooms, err := lrc.Client.GetAllRooms()
 	if err != nil {
 		return err

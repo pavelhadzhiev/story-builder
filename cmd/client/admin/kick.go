@@ -15,7 +15,6 @@
 package admin
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -52,29 +51,24 @@ func (kc *KickCmd) RequiresConnection() *cmd.Context {
 	return kc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (kc *KickCmd) RequiresAuthorization() {}
+
+// RequiresRoom marks the command to require the configuration to have a user logged in.
+func (kc *KickCmd) RequiresRoom() {}
+
 // Run is used to build the RunE function for the cobra command
 func (kc *KickCmd) Run() error {
-	cfg, err := kc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if cfg.Room == "" {
-		return errors.New("user has not joined in a room")
-	}
-
-	action := fmt.Sprintf("kick player \"%s\" from the game in room \"%s\"", kc.player, cfg.Room)
+	action := fmt.Sprintf("kick player \"%s\" from the game", kc.player)
 	if !util.ConfirmationPrompt(action) {
 		fmt.Println("Operation cancelled. No action taken.")
 		return nil
 	}
-	if err := kc.Client.KickPlayer(cfg.Room, kc.player); err != nil {
+	if err := kc.Client.KickPlayer(kc.player); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've kicked \"%s\" from the game in room \"%s\".\n", kc.player, cfg.Room)
+	fmt.Printf("You've kicked \"%s\" from the game.\n", kc.player)
 	return nil
 }
 

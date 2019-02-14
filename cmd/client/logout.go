@@ -15,7 +15,6 @@
 package client
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -39,20 +38,22 @@ func (lc *LogoutCmd) RequiresConnection() *cmd.Context {
 	return lc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (lc *LogoutCmd) RequiresAuthorization() {}
+
 // Run is used to build the RunE function for the cobra command
 func (lc *LogoutCmd) Run() error {
 	cfg, err := lc.Configurator.Load()
 	if err != nil {
 		return err
 	}
-	if cfg.Authorization == "" {
-		return errors.New("there is no logged in user")
-	}
 	if cfg.Room != "" {
 		lc.Client.LeaveRoom(cfg.Room)
 		cfg.Room = ""
 	}
-	lc.Client.Logout()
+	if err := lc.Client.Logout(); err != nil {
+		return err
+	}
 	cfg.Authorization = ""
 	lc.Configurator.Save(cfg)
 

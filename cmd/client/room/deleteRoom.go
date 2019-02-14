@@ -52,16 +52,11 @@ func (drc *DeleteRoomCmd) RequiresConnection() *cmd.Context {
 	return drc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (drc *DeleteRoomCmd) RequiresAuthorization() {}
 
 // Run is used to build the RunE function for the cobra command
 func (drc *DeleteRoomCmd) Run() error {
-	cfg, err := drc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
 	if drc.name == "" {
 		return errors.New("room name is empty")
 	}

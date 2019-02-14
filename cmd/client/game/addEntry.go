@@ -15,7 +15,6 @@
 package game
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -51,21 +50,15 @@ func (aec *AddEntryCmd) RequiresConnection() *cmd.Context {
 	return aec.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (aec *AddEntryCmd) RequiresAuthorization() {}
+
+// RequiresRoom marks the command to require the configuration to have a user logged in.
+func (aec *AddEntryCmd) RequiresRoom() {}
 
 // Run is used to build the RunE function for the cobra command
 func (aec *AddEntryCmd) Run() error {
-	cfg, err := aec.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if cfg.Room == "" {
-		return errors.New("user is not in a room")
-	}
-
-	if err := aec.Client.AddEntry(cfg.Room, aec.entry); err != nil {
+	if err := aec.Client.AddEntry(aec.entry); err != nil {
 		return err
 	}
 

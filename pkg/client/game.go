@@ -26,7 +26,8 @@ import (
 
 // GetGame retrieves the game of the room with the provided name.
 // Returns error if room doesn't exist or game is not started.
-func (client *SBClient) GetGame(roomName string) (*game.Game, error) {
+func (client *SBClient) GetGame() (*game.Game, error) {
+	roomName := client.config.Room
 	response, err := client.call(http.MethodGet, "/gameplay/"+roomName, nil, nil)
 	if err != nil {
 		return nil, fmt.Errorf("error during http request: %e", err)
@@ -48,7 +49,8 @@ func (client *SBClient) GetGame(roomName string) (*game.Game, error) {
 
 // AddEntry adds the provided entry in the game of the room with the provided name on behalf of the user.
 // Returns error if room doesn't exist, game is not started or it's not the users turn.
-func (client *SBClient) AddEntry(roomName, entry string) error {
+func (client *SBClient) AddEntry(entry string) error {
+	roomName := client.config.Room
 	headers := make(map[string]string)
 	headers["Entry-Text"] = entry
 	response, err := client.call(http.MethodPost, "/gameplay/"+roomName, nil, headers)
@@ -76,7 +78,7 @@ func (client *SBClient) AddEntry(roomName, entry string) error {
 
 // StartGame triggers a game in the room with the provided name.
 // Returns error if room doesn't exist, a game is already running or the user doesn't have the required permissions.
-func (client *SBClient) StartGame(roomName string, timeLimit, maxLength, entriesCount int) error {
+func (client *SBClient) StartGame(timeLimit, maxLength, entriesCount int) error {
 	if timeLimit < 0 {
 		return errors.New("cannost start game: negative time limit value")
 	}
@@ -86,6 +88,7 @@ func (client *SBClient) StartGame(roomName string, timeLimit, maxLength, entries
 	if entriesCount < 0 {
 		return errors.New("cannost start game: negative entires value")
 	}
+	roomName := client.config.Room
 	if client.config.Room != roomName {
 		return errors.New("cannot start game: requires user to be joined in the room")
 	}
@@ -113,7 +116,8 @@ func (client *SBClient) StartGame(roomName string, timeLimit, maxLength, entries
 
 // EndGame ends a running game. Once called it will set the game's remaining entries to the provided number and the game will effectively end after the count is reached.
 // Returns error if room doesn't exist, no game is running or the user doesn't have the required permissions.
-func (client *SBClient) EndGame(roomName string, entriesCount int) error {
+func (client *SBClient) EndGame(entriesCount int) error {
+	roomName := client.config.Room
 	if entriesCount < 0 {
 		return errors.New("cannost start game: negative entires value")
 	}

@@ -15,7 +15,6 @@
 package admin
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -52,29 +51,24 @@ func (bc *BanCmd) RequiresConnection() *cmd.Context {
 	return bc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (bc *BanCmd) RequiresAuthorization() {}
+
+// RequiresRoom marks the command to require the configuration to have a user logged in.
+func (bc *BanCmd) RequiresRoom() {}
+
 // Run is used to build the RunE function for the cobra command
 func (bc *BanCmd) Run() error {
-	cfg, err := bc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if cfg.Room == "" {
-		return errors.New("user has not joined in a room")
-	}
-
-	action := fmt.Sprintf("ban player \"%s\" from room \"%s\"", bc.player, cfg.Room)
+	action := fmt.Sprintf("ban player \"%s\"", bc.player)
 	if !util.ConfirmationPrompt(action) {
 		fmt.Println("Operation cancelled. No action taken.")
 		return nil
 	}
-	if err := bc.Client.BanPlayer(cfg.Room, bc.player); err != nil {
+	if err := bc.Client.BanPlayer(bc.player); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've banned \"%s\" from room \"%s\".\n", bc.player, cfg.Room)
+	fmt.Printf("You've banned \"%s\".\n", bc.player)
 	return nil
 }
 

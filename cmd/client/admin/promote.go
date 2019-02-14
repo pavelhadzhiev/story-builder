@@ -15,7 +15,6 @@
 package admin
 
 import (
-	"errors"
 	"fmt"
 
 	"github.com/pavelhadzhiev/story-builder/cmd"
@@ -52,29 +51,24 @@ func (pc *PromoteCmd) RequiresConnection() *cmd.Context {
 	return pc.Context
 }
 
+// RequiresAuthorization marks the command to require the configuration to have a user logged in.
+func (pc *PromoteCmd) RequiresAuthorization() {}
+
+// RequiresRoom marks the command to require the configuration to have a user logged in.
+func (pc *PromoteCmd) RequiresRoom() {}
+
 // Run is used to build the RunE function for the cobra command
 func (pc *PromoteCmd) Run() error {
-	cfg, err := pc.Configurator.Load()
-	if err != nil {
-		return err
-	}
-	if cfg.Authorization == "" {
-		return errors.New("users is not logged in")
-	}
-	if cfg.Room == "" {
-		return errors.New("user has not joined in a room")
-	}
-
-	action := fmt.Sprintf("promote user \"%s\" to admin in room \"%s\"", pc.user, cfg.Room)
+	action := fmt.Sprintf("promote user \"%s\" to admin", pc.user)
 	if !util.ConfirmationPrompt(action) {
 		fmt.Println("Operation cancelled. No action taken.")
 		return nil
 	}
-	if err := pc.Client.PromoteAdmin(cfg.Room, pc.user); err != nil {
+	if err := pc.Client.PromoteAdmin(pc.user); err != nil {
 		return err
 	}
 
-	fmt.Printf("You've promoted \"%s\" to admin in room \"%s\".\n", pc.user, cfg.Room)
+	fmt.Printf("You've promoted \"%s\" to admin.\n", pc.user)
 	return nil
 }
 
