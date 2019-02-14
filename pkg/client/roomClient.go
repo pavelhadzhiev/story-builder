@@ -57,9 +57,9 @@ func (client *SBClient) CreateNewRoom(room *rooms.Room) error {
 		return fmt.Errorf("error during http request: %e", err)
 	}
 	switch response.StatusCode {
-	case 204:
+	case 201:
 		return nil
-	case 403:
+	case 409:
 		return errors.New("room \"" + room.Name + "\" already exists")
 	default:
 		return errors.New("something went really wrong :(")

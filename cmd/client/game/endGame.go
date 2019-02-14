@@ -84,7 +84,7 @@ func (egc *EndGameCmd) Run() error {
 func (egc *EndGameCmd) buildCommand() *cobra.Command {
 	var endGameCmd = &cobra.Command{
 		Use:     "end-game [entries-left]",
-		Aliases: []string{"eg"},
+		Aliases: []string{"eg", "end"},
 		Short:   "Ends the game in the joined room. Executing this means that game will have the provided number of entries left until it is finished. If not provided it will allow only one turn.",
 		Long:    `Ends the game in the joined room. Executing this means that game will have the provided number of entries left until it is finished. If not provided it will allow only one turn. Requires admin access. If there is no running game, returns error.`,
 		PreRunE: cmd.PreRunE(egc),

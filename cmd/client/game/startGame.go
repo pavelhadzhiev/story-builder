@@ -62,7 +62,7 @@ func (sgc *StartGameCmd) Run() error {
 func (sgc *StartGameCmd) buildCommand() *cobra.Command {
 	var startGameCmd = &cobra.Command{
 		Use:     "start-game",
-		Aliases: []string{"sg"},
+		Aliases: []string{"sg", "start"},
 		Short:   "Starts a game in the joined room.",
 		Long:    `Starts a game in the joined room. Requires admin access. If a game is already started, returns error. Supports configurations of time limit per turn and max length of entries. Default values are 60 seconds and 100 symbols. If you don't want to use any of these features, pass 0 with the according flag.`,
 		PreRunE: cmd.PreRunE(sgc),

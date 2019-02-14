@@ -47,10 +47,11 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 			}
 
 			if err := server.CreateNewRoom(room); err != nil {
-				w.WriteHeader(403)
-				w.Write([]byte("Cannot create more room. Either a room with this name exists or server capacity is reached."))
+				w.WriteHeader(409)
+				w.Write([]byte("Cannot create more room. A room with this name already exists"))
+				return
 			}
-			w.WriteHeader(204)
+			w.WriteHeader(201)
 			return
 		default:
 			w.WriteHeader(405)
