@@ -20,6 +20,8 @@ import (
 	"math"
 	"strings"
 	"time"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/util"
 )
 
 // Game represents a story builder game. It holds a
@@ -141,6 +143,10 @@ func (game *Game) EndGame(entries int) {
 	game.EntriesLeft = entries
 }
 
+// TriggerVoteKick starts a vote to kick a player. It requires an issuer on whose behalf the vote is triggered.
+// Parameters of the campaign are the acceptance ratio (a number between 0 and 1, indicating what part of the players must submit a vote in order to kick the player)
+// and a time limit (how many seconds before the campaign is considered unsuccessful)
+// Return error if there is already a running vote or if the player to be kicked is not in the game.
 func (game *Game) TriggerVoteKick(issuer, playerToKick string, acceptanceRatio float64, timeLimit int) error {
 	if game.VoteKick != nil {
 		return fmt.Errorf("there is an ongoing vote to kick player \"%s\"", game.VoteKick.Player)
@@ -156,6 +162,8 @@ func (game *Game) TriggerVoteKick(issuer, playerToKick string, acceptanceRatio f
 	return fmt.Errorf("player \"%s\" is not in the game", playerToKick)
 }
 
+// Vote submits a vote on behalf of the provided voter to the current campaign.
+// Returns errors if the issuer has already voted or he's not part of the game or if there is no ongoing vote at all.
 func (game *Game) Vote(voter string) error {
 	if game.VoteKick == nil {
 		return errors.New("there is no ongoing vote")
@@ -173,10 +181,12 @@ func (game *Game) Vote(voter string) error {
 	return fmt.Errorf("player \"%s\" cannot vote as he's not part of the game", voter)
 }
 
+// Kick kicks a player from the game immediately, iterating player turn if necessary.
+// Returns error of the player to be kicked is not part of the game
 func (game *Game) Kick(toRemove string) error {
 	for index, player := range game.Players {
 		if player == toRemove {
-			game.Players = append(game.Players[:index], game.Players[index+1:]...)
+			game.Players = util.DeleteFromSlice(game.Players, index)
 			if player == game.Turn {
 				game.setNextTurn()
 			}
