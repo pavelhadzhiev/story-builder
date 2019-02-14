@@ -31,6 +31,7 @@ func main() {
 		&server.HostCmd{},
 		&server.ConnectCmd{Context: ctx},
 		&server.DisconnectCmd{Context: ctx},
+		&cmd.InfoCmd{Context: ctx},
 		&client.LoginCmd{Context: ctx},
 		&client.LogoutCmd{Context: ctx},
 		&client.RegisterCmd{Context: ctx},
