@@ -18,7 +18,7 @@ import (
 	"os"
 
 	"github.com/pavelhadzhiev/story-builder/pkg/client"
-	"github.com/pavelhadzhiev/story-builder/pkg/config"
+	"github.com/pavelhadzhiev/story-builder/pkg/config/viper"
 	"github.com/spf13/cobra"
 )
 
@@ -33,7 +33,7 @@ func BuildRootCommand(ctx *Context) *cobra.Command {
 
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if ctx.Configurator == nil {
-				configurator, err := config.NewViperConfigurator(cfgFile)
+				configurator, err := viper.NewConfigurator(cfgFile)
 				if err != nil {
 					return err
 				}

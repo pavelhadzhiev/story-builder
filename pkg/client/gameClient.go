@@ -143,3 +143,53 @@ func (client *SBClient) EndGame(entriesCount int) error {
 		return errors.New("something went really wrong :(")
 	}
 }
+
+// TriggerVoteKick triggers a democratic vote to kick the player with the provided username from the game in the room with the provided room name.
+// Returns error if room doesn't exist, game is not started, the player is not in the game, or another vote is currently ongoing.
+func (client *SBClient) TriggerVoteKick(playerToKick string) error {
+	response, err := client.call(http.MethodPost, "/vote/"+client.config.Room+"/"+playerToKick, nil, nil)
+	if err != nil {
+		return fmt.Errorf("error during http request: %e", err)
+	}
+	switch response.StatusCode {
+	case 202:
+		return nil
+	case 404:
+		defer response.Body.Close()
+		errorMessage, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("could not trigger vote: %s", string(errorMessage))
+	case 409:
+		return errors.New("there is already an ongoing vote")
+	default:
+		return errors.New("something went really wrong :(")
+	}
+}
+
+// SubmitVote tells the server that the user agrees with the ongoing vote.
+// Returns error if room doesn't exist, game is not started or no vote is currently running.
+func (client *SBClient) SubmitVote() error {
+	response, err := client.call(http.MethodPut, "/vote/"+client.config.Room, nil, nil)
+	if err != nil {
+		return fmt.Errorf("error during http request: %e", err)
+	}
+	switch response.StatusCode {
+	case 200:
+		return nil
+	case 403:
+		return errors.New("cannot vote: user is not part of the game")
+	case 404:
+		defer response.Body.Close()
+		errorMessage, err := ioutil.ReadAll(response.Body)
+		if err != nil {
+			return err
+		}
+		return fmt.Errorf("cannot vote: %s", string(errorMessage))
+	case 409:
+		return errors.New("cannot vote: user has already voted once")
+	default:
+		return errors.New("something went really wrong :(")
+	}
+}

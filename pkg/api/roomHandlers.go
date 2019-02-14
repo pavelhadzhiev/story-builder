@@ -107,3 +107,77 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 }
+
+// JoinRoomHandler is an http handler for the story builder's join room API
+func (server *SBServer) JoinRoomHandler(w http.ResponseWriter, r *http.Request) {
+	urlSuffix := strings.TrimPrefix(r.URL.Path, "/join-room/")
+	urlSuffixSplit := strings.Split(urlSuffix, "/")
+	if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
+		w.WriteHeader(400)
+		w.Write([]byte("Room name is illegal."))
+		return
+	}
+	roomName := urlSuffixSplit[0]
+
+	switch r.Method {
+	case http.MethodPost:
+		player, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Error during decoding of authorization header."))
+			return
+		}
+		if _, err := server.GetRoom(roomName); err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" not found."))
+			return
+		}
+		if err := server.JoinRoom(roomName, player); err != nil {
+			w.WriteHeader(403)
+			w.Write([]byte("The user doesn't have permissions to join that room."))
+			return
+		}
+		w.Write([]byte("Joined room \"" + roomName + "\" successfully."))
+		return
+	default:
+		w.WriteHeader(405)
+		return
+	}
+}
+
+// LeaveRoomHandler is an http handler for the story builder's leave room API
+func (server *SBServer) LeaveRoomHandler(w http.ResponseWriter, r *http.Request) {
+	urlSuffix := strings.TrimPrefix(r.URL.Path, "/leave-room/")
+	urlSuffixSplit := strings.Split(urlSuffix, "/")
+	if len(urlSuffixSplit) > 2 || (len(urlSuffixSplit) == 2 && urlSuffixSplit[1] != "") {
+		w.WriteHeader(400)
+		w.Write([]byte("Room name is illegal."))
+		return
+	}
+	roomName := urlSuffixSplit[0]
+
+	switch r.Method {
+	case http.MethodPost:
+		player, err := util.ExtractUsernameFromAuthorizationHeader(r.Header.Get("Authorization"))
+		if err != nil {
+			w.WriteHeader(500)
+			w.Write([]byte("Error during decoding of authorization header."))
+			return
+		}
+		if _, err := server.GetRoom(roomName); err != nil {
+			w.WriteHeader(404)
+			w.Write([]byte("Room \"" + roomName + "\" not found."))
+			return
+		}
+		if err := server.LeaveRoom(roomName, player); err != nil {
+			w.WriteHeader(403)
+			w.Write([]byte("User \"" + player + "\" is not in room \"" + roomName + "\"."))
+			return
+		}
+		w.Write([]byte("Left room \"" + roomName + "\" successfully."))
+		return
+	default:
+		w.WriteHeader(405)
+		return
+	}
+}

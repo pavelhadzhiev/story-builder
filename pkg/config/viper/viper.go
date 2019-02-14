@@ -12,25 +12,27 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
-package config
+package viper
 
 import (
 	"path/filepath"
 
 	homedir "github.com/mitchellh/go-homedir"
 	"github.com/spf13/viper"
+
+	"github.com/pavelhadzhiev/story-builder/pkg/config"
 )
 
 // DefaultConfigFileName is the default configuration path, in case no other has been provided.
 const DefaultConfigFileName = ".story-builder.json"
 
-// ViperConfigurator implements the SBConfigurator interface using viper and the file system.
-type ViperConfigurator struct {
+// Configurator implements the SBConfigurator interface using viper and the file system.
+type Configurator struct {
 	viper *viper.Viper
 }
 
-// NewViperConfigurator creates a new ViperConfigurator, provided a configuration file path.
-func NewViperConfigurator(cfgFile string) (SBConfigurator, error) {
+// NewConfigurator creates a new ViperConfigurator, provided a configuration file path.
+func NewConfigurator(cfgFile string) (config.SBConfigurator, error) {
 	viper := viper.New()
 
 	absCfgFilePath, err := getConfigFileAbsPath(cfgFile)
@@ -39,16 +41,16 @@ func NewViperConfigurator(cfgFile string) (SBConfigurator, error) {
 	}
 	viper.SetConfigFile(absCfgFilePath)
 
-	configurator := &ViperConfigurator{viper: viper}
+	configurator := &Configurator{viper: viper}
 	if err := viper.ReadInConfig(); err != nil {
-		configurator.Save(&SBConfiguration{})
+		configurator.Save(&config.SBConfiguration{})
 	}
 
 	return configurator, nil
 }
 
 // Save is filling the configuration file with the properties from the passed configuration object
-func (viperConfig *ViperConfigurator) Save(sbConfig *SBConfiguration) error {
+func (viperConfig *Configurator) Save(sbConfig *config.SBConfiguration) error {
 	viperConfig.viper.Set("url", sbConfig.URL)
 	viperConfig.viper.Set("authorization", sbConfig.Authorization)
 	viperConfig.viper.Set("room", sbConfig.Room)
@@ -61,12 +63,12 @@ func (viperConfig *ViperConfigurator) Save(sbConfig *SBConfiguration) error {
 }
 
 // Load returns a SBConfiguration pointer, storing the properties from the configuration file
-func (viperConfig *ViperConfigurator) Load() (*SBConfiguration, error) {
+func (viperConfig *Configurator) Load() (*config.SBConfiguration, error) {
 	if err := viperConfig.viper.ReadInConfig(); err != nil {
 		return nil, err
 	}
 
-	sbConfig := &SBConfiguration{}
+	sbConfig := &config.SBConfiguration{}
 	if err := viperConfig.viper.Unmarshal(sbConfig); err != nil {
 		return nil, err
 	}
