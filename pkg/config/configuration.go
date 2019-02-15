@@ -15,6 +15,7 @@
 package config
 
 // SBConfigurator is an objet that can save and load Story Builder Configuration objects.
+//go:generate counterfeiter . SBConfigurator
 type SBConfigurator interface {
 	Save(*SBConfiguration) error
 	Load() (*SBConfiguration, error)
