@@ -18,6 +18,7 @@ var _ = Describe("Story Builder Room Client test", func() {
 	var responseBody []byte
 	var sbServer *httptest.Server
 	var clientConfig *config.SBConfiguration
+	testHandler := TestingHandler(&responseBody, &responseStatusCode)
 
 	configurator := &configfakes.FakeSBConfigurator{}
 	configurator.LoadReturns(clientConfig, nil)
@@ -31,21 +32,14 @@ var _ = Describe("Story Builder Room Client test", func() {
 	authHeader := base64.StdEncoding.EncodeToString([]byte(username + ":" + password))
 	roomName := "someRoom"
 
-	testHandler := func() http.HandlerFunc {
-		return func(response http.ResponseWriter, req *http.Request) {
-			response.WriteHeader(responseStatusCode)
-			response.Write([]byte(responseBody))
-		}
-	}
-
 	BeforeEach(func() {
-		sbServer = httptest.NewServer(testHandler())
+		sbServer = httptest.NewServer(testHandler)
 		clientConfig = &config.SBConfiguration{URL: sbServer.URL, Authorization: authHeader, Room: roomName}
 		client = NewSBClient(clientConfig)
 	})
 
 	setupFaultyServer := func() {
-		sbServer = httptest.NewUnstartedServer(testHandler())
+		sbServer = httptest.NewUnstartedServer(testHandler)
 		clientConfig := &config.SBConfiguration{URL: sbServer.URL, Authorization: authHeader, Room: roomName}
 		client = NewSBClient(clientConfig)
 	}

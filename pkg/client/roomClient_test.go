@@ -20,6 +20,7 @@ var _ = Describe("Story Builder Room Client test", func() {
 	var responseStatusCode int
 	var responseBody []byte
 	var sbServer *httptest.Server
+	testHandler := TestingHandler(&responseBody, &responseStatusCode)
 
 	username := "user"
 	password := "password"
@@ -28,21 +29,14 @@ var _ = Describe("Story Builder Room Client test", func() {
 	room := &rooms.Room{Name: "roomName", Creator: "creator"}
 	roomList := []rooms.Room{*room, rooms.Room{Name: "roomName2", Creator: "creator2"}}
 
-	testHandler := func() http.HandlerFunc {
-		return func(response http.ResponseWriter, req *http.Request) {
-			response.WriteHeader(responseStatusCode)
-			response.Write([]byte(responseBody))
-		}
-	}
-
 	BeforeEach(func() {
-		sbServer = httptest.NewServer(testHandler())
+		sbServer = httptest.NewServer(testHandler)
 		clientConfig := &config.SBConfiguration{URL: sbServer.URL, Authorization: authHeader, Room: room.Name}
 		client = NewSBClient(clientConfig)
 	})
 
 	setupFaultyServer := func() {
-		sbServer = httptest.NewUnstartedServer(testHandler())
+		sbServer = httptest.NewUnstartedServer(testHandler)
 		clientConfig := &config.SBConfiguration{URL: sbServer.URL, Authorization: authHeader, Room: room.Name}
 		client = NewSBClient(clientConfig)
 	}
