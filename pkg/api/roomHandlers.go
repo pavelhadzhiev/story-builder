@@ -51,6 +51,7 @@ func (server *SBServer) RoomHandler(w http.ResponseWriter, r *http.Request) {
 				w.Write([]byte("Cannot create more room. A room with this name already exists"))
 				return
 			}
+
 			w.WriteHeader(201)
 			return
 		default:

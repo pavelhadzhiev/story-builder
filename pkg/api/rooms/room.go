@@ -23,7 +23,7 @@ import (
 
 // Room represents a story builder room, in which a select group of players can play the game
 type Room struct {
-	Name    string   `json:"name,required"`
+	Name    string   `json:"name"`
 	Creator string   `json:"creator,omitempty"`
 	Admins  []string `json:"admins,omitempty"`
 	Banned  []string `json:"banned,omitempty"`

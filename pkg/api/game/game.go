@@ -148,6 +148,9 @@ func (game *Game) EndGame(entries int) {
 // and a time limit (how many seconds before the campaign is considered unsuccessful)
 // Return error if there is already a running vote or if the player to be kicked is not in the game.
 func (game *Game) TriggerVoteKick(issuer, playerToKick string, acceptanceRatio float64, timeLimit int) error {
+	if game.Finished {
+		return errors.New("there is no running game")
+	}
 	if game.VoteKick != nil {
 		return fmt.Errorf("there is an ongoing vote to kick player \"%s\"", game.VoteKick.Player)
 	}
@@ -165,6 +168,9 @@ func (game *Game) TriggerVoteKick(issuer, playerToKick string, acceptanceRatio f
 // Vote submits a vote on behalf of the provided voter to the current campaign.
 // Returns errors if the issuer has already voted or he's not part of the game or if there is no ongoing vote at all.
 func (game *Game) Vote(voter string) error {
+	if game.Finished {
+		return errors.New("there is no running game")
+	}
 	if game.VoteKick == nil {
 		return errors.New("there is no ongoing vote")
 	}

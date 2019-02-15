@@ -255,7 +255,7 @@ func (server *SBServer) VoteHandler(w http.ResponseWriter, r *http.Request) {
 
 		if err := game.TriggerVoteKick(issuer, playerToKick, 0.65, 60); err != nil {
 			w.WriteHeader(404)
-			w.Write([]byte("The requested player \"" + playerToKick + "\" to trigger a vote for is not in the game."))
+			w.Write([]byte(err.Error()))
 			return
 		}
 
@@ -274,6 +274,12 @@ func (server *SBServer) VoteHandler(w http.ResponseWriter, r *http.Request) {
 		if err != nil {
 			w.WriteHeader(404)
 			w.Write([]byte("Room \"" + roomName + "\" doesn't exist or no games have been started."))
+			return
+		}
+
+		if game.Finished {
+			w.WriteHeader(404)
+			w.Write([]byte("There is no running game."))
 			return
 		}
 
