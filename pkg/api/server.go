@@ -25,7 +25,7 @@ import (
 
 // SBServer implements the story builder server API. It contains a database and some configurations. Use the Start and Shutdown methods to manage.
 type SBServer struct {
-	Database *db.SBDatabase
+	Database db.UserDatabase
 	Rooms    []rooms.Room
 	Online   []string
 

@@ -8,7 +8,7 @@ import (
 	. "github.com/onsi/gomega"
 )
 
-func TestSmClient(t *testing.T) {
+func TestStoryBuilderClient(t *testing.T) {
 	RegisterFailHandler(Fail)
 	RunSpecs(t, "")
 }

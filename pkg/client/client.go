@@ -61,3 +61,14 @@ func (client *SBClient) call(method string, path string, body io.Reader, headers
 
 	return resp, nil
 }
+
+func NewTestSBClient(config *config.SBConfiguration, httpClient *http.Client) *SBClient {
+	client := &SBClient{config: config, httpClient: httpClient}
+	client.headers = &http.Header{}
+	client.headers.Add("Content-Type", "application/json")
+	if len(client.config.Authorization) > 0 {
+		client.headers.Add("Authorization", client.config.Authorization)
+	}
+
+	return client
+}

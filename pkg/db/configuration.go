@@ -20,6 +20,17 @@ import (
 	"github.com/go-sql-driver/mysql"
 )
 
+// UserDatabase represents an object that can be used to store users and their credentials
+//go:generate counterfeiter . UserDatabase
+type UserDatabase interface {
+	InitializeDB() error
+	CloseDB()
+
+	LoginUser(username, password string) error
+	RegisterUser(username, password string) error
+	UserExists(username string) (bool, error)
+}
+
 // SBDatabase represents the database layer for the story builder server
 type SBDatabase struct {
 	database *sql.DB // a database variable to close on program exit
