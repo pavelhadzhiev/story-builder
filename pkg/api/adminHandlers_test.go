@@ -367,8 +367,8 @@ var _ = Describe("Story Builder Admin Handlers test", func() {
 			})
 		})
 
-		Context("When invalid URL is requested", func() {
-			It("should return error if invalid URL", func() {
+		Context("When URL path is invalid", func() {
+			It("should return error", func() {
 				err := sbClient.PromoteAdmin("not/a/valid/playername")
 
 				Expect(err).Should(HaveOccurred())
