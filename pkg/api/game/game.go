@@ -50,9 +50,9 @@ func (game *Game) String() string {
 
 	gameString += "Players in the game: "
 	for _, player := range game.Players {
-		gameString += player + ","
+		gameString += player + ", "
 	}
-	gameString = strings.TrimSuffix(gameString, ",")
+	gameString = strings.TrimSuffix(gameString, ", ")
 
 	gameString += "\n--------------------------------\n"
 	for _, entry := range game.Story {
