@@ -26,7 +26,7 @@ type BadGame struct {
 func TestServerCreation(t *testing.T) {
 	database := &db.SBDatabase{}
 	sbServer := NewSBServer(database, 8080)
-	expectedAddress := "http://localhost:8080"
+	expectedAddress := ":8080"
 
 	if sbServer.srv.Addr != expectedAddress {
 		t.Errorf("got '%s' want '%s'", sbServer.srv.Addr, expectedAddress)

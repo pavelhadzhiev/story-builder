@@ -28,6 +28,8 @@ type VoteKick struct {
 	voted []string
 }
 
+// NewVoteKick creates a vote kick object reference for the provided player, on behalf of the issuer.
+// Also requires treshold for vote to be considered a success and time limit for vote to be considered failed.
 func NewVoteKick(issuer, player string, treshold, timeleft int) *VoteKick {
 	return &VoteKick{
 		Player:   player,
